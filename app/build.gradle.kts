@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.kapt) // Necesario para Hilt
     alias(libs.plugins.hilt) // Aplica el plugin de Hilt aquí
+    id("com.google.gms.google-services")
+
 
 }
 
@@ -72,6 +74,14 @@ dependencies {
 
     // Navigation
     implementation(libs.navigation.compose)
+
+    // Firebase BOM
+    implementation(platform(libs.firebase.bom))
+
+    // Firebase Services
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage)
 
 
 

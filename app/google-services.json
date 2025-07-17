@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "753887109649",
+    "project_id": "pymetask",
+    "storage_bucket": "pymetask.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:753887109649:android:088c5679e69e802e66c7b0",
+        "android_client_info": {
+          "package_name": "com.dls.pymetask"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZlbvXXxuV7ZcJkYxLfyS19ytpgn5-twU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
