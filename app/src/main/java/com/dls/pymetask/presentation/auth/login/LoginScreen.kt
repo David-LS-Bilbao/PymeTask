@@ -23,10 +23,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dls.pymetask.R
+import com.dls.pymetask.domain.repository.AuthRepository
 import com.dls.pymetask.ui.theme.Poppins
+import com.dls.pymetask.ui.theme.PymeTaskTheme
 import com.dls.pymetask.ui.theme.Roboto
 import kotlinx.coroutines.launch
 
@@ -61,7 +64,7 @@ fun LoginScreen(
         Image(
             painter = painterResource(id = R.drawable.ic_logo),
             contentDescription = "Logo",
-            modifier = Modifier.size(100.dp)
+            modifier = Modifier.size(200.dp)
         )
 
         // Título
@@ -151,3 +154,73 @@ fun LoginScreen(
         }
     }
 }
+
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun LoginScreenPreview() {
+    PymeTaskTheme {
+        var email by remember { mutableStateOf("") }
+        var password by remember { mutableStateOf("") }
+        var showPassword by remember { mutableStateOf(false) }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterVertically)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_logo),
+                contentDescription = "Logo",
+                modifier = Modifier.size(200.dp)
+            )
+            Text("Bienvenido a PymeTask", fontFamily = Poppins, fontWeight = FontWeight.SemiBold, fontSize = 22.sp)
+            Text("Gestiona tu negocio de forma simple y profesional", fontFamily = Roboto, fontSize = 16.sp)
+
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("Correo electrónico") },
+                leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Contraseña") },
+                leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
+                trailingIcon = {
+                    IconButton(onClick = { showPassword = !showPassword }) {
+                        Icon(
+                            if (showPassword) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                            contentDescription = null
+                        )
+                    }
+                },
+                visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Button(
+                onClick = { },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Iniciar sesión")
+            }
+
+            Row {
+                Text("¿No tienes cuenta? ")
+                Text(
+                    text = "Registrarse",
+                color = Color(0xFF1976D2),
+                modifier = Modifier.clickable { }
+                )
+            }
+        }
+    }
+}
+
+
