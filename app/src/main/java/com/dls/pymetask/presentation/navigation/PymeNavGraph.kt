@@ -12,6 +12,7 @@ import com.dls.pymetask.presentation.auth.login.LoginScreen
 import com.dls.pymetask.presentation.auth.login.LoginViewModel
 import com.dls.pymetask.presentation.auth.register.RegisterScreen
 import com.dls.pymetask.presentation.auth.register.RegisterViewModel
+import com.dls.pymetask.presentation.dashboard.DashboardScreen
 
 @Composable
 fun PymeNavGraph(
@@ -41,7 +42,11 @@ fun PymeNavGraph(
             }
         }
         composable("dashboard") {
-           // DashboardScreen() // A crear más adelante
+            DashboardScreen(
+                onCardClick = { section ->
+                    // Aquí puedes manejar navegación a detalles según el título
+                }
+            )
         }
     }
 }
