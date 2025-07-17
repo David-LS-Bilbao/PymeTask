@@ -1,8 +1,11 @@
 package com.dls.pymetask.presentation.auth.login
 
 
+import android.content.Intent
+import android.content.IntentSender
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dls.pymetask.data.auth.GoogleAuthUiClient
 import com.dls.pymetask.domain.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val googleAuthClient: GoogleAuthUiClient
 ) : ViewModel() {
 
     // Estado que indica si se está procesando una operación
@@ -26,6 +30,28 @@ class LoginViewModel @Inject constructor(
     // Estado que indica si el login fue exitoso
     private val _loginSuccess = MutableStateFlow(false)
     val loginSuccess = _loginSuccess.asStateFlow()
+
+    private val _googleSignInIntent = MutableStateFlow<IntentSender?>(null)
+    val googleSignInIntent = _googleSignInIntent.asStateFlow()
+
+    fun launchGoogleSignIn() {
+        viewModelScope.launch {
+            val result = googleAuthClient.signIn()
+            _googleSignInIntent.value = result.intentSender
+        }
+    }
+
+    fun onGoogleSignInResult(intent: Intent) {
+        viewModelScope.launch {
+            val result = googleAuthClient.signInWithIntent(intent)
+            if (result.user != null) {
+                // Usuario logueado con éxito
+            } else {
+                // Error en result.errorMessage
+            }
+        }
+    }
+
 
     // Función para iniciar sesión con email y contraseña
     fun login(email: String, password: String) {

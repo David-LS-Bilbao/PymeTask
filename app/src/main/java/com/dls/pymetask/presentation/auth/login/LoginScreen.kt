@@ -2,17 +2,38 @@ package com.dls.pymetask.presentation.auth.login
 
 
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,7 +48,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dls.pymetask.R
-import com.dls.pymetask.domain.repository.AuthRepository
 import com.dls.pymetask.ui.theme.Poppins
 import com.dls.pymetask.ui.theme.PymeTaskTheme
 import com.dls.pymetask.ui.theme.Roboto
@@ -42,15 +62,27 @@ fun LoginScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
     val loginSuccess by viewModel.loginSuccess.collectAsState()
+    val googleIntent by viewModel.googleSignInIntent.collectAsState()
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+        val data = result.data
+        if (data != null) viewModel.onGoogleSignInResult(data)
+    }
+
+
     // Lanza navegación cuando el login es exitoso
     LaunchedEffect(loginSuccess) {
         if (loginSuccess) onLoginSuccess()
+    }
+    LaunchedEffect(googleIntent) {
+        googleIntent?.let {
+            launcher.launch(IntentSenderRequest.Builder(it).build())
+        }
     }
 
     Column(
@@ -143,6 +175,15 @@ fun LoginScreen(
             Text("Iniciar sesión")
         }
 
+        // Botón de inicio de sesión con Google
+        Button(
+            onClick = { viewModel.launchGoogleSignIn() },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isLoading
+        ) {
+            Text("Iniciar sesión con Google")
+        }
+
         // Registro
         Row {
             Text("¿No tienes cuenta? ")
@@ -154,6 +195,10 @@ fun LoginScreen(
         }
     }
 }
+
+
+
+
 
 
 @Preview(showBackground = true, showSystemUi = true)
@@ -205,11 +250,13 @@ fun LoginScreenPreview() {
             )
 
             Button(
-                onClick = { },
+                onClick = {},
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Iniciar sesión")
             }
+
+
 
             Row {
                 Text("¿No tienes cuenta? ")
