@@ -12,11 +12,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.dls.pymetask.domain.model.Movimiento
 import com.dls.pymetask.ui.theme.Poppins
 import com.dls.pymetask.ui.theme.Roboto
+import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Date
 import java.util.UUID
 
@@ -24,7 +26,7 @@ import java.util.UUID
 @Composable
 fun CrearMovimientoScreen(
     navController: NavController,
-    viewModel: MovimientosViewModel = viewModel()
+    viewModel: MovimientosViewModel = hiltViewModel()
 ) {
     var titulo by remember { mutableStateOf("") }
     var subtitulo by remember { mutableStateOf("") }

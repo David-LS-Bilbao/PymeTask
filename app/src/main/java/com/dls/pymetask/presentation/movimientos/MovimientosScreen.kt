@@ -43,6 +43,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.dls.pymetask.domain.model.Movimiento
@@ -50,7 +51,8 @@ import com.dls.pymetask.ui.theme.Poppins
 import com.dls.pymetask.ui.theme.Roboto
 
 @Composable
-fun MovimientosScreen(navController: NavController, viewModel: MovimientosViewModel = viewModel()) {
+fun MovimientosScreen(navController: NavController, viewModel: MovimientosViewModel = hiltViewModel()
+) {
     val selectedTab by viewModel.tipoSeleccionado.collectAsState()
     val movimientosHoy by viewModel.movimientos.collectAsState()
     val dateFormat = remember { java.text.SimpleDateFormat("dd MMM yyyy", java.util.Locale.getDefault()) }

@@ -3,13 +3,19 @@ package com.dls.pymetask.presentation.movimientos
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dls.pymetask.domain.model.Movimiento
+import com.dls.pymetask.domain.repository.MovimientoRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.Date
+import javax.inject.Inject
 
-class MovimientosViewModel : ViewModel() {
+@HiltViewModel
+class MovimientosViewModel @Inject constructor(
+    private val repository: MovimientoRepository
+) : ViewModel() {
 
     private val _movimientos = MutableStateFlow<List<Movimiento>>(emptyList())
     val movimientos: StateFlow<List<Movimiento>> = _movimientos.asStateFlow()
@@ -31,8 +37,16 @@ class MovimientosViewModel : ViewModel() {
     }
 
     fun addMovimiento(mov: Movimiento) {
-        _movimientos.value = _movimientos.value + mov
+        viewModelScope.launch {
+            try {
+                repository.insertMovimiento(mov)
+            } catch (e: Exception) {
+                // Puedes mostrar un error con otro StateFlow si lo deseas
+                e.printStackTrace()
+            }
+        }
     }
+
 
     fun updateMovimiento(updated: Movimiento) {
         _movimientos.value = _movimientos.value.map {
