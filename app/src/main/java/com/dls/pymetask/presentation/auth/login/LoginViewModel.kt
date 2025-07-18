@@ -45,9 +45,9 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             val result = googleAuthClient.signInWithIntent(intent)
             if (result.user != null) {
-                // Usuario logueado con éxito
+                _loginSuccess.value = true
             } else {
-                // Error en result.errorMessage
+                _errorMessage.value = result.errorMessage
             }
         }
     }

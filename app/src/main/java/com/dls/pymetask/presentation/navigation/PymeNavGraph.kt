@@ -13,6 +13,9 @@ import com.dls.pymetask.presentation.auth.login.LoginViewModel
 import com.dls.pymetask.presentation.auth.register.RegisterScreen
 import com.dls.pymetask.presentation.auth.register.RegisterViewModel
 import com.dls.pymetask.presentation.dashboard.DashboardScreen
+import com.dls.pymetask.presentation.movimientos.CrearMovimientoScreen
+import com.dls.pymetask.presentation.movimientos.EditarMovimientoScreen
+import com.dls.pymetask.presentation.movimientos.MovimientosScreen
 
 @Composable
 fun PymeNavGraph(
@@ -45,8 +48,32 @@ fun PymeNavGraph(
             DashboardScreen(
                 onCardClick = { section ->
                     // Aquí puedes manejar navegación a detalles según el título
+                    if (section == "Movimientos") {
+                        navController.navigate("movimientos")
+                    }
                 }
             )
         }
+        composable("movimientos") {
+            MovimientosScreen(
+                navController = navController
+            )
+        }
+
+        composable("crear_movimiento") {
+            CrearMovimientoScreen(
+                navController = navController
+            )
+        }
+        composable("editar_movimiento/{id}") { backStackEntry ->
+            val movimientoId = backStackEntry.arguments?.getString("id")
+            EditarMovimientoScreen(
+                movimientoId = movimientoId,
+                navController = navController
+            )
+        }
+
+
+
     }
 }

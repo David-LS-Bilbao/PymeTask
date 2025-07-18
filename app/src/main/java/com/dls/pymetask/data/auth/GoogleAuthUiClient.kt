@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.dls.pymetask.data.auth
 
 import android.content.Context
