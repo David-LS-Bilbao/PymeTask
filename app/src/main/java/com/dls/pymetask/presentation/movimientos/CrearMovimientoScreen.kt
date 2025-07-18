@@ -1,6 +1,8 @@
 package com.dls.pymetask.presentation.movimientos
 
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -22,6 +24,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Date
 import java.util.UUID
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CrearMovimientoScreen(
@@ -110,7 +113,7 @@ fun CrearMovimientoScreen(
                             subtitulo = subtitulo,
                             cantidad = cantidad.toDoubleOrNull() ?: 0.0,
                             ingreso = tipoIngreso,
-                            fecha = Date()
+                            fecha = com.google.firebase.Timestamp.now()
                         )
                         viewModel.addMovimiento(nuevo)
                         navController.popBackStack() // volver atrás tras guardar

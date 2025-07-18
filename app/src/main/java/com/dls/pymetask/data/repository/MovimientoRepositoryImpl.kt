@@ -43,5 +43,9 @@ class MovimientoRepositoryImpl(
             .document(mov.id)
             .set(mov)
     }
+    override suspend fun deleteMovimiento(id: String) {
+        collection.document(id).delete().await()
+    }
+
 
 }

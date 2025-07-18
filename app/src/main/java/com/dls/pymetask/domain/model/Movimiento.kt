@@ -1,12 +1,14 @@
 package com.dls.pymetask.domain.model
 
-import java.util.Date
+import com.google.firebase.Timestamp
+
 
 data class Movimiento(
-    val id: String,
-    val titulo: String,
-    val subtitulo: String,
-    val cantidad: Double,
-    val ingreso: Boolean,
-    val fecha: Date
+    val id: String = "",
+    val titulo: String = "",
+    val subtitulo: String = "",
+    val cantidad: Double = 0.0,
+    val ingreso: Boolean = true,
+    val fecha: Timestamp = Timestamp.now(),
+    val imagenUrl: String = ""
 )

@@ -1,21 +1,38 @@
 package com.dls.pymetask.presentation.movimientos
 
+import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dls.pymetask.domain.model.Movimiento
 import com.dls.pymetask.domain.repository.MovimientoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.util.Date
+import java.time.LocalDate
 import javax.inject.Inject
 
+@SuppressLint("AutoboxingStateCreation")
+@RequiresApi(Build.VERSION_CODES.O)
 @HiltViewModel
 class MovimientosViewModel @Inject constructor(
     private val repository: MovimientoRepository
 ) : ViewModel() {
+
+    private val _selectedMonth = MutableStateFlow(LocalDate.now().monthValue)
+    val selectedMonth: StateFlow<Int> = _selectedMonth.asStateFlow()
+
+    private val _selectedYear = MutableStateFlow(LocalDate.now().year)
+    val selectedYear: StateFlow<Int> = _selectedYear.asStateFlow()
+
+    fun onMonthSelected(month: Int) {
+        _selectedMonth.value = month
+    }
+
+    fun onYearSelected(year: Int) {
+        _selectedYear.value = year
+    }
 
     private val _movimientos = MutableStateFlow<List<Movimiento>>(emptyList())
     val movimientos: StateFlow<List<Movimiento>> = _movimientos.asStateFlow()
@@ -27,13 +44,16 @@ class MovimientosViewModel @Inject constructor(
         _tipoSeleccionado.value = tipo
     }
 
-    fun loadMovimientos() {
-        // Aquí simulamos datos. Luego conectarás con Firebase Firestore
-        val lista = listOf(
-            Movimiento("1", "Pago recibido", "Cliente Juan", 800.0, true, Date()),
-            Movimiento("2", "Compra material", "Proveedor X", 50.0, false, Date())
-        )
-        _movimientos.value = lista
+    init {
+        loadMovimientos()
+    }
+
+    private fun loadMovimientos() {
+        viewModelScope.launch {
+            repository.getMovimientos().collect { lista ->
+                _movimientos.value = lista
+            }
+        }
     }
 
     fun addMovimiento(mov: Movimiento) {
@@ -41,12 +61,10 @@ class MovimientosViewModel @Inject constructor(
             try {
                 repository.insertMovimiento(mov)
             } catch (e: Exception) {
-                // Puedes mostrar un error con otro StateFlow si lo deseas
                 e.printStackTrace()
             }
         }
     }
-
 
     fun updateMovimiento(updated: Movimiento) {
         _movimientos.value = _movimientos.value.map {
@@ -57,4 +75,10 @@ class MovimientosViewModel @Inject constructor(
     fun getMovimientoById(id: String): Movimiento? {
         return _movimientos.value.find { it.id == id }
     }
+    fun deleteMovimiento(id: String) {
+        viewModelScope.launch {
+            repository.deleteMovimiento(id)
+        }
+    }
+
 }

@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -70,6 +72,7 @@ dependencies {
 
     implementation(libs.google.auth)
 
+    implementation(libs.coil.compose)
 
 
     // Hilt

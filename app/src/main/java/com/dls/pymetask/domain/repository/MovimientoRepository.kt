@@ -9,4 +9,6 @@ interface MovimientoRepository {
     suspend fun updateMovimiento(movimiento: Movimiento)
     suspend fun getMovimientoById(id: String): Movimiento?
     suspend fun insertMovimiento(mov: Movimiento)
+    suspend fun deleteMovimiento(id: String)
+
 }

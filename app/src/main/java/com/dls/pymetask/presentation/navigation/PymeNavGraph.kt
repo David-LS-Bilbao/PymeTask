@@ -1,5 +1,7 @@
 package com.dls.pymetask.presentation.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -17,6 +19,7 @@ import com.dls.pymetask.presentation.movimientos.CrearMovimientoScreen
 import com.dls.pymetask.presentation.movimientos.EditarMovimientoScreen
 import com.dls.pymetask.presentation.movimientos.MovimientosScreen
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PymeNavGraph(
     navController: NavHostController,
@@ -56,19 +59,36 @@ fun PymeNavGraph(
         }
         composable("movimientos") {
             MovimientosScreen(
-                navController = navController
+                navController = navController,
             )
         }
+//
+//        composable("crear_movimiento") {
+//            CrearMovimientoScreen(
+//                navController = navController
+//            )
+//        }
+//        composable("editar_movimiento/{id}") { backStackEntry ->
+//            val movimientoId = backStackEntry.arguments?.getString("id")
+//            EditarMovimientoScreen(
+//                movimientoId = movimientoId,
+//                navController = navController
+//            )
+//        }
 
-        composable("crear_movimiento") {
-            CrearMovimientoScreen(
+
+
+
+        composable("editar_movimiento") {
+            EditarMovimientoScreen(
+                movimientoId = null,
                 navController = navController
             )
         }
         composable("editar_movimiento/{id}") { backStackEntry ->
-            val movimientoId = backStackEntry.arguments?.getString("id")
+            val id = backStackEntry.arguments?.getString("id")
             EditarMovimientoScreen(
-                movimientoId = movimientoId,
+                movimientoId = id,
                 navController = navController
             )
         }
