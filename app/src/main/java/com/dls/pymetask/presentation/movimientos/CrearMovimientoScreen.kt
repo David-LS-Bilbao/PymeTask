@@ -6,6 +6,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material3.*
@@ -23,6 +24,9 @@ import com.dls.pymetask.ui.theme.Roboto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Date
 import java.util.UUID
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.text.input.KeyboardType
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,6 +39,8 @@ fun CrearMovimientoScreen(
     var subtitulo by remember { mutableStateOf("") }
     var cantidad by remember { mutableStateOf("") }
     var tipoIngreso by remember { mutableStateOf(true) }
+    var cantidadFocus by remember { mutableStateOf(false) }
+
 
     Scaffold(
         topBar = {
@@ -45,7 +51,13 @@ fun CrearMovimientoScreen(
                         fontFamily = Poppins,
                         fontSize = 20.sp
                     )
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Atrás")
+                    }
                 }
+
             )
         }
     ) { padding ->
@@ -72,11 +84,24 @@ fun CrearMovimientoScreen(
 
             OutlinedTextField(
                 value = cantidad,
-                onValueChange = { cantidad = it },
+                onValueChange = {
+                    cantidad = it
+                },
                 label = { Text("Cantidad (€)") },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onFocusChanged { focusState ->
+                        cantidadFocus = focusState.isFocused
+                        if (!cantidadFocus) {
+                            val valor = cantidad.replace(",", ".").toDoubleOrNull()
+                            if (valor != null) {
+                                cantidad = String.format("%.2f", valor)
+                            }
+                        }
+                    },
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal)
             )
+
 
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 Button(

@@ -53,9 +53,6 @@ class GoogleAuthUiClient(
         }
     }
 
-    fun signOut() {
-        auth.signOut()
-    }
 }
 
 data class SignInResult(

@@ -8,8 +8,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.dls.pymetask.presentation.auth.login.LoginScreen
 import com.dls.pymetask.presentation.auth.login.LoginViewModel
 import com.dls.pymetask.presentation.auth.register.RegisterScreen
@@ -49,6 +51,7 @@ fun PymeNavGraph(
         }
         composable("dashboard") {
             DashboardScreen(
+                navController = navController,
                 onCardClick = { section ->
                     // Aquí puedes manejar navegación a detalles según el título
                     if (section == "Movimientos") {
@@ -62,38 +65,22 @@ fun PymeNavGraph(
                 navController = navController,
             )
         }
-//
-//        composable("crear_movimiento") {
-//            CrearMovimientoScreen(
-//                navController = navController
-//            )
-//        }
-//        composable("editar_movimiento/{id}") { backStackEntry ->
-//            val movimientoId = backStackEntry.arguments?.getString("id")
-//            EditarMovimientoScreen(
-//                movimientoId = movimientoId,
-//                navController = navController
-//            )
-//        }
 
-
-
-
-        composable("editar_movimiento") {
-            EditarMovimientoScreen(
-                movimientoId = null,
+        composable("crear_movimiento") {
+            CrearMovimientoScreen(
                 navController = navController
             )
         }
-        composable("editar_movimiento/{id}") { backStackEntry ->
+        // editar movimiento nuevo
+        composable(
+            route = "editar_movimiento/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.StringType })
+        ) { backStackEntry ->
             val id = backStackEntry.arguments?.getString("id")
-            EditarMovimientoScreen(
-                movimientoId = id,
-                navController = navController
-            )
+            id?.let {
+                EditarMovimientoScreen(navController = navController, movimientoId = it)
+            }
         }
-
-
 
     }
 }

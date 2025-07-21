@@ -34,7 +34,14 @@ class AuthRepositoryImpl(
         auth.signOut()
     }
 
+    override fun getCurrentUserId(): String? {
+        return auth.currentUser?.uid
+    }
+
     override fun getCurrentUserEmail(): String? {
         return auth.currentUser?.email
+    }
+    override fun isUserLoggedIn(): Boolean {
+        return auth.currentUser != null
     }
 }

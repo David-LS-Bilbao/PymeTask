@@ -67,10 +67,18 @@ class MovimientosViewModel @Inject constructor(
     }
 
     fun updateMovimiento(updated: Movimiento) {
-        _movimientos.value = _movimientos.value.map {
-            if (it.id == updated.id) updated else it
+        viewModelScope.launch {
+            try {
+                repository.updateMovimiento(updated) // persistencia
+                _movimientos.value = _movimientos.value.map {
+                    if (it.id == updated.id) updated else it
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
+
 
     fun getMovimientoById(id: String): Movimiento? {
         return _movimientos.value.find { it.id == id }

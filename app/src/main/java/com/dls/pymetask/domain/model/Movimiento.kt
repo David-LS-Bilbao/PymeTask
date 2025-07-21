@@ -10,5 +10,4 @@ data class Movimiento(
     val cantidad: Double = 0.0,
     val ingreso: Boolean = true,
     val fecha: Timestamp = Timestamp.now(),
-    val imagenUrl: String = ""
 )

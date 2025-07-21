@@ -90,4 +90,10 @@ class LoginViewModel @Inject constructor(
         _errorMessage.value = message
     }
 
+    fun logout() {
+        viewModelScope.launch {
+            authRepository.logout()
+        }
+    }
+
 }

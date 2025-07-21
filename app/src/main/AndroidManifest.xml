@@ -19,7 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PymeTask" >
         <activity
-            android:name=".MainActivity"
+            android:name=".main.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.PymeTask" >
             <intent-filter>

@@ -18,11 +18,9 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Euro
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Group
@@ -31,6 +29,7 @@ import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,29 +41,41 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import com.dls.pymetask.presentation.auth.login.LoginViewModel
 import com.dls.pymetask.ui.theme.Poppins
 import com.dls.pymetask.ui.theme.Roboto
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
-    onCardClick: (String) -> Unit = {}
+    onCardClick: (String) -> Unit = {},
+    viewModel: LoginViewModel = hiltViewModel(),
+    navController: NavController
 ) {
     val cards = listOf(
         DashboardCard("Movimientos", "Ver movimientos registrados", Icons.Default.Euro),
         DashboardCard("Archivos", "Ver archivos guardados", Icons.Default.Folder),
-        DashboardCard("Clientes", "Ver lista de clientes", Icons.Default.Person),
+        DashboardCard("Contactos", "Ver lista de contactos", Icons.Default.Person),
         DashboardCard("Notas", "Ver notas guardadas", Icons.Default.List)
     )
+    var showLogoutDialog by remember { mutableStateOf(false) }
+
 
 
     Scaffold(
+        // barra de navegación superior con íconos
         topBar = {
             TopAppBar(
                 title = { Text("PymeTask", fontFamily = Poppins, fontWeight = FontWeight.SemiBold) },
@@ -74,12 +85,14 @@ fun DashboardScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = {}) {
-                        Icon(Icons.Default.AccountCircle, contentDescription = "Perfil")
+                    IconButton(onClick = { showLogoutDialog = true }) {
+                        Icon(Icons.Default.Close, contentDescription = "Cerrar sesión")
                     }
                 }
+
             )
         },
+        // barra de navegación inferior con iconos
         bottomBar = {
             NavigationBar {
                 NavigationBarItem(selected = true, onClick = {}, icon = { Icon(Icons.Default.Home, contentDescription = "Inicio") })
@@ -113,19 +126,51 @@ fun DashboardScreen(
                 color = Color(0xFF546E7A)
             )
 
+            // cuadrícula de tarjetas con clics en cada una
             LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                columns = GridCells.Fixed(2),// número de columnas
+                verticalArrangement = Arrangement.spacedBy(12.dp),// espacio vertical entre elementos
+                horizontalArrangement = Arrangement.spacedBy(12.dp),// espacio horizontal entre elementos
                 modifier = Modifier.fillMaxHeight()
             ) {
+                // lista de tarjetas con datos
                 items(cards) { card ->
                     DashboardCardItem(card = card, onClick = { onCardClick(card.title) })
                 }
             }
         }
     }
+
+    if (showLogoutDialog) {
+        AlertDialog(
+            onDismissRequest = { showLogoutDialog = false },
+            confirmButton = {
+                Text(
+                    "Cerrar sesión",
+                    modifier = Modifier.clickable {
+                        viewModel.logout()
+                        showLogoutDialog = false
+                        navController.navigate("login") {
+                            popUpTo("dashboard") { inclusive = true }
+                        }
+                    },
+                    color = Color.Red
+                )
+            },
+            dismissButton = {
+                Text(
+                    "Cancelar",
+                    modifier = Modifier.clickable { showLogoutDialog = false }
+                )
+            },
+            title = { Text("¿Cerrar sesión?") },
+            text = { Text("¿Estás seguro de que deseas cerrar sesión?") }
+        )
+    }
+
+
 }
+
 
 @Composable
 fun DashboardCardItem(card: DashboardCard, onClick: () -> Unit) {
