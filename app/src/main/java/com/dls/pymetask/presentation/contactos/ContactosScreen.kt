@@ -4,9 +4,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
@@ -29,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.dls.pymetask.domain.model.Contacto
 import com.google.firebase.storage.FirebaseStorage
@@ -38,7 +41,7 @@ import com.google.firebase.storage.FirebaseStorage
 @Composable
 fun ContactosScreen(
     navController: NavController,
-    viewModel: ContactoViewModel = androidx.hilt.navigation.compose.hiltViewModel()
+    viewModel: ContactoViewModel = hiltViewModel()
 ) {
     val contactos by viewModel.contactos.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
@@ -51,12 +54,13 @@ fun ContactosScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Contactos") },
-                actions = {
-                    // Botón para volver al dashboard
-                    IconButton(onClick = { navController.navigate("dashboard") }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver al dashboard")
+                title = { Text("Contactos")},
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
+                },
+                actions = {
                     // Botón para crear un nuevo contacto
                     IconButton(onClick = { navController.navigate("crear_contacto") }) {
                         Icon(Icons.Default.Add, contentDescription = "Nuevo contacto")

@@ -1,14 +1,13 @@
 package com.dls.pymetask.presentation.contactos
 
 import android.content.Intent
-import android.net.Uri
-import android.provider.ContactsContract
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -26,7 +25,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.dls.pymetask.R
-import com.dls.pymetask.domain.model.Contacto
 import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,7 +32,7 @@ import androidx.core.net.toUri
 fun DetalleContactoScreen(
     navController: NavController,
     contactoId: String,
-    viewModel: ContactoViewModel = hiltViewModel(),
+    viewModel: ContactoViewModel = hiltViewModel()
 ) {
     val contactos by viewModel.contactos.collectAsState()
     val contacto = contactos.find { it.id == contactoId }
@@ -51,7 +49,7 @@ fun DetalleContactoScreen(
                 title = { Text(contacto.nombre) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
                 },
                 actions = {
@@ -69,7 +67,7 @@ fun DetalleContactoScreen(
                 .padding(padding)
                 .fillMaxSize()
                 .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Imagen o inicial
@@ -89,26 +87,35 @@ fun DetalleContactoScreen(
                 } else {
                     Text(
                         text = contacto.nombre.first().uppercase(),
-                        fontSize = 36.sp,
+                        fontSize = 60.sp,
                         color = Color(0xFF1976D2)
                     )
                 }
             }
 
-            Text("📞 ${contacto.telefono}")
-            Text("✉️ ${contacto.email}")
-            Text("🏠 ${contacto.direccion}")
-            Text("Tipo: ${contacto.tipo}")
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text("📞 ${contacto.telefono}", fontSize = 24.sp)
+            Text("✉️ ${contacto.email}", fontSize = 24.sp)
+            Text("🏠 ${contacto.direccion}", fontSize = 24.sp)
+            Text("Tipo: ${contacto.tipo}", fontSize = 24.sp)
+
+            Spacer(modifier = Modifier.height(24.dp))
 
             Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(24.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = {
                     val intent = Intent(Intent.ACTION_DIAL, "tel:${contacto.telefono}".toUri())
                     context.startActivity(intent)
                 }) {
-                    Icon(Icons.Default.Phone, contentDescription = "Llamar")
+                    Icon(
+                        imageVector = Icons.Default.Phone,
+                        contentDescription = "Llamar",
+                        tint = Color(0xFF4CAF50),
+                        modifier = Modifier.size(48.dp)
+                    )
                 }
 
                 IconButton(onClick = {
@@ -117,7 +124,12 @@ fun DetalleContactoScreen(
                     }
                     context.startActivity(intent)
                 }) {
-                    Icon(Icons.Default.Message, contentDescription = "SMS")
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Message,
+                        contentDescription = "SMS",
+                        tint = Color(0xFF03A9F4),
+                        modifier = Modifier.size(48.dp)
+                    )
                 }
 
                 IconButton(onClick = {
@@ -126,13 +138,16 @@ fun DetalleContactoScreen(
                     val intent = Intent(Intent.ACTION_VIEW, uri)
                     try {
                         context.startActivity(intent)
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         Toast.makeText(context, "No se pudo abrir WhatsApp", Toast.LENGTH_SHORT).show()
                     }
                 }) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_whatsapp)
-                        , contentDescription = "WhatsApp")
+                        painter = painterResource(id = R.drawable.ic_whatsapp),
+                        contentDescription = "WhatsApp",
+                        tint = Color(0xFF25D366),
+                        modifier = Modifier.size(48.dp)
+                    )
                 }
 
                 IconButton(onClick = {
@@ -145,9 +160,15 @@ fun DetalleContactoScreen(
                         Toast.makeText(context, "Este contacto no tiene email", Toast.LENGTH_SHORT).show()
                     }
                 }) {
-                    Icon(Icons.Default.Email, contentDescription = "Email")
+                    Icon(
+                        imageVector = Icons.Default.Email,
+                        contentDescription = "Email",
+                        tint = Color(0xFF673AB7),
+                        modifier = Modifier.size(48.dp)
+                    )
                 }
             }
         }
     }
 }
+

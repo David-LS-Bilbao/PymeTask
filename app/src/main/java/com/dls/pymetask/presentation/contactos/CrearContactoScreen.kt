@@ -1,6 +1,8 @@
 package com.dls.pymetask.presentation.contactos
 
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.provider.ContactsContract
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -49,6 +52,9 @@ fun CrearContactoScreen(
     var fotoUrl by remember { mutableStateOf<String?>(null) }
     var isUploading by remember { mutableStateOf(false) }
 
+    val contactPermission = android.Manifest.permission.READ_CONTACTS
+
+
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -62,12 +68,57 @@ fun CrearContactoScreen(
                     imageRef.putFile(it).await()
                     val downloadUrl = imageRef.downloadUrl.await()
                     fotoUrl = downloadUrl.toString()
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     Toast.makeText(context, "Error al subir imagen", Toast.LENGTH_SHORT).show()
                 } finally {
                     isUploading = false
                 }
             }
+        }
+    }
+
+    val contactPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickContact()
+    ) { uri: Uri? ->
+        uri?.let {
+            val resolver = context.contentResolver
+            val cursor = resolver.query(it, null, null, null, null)
+            cursor?.use { it ->
+                if (it.moveToFirst()) {
+                    val nameIndex = it.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)
+                    val idIndex = it.getColumnIndex(ContactsContract.Contacts._ID)
+                    val contactName = it.getString(nameIndex)
+                    val contactId = it.getString(idIndex)
+
+                    val phonesCursor = resolver.query(
+                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                        null,
+                        "${ContactsContract.CommonDataKinds.Phone.CONTACT_ID} = ?",
+                        arrayOf(contactId),
+                        null
+                    )
+                    phonesCursor?.use { pc ->
+                        if (pc.moveToFirst()) {
+                            val phoneIndex = pc.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                            val phone = pc.getString(phoneIndex)
+
+                            // Rellenar campos
+                            nombre = contactName
+                            telefono = phone
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            contactPickerLauncher.launch(null)
+        } else {
+            Toast.makeText(context, "Permiso denegado", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -181,8 +232,18 @@ fun CrearContactoScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
+            Button(
+                onClick = {
+                    if (ContextCompat.checkSelfPermission(context, contactPermission)
+                        == PackageManager.PERMISSION_GRANTED) {
+                    contactPickerLauncher.launch(null)
+                } else {
+                    permissionLauncher.launch(contactPermission)
+                } },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Importar desde contactos del dispositivo")
+            }
             // Botón Guardar
             Button(
                 onClick = {
