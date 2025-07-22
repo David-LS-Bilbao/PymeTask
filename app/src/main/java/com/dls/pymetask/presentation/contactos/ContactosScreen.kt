@@ -7,140 +7,110 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberImagePainter
+import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.dls.pymetask.domain.model.Contacto
-
-
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ContactosScreen(
-    viewModel: ContactoViewModel,
-    onNavigateToForm: (Contacto?) -> Unit,
-    onBack: () -> Unit,
-    onHome: () -> Unit
+    navController: NavController,
+    viewModel: ContactoViewModel = androidx.hilt.navigation.compose.hiltViewModel()
 ) {
     val contactos by viewModel.contactos.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
-    val errorMessage by viewModel.errorMessage.collectAsState()
-    var contactoSeleccionado by remember { mutableStateOf<Contacto?>(null) }
-    var showDialog by remember { mutableStateOf(false) }
+    val error by viewModel.errorMessage.collectAsState()
 
     Scaffold(
         topBar = {
-            TopAppBar({ Text("Contactos", fontWeight = FontWeight.Bold) }, navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Atrás")
+            TopAppBar(
+                title = { Text("Contactos") },
+                actions = {
+                    // Botón para volver al dashboard
+                    IconButton(onClick = { navController.navigate("dashboard") }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver al dashboard")
                     }
-                }, actions = {
-                    IconButton(onClick = onHome) {
-                        Icon(Icons.Default.Home, contentDescription = "Inicio")
+                    // Botón para crear un nuevo contacto
+                    IconButton(onClick = { navController.navigate("crear_contacto") }) {
+                        Icon(Icons.Default.Add, contentDescription = "Nuevo contacto")
                     }
-                }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White))
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { onNavigateToForm(null) }) {
-                Icon(Icons.Default.MoreVert, contentDescription = "Nuevo contacto")
-            }
+                }
+            )
         }
     ) { padding ->
-        Column(modifier = Modifier.padding(padding)) {
-            if (isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-            } else if (errorMessage != null) {
-                Text(errorMessage ?: "", color = Color.Red)
-            } else {
-                LazyColumn(contentPadding = PaddingValues(16.dp)) {
-                    items(contactos) { contacto ->
-                        ContactoItem(
-                            contacto = contacto,
-                            onClick = { contactoSeleccionado = contacto },
-                            onEdit = { onNavigateToForm(it) },
-                            onDelete = {
-                                contactoSeleccionado = it
-                                showDialog = true
-                            }
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
+        Box(modifier = Modifier.padding(padding).fillMaxSize()) {
+            when {
+                isLoading -> {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
+
+                error != null -> {
+                    Text(
+                        text = error ?: "Error desconocido",
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize().padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(contactos) { contacto ->
+                            ContactoItemCard(
+                                contacto = contacto,
+                                onClick = {
+                                    navController.navigate("editar_contacto/${contacto.id}")
+                                }
+                            )
+                        }
                     }
                 }
             }
-
-            if (showDialog && contactoSeleccionado != null) {
-                AlertDialog(
-                    onDismissRequest = { showDialog = false },
-                    title = { Text("Eliminar contacto") },
-                    text = { Text("¿Estás seguro de que deseas eliminar este contacto?") },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            viewModel.onDeleteContacto(contactoSeleccionado!!.id)
-                            showDialog = false
-                        }) {
-                            Text("Eliminar")
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { showDialog = false }) {
-                            Text("Cancelar")
-                        }
-                    }
-                )
-            }
         }
     }
+
 }
 
 
-
 @Composable
-fun ContactoItem(
+fun ContactoItemCard(
     contacto: Contacto,
-    onClick: () -> Unit,
-    onEdit: (Contacto) -> Unit,
-    onDelete: (Contacto) -> Unit
+    onClick: () -> Unit
 ) {
-    Card( modifier = Modifier
-        .fillMaxWidth()
-        .clickable { onClick() },
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
+        elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (contacto.tipo == "Cliente") Color(0xFFE8F2FB) else Color(0xFFF5EEDC)
-        )) {
-        Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            if (contacto.fotoUrl != null) {
+            containerColor = if (contacto.tipo == "Cliente") Color(0xFFE3F2FD) else Color(0xFFFFF3E0)
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Foto o inicial
+            if (!contacto.fotoUrl.isNullOrBlank()) {
                 Image(
-                    painter = rememberImagePainter(contacto.fotoUrl),
-                    contentDescription = "Foto de contacto",
+                    painter = rememberAsyncImagePainter(contacto.fotoUrl),
+                    contentDescription = "Foto de ${contacto.nombre}",
                     modifier = Modifier
                         .size(48.dp)
                         .clip(CircleShape)
@@ -150,13 +120,13 @@ fun ContactoItem(
                     modifier = Modifier
                         .size(48.dp)
                         .clip(CircleShape)
-                        .background(if (contacto.tipo == "Cliente") Color(0xFFD0E6FA) else Color(0xFFE9DEC3)),
+                        .background(if (contacto.tipo == "Cliente") Color(0xFF90CAF9) else Color(0xFFFFCC80)),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = contacto.nombre.first().uppercase(),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
+                        text = contacto.nombre.firstOrNull()?.uppercase() ?: "?",
+                        fontSize = 20.sp,
+                        color = Color.White
                     )
                 }
             }
@@ -164,39 +134,19 @@ fun ContactoItem(
             Spacer(modifier = Modifier.width(16.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text(contacto.nombre, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                Text(contacto.telefono, fontSize = 14.sp)
+                Text(contacto.nombre, style = MaterialTheme.typography.titleMedium)
+                Text("📞 ${contacto.telefono}", fontSize = 13.sp)
+                Text("🏠 ${contacto.direccion}", fontSize = 13.sp)
             }
 
-            Text(contacto.tipo, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-
-            DropdownMenuButton(contacto = contacto, onEdit = onEdit, onDelete = onDelete)
+            Text(
+                text = contacto.tipo,
+                style = MaterialTheme.typography.labelSmall,
+                modifier = Modifier.padding(start = 8.dp)
+            )
         }
     }
 }
 
-@Composable
-fun DropdownMenuButton(
-    contacto: Contacto,
-    onEdit: (Contacto) -> Unit,
-    onDelete: (Contacto) -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
 
-    Box {
-        IconButton(onClick = { expanded = true }) {
-            Icon(Icons.Default.MoreVert, contentDescription = "Más opciones")
-        }
-        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            DropdownMenuItem(text = { Text("Editar") }, onClick = {
-                onEdit(contacto)
-                expanded = false
-            })
-            DropdownMenuItem(text = { Text("Eliminar") }, onClick = {
-                onDelete(contacto)
-                expanded = false
-            })
-        }
-    }
-}
 

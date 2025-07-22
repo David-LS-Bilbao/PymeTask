@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Close
@@ -26,9 +27,11 @@ import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.ViewAgenda
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -53,7 +56,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.dls.pymetask.presentation.auth.login.LoginViewModel
+import com.dls.pymetask.presentation.navigation.Routes
 import com.dls.pymetask.ui.theme.Poppins
 import com.dls.pymetask.ui.theme.Roboto
 
@@ -67,10 +72,12 @@ fun DashboardScreen(
     val cards = listOf(
         DashboardCard("Movimientos", "Ver movimientos registrados", Icons.Default.Euro),
         DashboardCard("Archivos", "Ver archivos guardados", Icons.Default.Folder),
-        DashboardCard("Contactos", "Ver lista de contactos", Icons.Default.Person),
+        DashboardCard("Agenda", "Agenda de tareas", Icons.Default.ViewAgenda),
         DashboardCard("Notas", "Ver notas guardadas", Icons.Default.List)
     )
     var showLogoutDialog by remember { mutableStateOf(false) }
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
 
 
 
@@ -86,7 +93,7 @@ fun DashboardScreen(
                 },
                 actions = {
                     IconButton(onClick = { showLogoutDialog = true }) {
-                        Icon(Icons.Default.Close, contentDescription = "Cerrar sesión")
+                        Icon(Icons.Default.Logout, contentDescription = "Cerrar sesión")
                     }
                 }
 
@@ -95,10 +102,26 @@ fun DashboardScreen(
         // barra de navegación inferior con iconos
         bottomBar = {
             NavigationBar {
-                NavigationBarItem(selected = true, onClick = {}, icon = { Icon(Icons.Default.Home, contentDescription = "Inicio") })
-                NavigationBarItem(selected = false, onClick = {}, icon = { Icon(Icons.Default.BarChart, contentDescription = "Estadísticas") })
-                NavigationBarItem(selected = false, onClick = {}, icon = { Icon(Icons.Default.Group, contentDescription = "Clientes") })
-                NavigationBarItem(selected = false, onClick = {}, icon = { Icon(Icons.Default.Settings, contentDescription = "Ajustes") })
+                NavigationBarItem(
+                    selected = currentRoute == "dashboard",
+                    onClick = { navController.navigate("dashboard") },
+                    icon = { Icon(Icons.Default.Home, contentDescription = "Inicio") }
+                )
+                NavigationBarItem(
+                    selected = currentRoute == "estadisticas",
+                    onClick = { navController.navigate("estadisticas") },
+                    icon = { Icon(Icons.Default.BarChart, contentDescription = "Estadísticas") }
+                )
+                NavigationBarItem(
+                    selected = currentRoute == "contactos",
+                    onClick = { navController.navigate(Routes.CONTACTOS) },
+                    icon = { Icon(Icons.Default.Group, contentDescription = "Contactos") }
+                )
+                NavigationBarItem(
+                    selected = currentRoute == "ajustes",
+                    onClick = { navController.navigate("ajustes") },
+                    icon = { Icon(Icons.Default.Settings, contentDescription = "Ajustes") }
+                )
             }
         },
         containerColor = Color(0xFFECEFF1) // background

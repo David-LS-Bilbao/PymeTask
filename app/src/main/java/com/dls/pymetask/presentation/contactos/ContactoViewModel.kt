@@ -3,15 +3,17 @@ package com.dls.pymetask.presentation.contactos
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dls.pymetask.domain.model.Contacto
-import com.dls.pymetask.domain.usecase.DeleteContactoUseCase
-import com.dls.pymetask.domain.usecase.GetContactosUseCase
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ContactoViewModel(
-    private val getContactosUseCase: GetContactosUseCase,
-    private val deleteContactoUseCase: DeleteContactoUseCase
+@HiltViewModel
+class ContactoViewModel @Inject constructor(
+    private val firestore: FirebaseFirestore
 ) : ViewModel() {
 
     private val _contactos = MutableStateFlow<List<Contacto>>(emptyList())
@@ -23,36 +25,56 @@ class ContactoViewModel(
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
 
+    private var listenerRegistration: ListenerRegistration? = null
+
     init {
-        cargarContactos()
+        getContactos()
     }
 
-    fun cargarContactos() {
-        viewModelScope.launch {
-            _isLoading.value = true
-            try {
-               // _contactos.value = getContactosUseCase()
-                _errorMessage.value = null
-            } catch (e: Exception) {
-                _errorMessage.value = e.message ?: "Error al cargar contactos"
-            } finally {
+    private fun getContactos() {
+        _isLoading.value = true
+        listenerRegistration = firestore.collection("contactos")
+            .addSnapshotListener { snapshots, error ->
                 _isLoading.value = false
+                if (error != null) {
+                    _errorMessage.value = "Error al cargar contactos: ${error.message}"
+                    return@addSnapshotListener
+                }
+
+                val lista = snapshots?.documents?.mapNotNull { doc ->
+                    doc.toObject(Contacto::class.java)?.copy(id = doc.id)
+                } ?: emptyList()
+
+                _contactos.value = lista
             }
-        }
+    }
+
+    fun onAddContacto(contacto: Contacto) {
+        firestore.collection("contactos").document(contacto.id)
+            .set(contacto)
+            .addOnFailureListener {
+                _errorMessage.value = "Error al guardar: ${it.message}"
+            }
+    }
+
+    fun onUpdateContacto(contacto: Contacto) {
+        firestore.collection("contactos").document(contacto.id)
+            .set(contacto)
+            .addOnFailureListener {
+                _errorMessage.value = "Error al actualizar: ${it.message}"
+            }
     }
 
     fun onDeleteContacto(id: String) {
-        viewModelScope.launch {
-            try {
-              //  deleteContactoUseCase(id)
-                cargarContactos()
-            } catch (e: Exception) {
-                _errorMessage.value = e.message ?: "Error al eliminar contacto"
+        firestore.collection("contactos").document(id)
+            .delete()
+            .addOnFailureListener {
+                _errorMessage.value = "Error al eliminar: ${it.message}"
             }
-        }
     }
 
-    fun onEditContacto(contacto: Contacto) {
-        // Lógica de navegación se maneja en la pantalla, aquí no es necesario implementar nada.
+    override fun onCleared() {
+        super.onCleared()
+        listenerRegistration?.remove()
     }
 }
