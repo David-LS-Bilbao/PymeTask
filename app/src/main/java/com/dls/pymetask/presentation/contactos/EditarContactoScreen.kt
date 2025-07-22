@@ -21,7 +21,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -63,6 +65,7 @@ fun EditarContactoScreen(
 ) {
     val contactos by viewModel.contactos.collectAsState()
     val contacto = contactos.find { it.id == contactoId }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     if (contacto == null) {
         Text("Contacto no encontrado", modifier = Modifier.padding(16.dp))
@@ -295,6 +298,57 @@ fun EditarContactoScreen(
                 enabled = !isUploading
             ) {
                 Text("Cancelar")
+            }
+            OutlinedButton(
+                onClick = { showDeleteDialog = true },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isUploading,
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red)
+            ) {
+                Text("Eliminar contacto")
+            }
+            // Dialog de confirmación
+            if (showDeleteDialog) {
+                AlertDialog(
+                    onDismissRequest = { showDeleteDialog = false },
+                    title = { Text("¿Eliminar contacto?") },
+                    text = { Text("Esta acción no se puede deshacer. ¿Deseas continuar?") },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                coroutineScope.launch {
+                                    isUploading = true
+
+                                    // Eliminar imagen si existe
+                                    fotoUrl?.let { url ->
+                                        if (url.contains("firebasestorage")) {
+                                            try {
+                                                val ref = FirebaseStorage.getInstance().getReferenceFromUrl(url)
+                                                ref.delete().await()
+                                            } catch (_: Exception) {
+                                                Toast.makeText(context, "No se pudo eliminar la imagen.", Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
+                                    }
+
+                                    // Eliminar contacto
+                                    viewModel.onDeleteContacto(contactoId)
+
+                                    isUploading = false
+                                    showDeleteDialog = false
+                                    navController.popBackStack()
+                                }
+                            }
+                        ) {
+                            Text("Eliminar", color = Color.Red)
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showDeleteDialog = false }) {
+                            Text("Cancelar")
+                        }
+                    }
+                )
             }
         }
     }

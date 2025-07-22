@@ -26,6 +26,7 @@ import com.dls.pymetask.presentation.estadisticas.EstadisticasScreen
 import com.dls.pymetask.presentation.ajustes.AjustesScreen
 import com.dls.pymetask.presentation.archivos.ArchivosScreen
 import com.dls.pymetask.presentation.contactos.CrearContactoScreen
+import com.dls.pymetask.presentation.contactos.DetalleContactoScreen
 import com.dls.pymetask.presentation.contactos.EditarContactoScreen
 import com.dls.pymetask.presentation.notas.NotasScreen
 
@@ -124,6 +125,15 @@ fun PymeNavGraph(
         composable("crear_contacto") {
             CrearContactoScreen(navController = navController)
         }
+
+        composable("detalle_contacto/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.StringType })
+        ) { backStack ->
+            backStack.arguments?.getString("id")?.let {
+                DetalleContactoScreen(navController = navController, contactoId = it)
+            }
+        }
+
     }
 }
 
