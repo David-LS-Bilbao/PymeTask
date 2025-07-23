@@ -7,11 +7,26 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
 
-class NotaRepositoryImpl(private val firestore: FirebaseFirestore) : NotaRepository {
+class NotaRepositoryImpl(firestore: FirebaseFirestore) : NotaRepository {
     private val collection = firestore.collection("notas")
 
+//    override suspend fun inicializarPosicionesSiFaltan() {
+//        val snapshot = collection.get().await()
+//        val documentosSinPosicion = snapshot.documents.filter { it.getLong("posicion") == null }
+//
+//        documentosSinPosicion.forEachIndexed { index, doc ->
+//            doc.reference.update("posicion", index)
+//        }
+//    }
+
+
     override suspend fun getNotas(): List<Nota> {
-        return collection.get().await().documents.mapNotNull { it.toObject(NotaDto::class.java)?.toDomain() }
+        return collection
+            .get()
+            .await()
+            .documents
+            .mapNotNull { it.toObject(NotaDto::class.java)?.toDomain() }
+            .sortedBy { it.posicion }
     }
 
     override suspend fun getNotaById(id: String): Nota? {

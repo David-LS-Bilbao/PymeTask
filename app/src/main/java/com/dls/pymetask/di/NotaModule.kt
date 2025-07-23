@@ -29,7 +29,8 @@ object NotaModule {
             getNota = GetNota(repository),
             addNota = AddNota(repository),
             updateNota = UpdateNota(repository),
-            deleteNota = DeleteNota(repository)
+            deleteNota = DeleteNota(repository),
+
         )
     }
 }

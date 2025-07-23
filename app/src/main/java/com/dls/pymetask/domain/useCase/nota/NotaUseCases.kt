@@ -27,3 +27,11 @@ class UpdateNota(private val repo: NotaRepository) {
 class DeleteNota(private val repo: NotaRepository) {
     suspend operator fun invoke(id: String) = repo.deleteNota(id)
 }
+//class InicializarPosicionesSiFaltanUseCase(
+//    private val repository: NotaRepository
+//) {
+//    suspend operator fun invoke() {
+//        repository.inicializarPosicionesSiFaltan()
+//    }
+//}
+

@@ -7,16 +7,21 @@ data class NotaDto(
     val titulo: String = "",
     val contenido: String = "",
     val fecha: Long = System.currentTimeMillis(),
-    val contactoId: String? = null
+    val colorHex: String = "#FFF9C4", // ✅ AÑADIDO AQUÍ
+    val contactoId: String? = null,
+
 ) {
-    fun toDomain() = Nota(id, titulo, contenido, fecha, contactoId)
+    fun toDomain() = Nota(id, titulo, contenido, fecha, colorHex, contactoId)
+
     companion object {
         fun fromDomain(nota: Nota) = NotaDto(
             id = nota.id,
             titulo = nota.titulo,
             contenido = nota.contenido,
             fecha = nota.fecha,
-            contactoId = nota.contactoId
+            colorHex = nota.colorHex, // ✅ AÑADIDO AQUÍ
+            contactoId = nota.contactoId,
+
         )
     }
 }

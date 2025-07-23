@@ -1,28 +1,30 @@
 package com.dls.pymetask.presentation.notas
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dls.pymetask.domain.model.Nota
 import com.dls.pymetask.domain.useCase.nota.NotaUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.util.UUID
 import javax.inject.Inject
 
-
 @HiltViewModel
-class NotaViewModel @Inject constructor(private val useCases: NotaUseCases) : ViewModel() {
-    var notas by mutableStateOf(listOf<Nota>())
-        private set
+class NotaViewModel @Inject constructor(
+    private val useCases: NotaUseCases
+) : ViewModel() {
 
-    var notaActual by mutableStateOf<Nota?>(null)
+    private val _notas = MutableStateFlow<List<Nota>>(emptyList())
+    val notas: StateFlow<List<Nota>> = _notas
+
+    var notaActual: Nota? by mutableStateOf(null)
+        private set
 
     fun cargarNotas() {
         viewModelScope.launch {
-            notas = useCases.getNotas()
+            _notas.value = useCases.getNotas()
         }
     }
 
@@ -34,19 +36,19 @@ class NotaViewModel @Inject constructor(private val useCases: NotaUseCases) : Vi
 
     fun guardarNota(nota: Nota) {
         viewModelScope.launch {
-            if (nota.id.isBlank()) {
-                useCases.addNota(nota.copy(id = UUID.randomUUID().toString()))
-            } else {
-                useCases.updateNota(nota)
-            }
+            useCases.addNota(nota)
             cargarNotas()
         }
     }
 
-    fun eliminarNota(id: String) {
+    fun eliminarNota(nota: Nota) {
         viewModelScope.launch {
-            useCases.deleteNota(id)
+            useCases.deleteNota(nota.toString())
             cargarNotas()
         }
+    }
+
+    fun limpiarNotaActual() {
+        notaActual = null
     }
 }
