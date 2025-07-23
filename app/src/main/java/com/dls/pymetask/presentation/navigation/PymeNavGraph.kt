@@ -28,6 +28,8 @@ import com.dls.pymetask.presentation.archivos.ArchivosScreen
 import com.dls.pymetask.presentation.contactos.CrearContactoScreen
 import com.dls.pymetask.presentation.contactos.DetalleContactoScreen
 import com.dls.pymetask.presentation.contactos.EditarContactoScreen
+import com.dls.pymetask.presentation.notas.DetalleNotaScreen
+import com.dls.pymetask.presentation.notas.NotaFormScreen
 import com.dls.pymetask.presentation.notas.NotasScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -133,6 +135,34 @@ fun PymeNavGraph(
                 DetalleContactoScreen(navController = navController, contactoId = it)
             }
         }
+        composable("nota_form") {
+            NotaFormScreen(navController = navController)
+        }
+
+        composable(
+            route = "nota_form?notaId={notaId}",
+            arguments = listOf(navArgument("notaId") {
+                nullable = true
+                defaultValue = null
+            })
+        ) { backStackEntry ->
+            NotaFormScreen(
+                navController = navController,
+                notaId = backStackEntry.arguments?.getString("notaId")
+            )
+        }
+
+        composable(
+            route = "detalle_nota?notaId={notaId}",
+            arguments = listOf(navArgument("notaId") {
+                type = NavType.StringType
+                nullable = false
+            })
+        ) { backStackEntry ->
+            val notaId = backStackEntry.arguments?.getString("notaId")!!
+            DetalleNotaScreen(navController = navController, notaId = notaId)
+        }
+
 
     }
 }
