@@ -8,7 +8,8 @@ val coloresDisponibles = listOf(
 "Rojo" to "#FFCDD2",
 "Verde" to "#C8E6C9",
 "Azul" to "#BBDEFB",
-"Lila" to "#D1C4E9"
+"Lila" to "#D1C4E9",
+"Blanco" to "#FFFFFF"
 )
 
 }
