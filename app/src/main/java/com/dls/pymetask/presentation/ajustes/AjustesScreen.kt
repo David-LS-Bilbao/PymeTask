@@ -27,7 +27,9 @@ fun AjustesScreen(
 ) {
     val theme by viewModel.themeMode.collectAsState()
 
+
     Column(modifier = Modifier.padding(16.dp)) {
+
         Text("Tema de la aplicación", fontWeight = FontWeight.SemiBold)
 
         Spacer(Modifier.height(8.dp))

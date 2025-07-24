@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
+import com.dls.pymetask.presentation.ajustes.ThemeViewModel
 import com.dls.pymetask.presentation.navigation.PymeNavGraph
 import com.dls.pymetask.ui.theme.PymeTaskTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -34,29 +35,30 @@ class MainActivity : ComponentActivity() {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun PymeTaskAppRoot(viewModel: MainViewModel=hiltViewModel()) {
-
+fun PymeTaskAppRoot(
+    mainViewModel: MainViewModel = hiltViewModel(),
+    themeViewModel: ThemeViewModel = hiltViewModel()
+) {
     val navController = rememberNavController()
-    val isUserLoggedIn by viewModel.isUserLoggedIn.collectAsState()
+    val isUserLoggedIn by mainViewModel.isUserLoggedIn.collectAsState()
+    val themeMode by themeViewModel.themeMode.collectAsState()
 
-
-    PymeTaskTheme {
-
-
+    // 🟢 APLICA el tema aquí:
+    PymeTaskTheme(themeMode = themeMode) {
         Scaffold { innerPadding ->
-            // Usamos Box para aplicar correctamente el padding
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
             ) {
                 if (isUserLoggedIn != null) {
                     PymeNavGraph(
                         navController = navController,
                         startDestination = if (isUserLoggedIn == true) "dashboard" else "login"
                     )
-
                 }
             }
         }
     }
 }
+
