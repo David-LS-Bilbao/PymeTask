@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.dls.pymetask.R
+import com.dls.pymetask.data.preferences.ThemeMode
 
 
 val Poppins = FontFamily(Font(R.font.poppins_semibold))
@@ -75,25 +76,49 @@ private val LightColorScheme = lightColorScheme(
 )
 
 
+
 @Composable
 fun PymeTaskTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    themeMode: ThemeMode = ThemeMode.SYSTEM,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-      dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-        val context = LocalContext.current
-        if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-      }
-      darkTheme -> DarkColorScheme
-      else -> LightColorScheme
+    val darkTheme = when (themeMode) {
+        ThemeMode.LIGHT -> false
+        ThemeMode.DARK -> true
+        ThemeMode.SYSTEM -> isSystemInDarkTheme()
     }
 
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+
     MaterialTheme(
-      colorScheme = colorScheme,
-      typography = PymeTypography,
-      content = content
+        colorScheme = colorScheme,
+        typography = PymeTypography,
+        content = content
     )
 }
+
+
+
+
+//@Composable
+//fun PymeTaskTheme(
+//    darkTheme: Boolean = isSystemInDarkTheme(),
+//    // Dynamic color is available on Android 12+
+//    dynamicColor: Boolean = true,
+//    content: @Composable () -> Unit
+//) {
+//    val colorScheme = when {
+//      dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+//        val context = LocalContext.current
+//        if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+//      }
+//      darkTheme -> DarkColorScheme
+//      else -> LightColorScheme
+//    }
+//
+//    MaterialTheme(
+//      colorScheme = colorScheme,
+//      typography = PymeTypography,
+//      content = content
+//    )
+//}

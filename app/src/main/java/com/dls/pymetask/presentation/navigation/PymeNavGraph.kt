@@ -31,6 +31,8 @@ import com.dls.pymetask.presentation.contactos.EditarContactoScreen
 
 import com.dls.pymetask.presentation.notas.NotaFormScreen
 import com.dls.pymetask.presentation.notas.NotasScreen
+import com.dls.pymetask.presentation.perfil.EditarPerfilScreen
+import com.dls.pymetask.presentation.perfil.PerfilUserScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -51,8 +53,8 @@ fun PymeNavGraph(
             val viewModel: RegisterViewModel = hiltViewModel()
             RegisterScreen(
                 onNavigateToLogin = { navController.popBackStack() },
-                onRegisterClicked = { email, password, _ ->
-                    viewModel.register(email, password)
+                onRegisterClicked = { email, password, nombre ->
+                    viewModel.register(email, password,nombre)
                 }
             )
             val registerSuccess by viewModel.registerSuccess.collectAsState()
@@ -114,6 +116,15 @@ fun PymeNavGraph(
         composable("contactos") {
             ContactosScreen(navController = navController)
         }
+        composable("perfil_user") {
+            PerfilUserScreen(navController = navController)
+        }
+
+        composable("editar_perfil") {
+            EditarPerfilScreen(onBack = { navController.popBackStack() })
+        }
+
+
 
         composable(
             route = "editar_contacto/{id}",
@@ -151,7 +162,6 @@ fun PymeNavGraph(
                 notaId = backStackEntry.arguments?.getString("notaId")
             )
         }
-
 
 
     }

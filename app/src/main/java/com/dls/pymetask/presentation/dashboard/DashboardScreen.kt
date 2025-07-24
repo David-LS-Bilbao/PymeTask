@@ -2,6 +2,9 @@ package com.dls.pymetask.presentation.dashboard
 
 
 
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.pm.ActivityInfo
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,18 +21,14 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.BarChart
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Euro
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Logout
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ViewAgenda
 import androidx.compose.material3.AlertDialog
@@ -44,6 +43,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,6 +52,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -62,6 +64,7 @@ import com.dls.pymetask.presentation.navigation.Routes
 import com.dls.pymetask.ui.theme.Poppins
 import com.dls.pymetask.ui.theme.Roboto
 
+@SuppressLint("SourceLockedOrientationActivity")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
@@ -78,17 +81,33 @@ fun DashboardScreen(
     var showLogoutDialog by remember { mutableStateOf(false) }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+//desactivar modo landscape
+    val context = LocalContext.current
+    val activity = context as? Activity
+    LaunchedEffect(Unit) {
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+    }
+    // reactivar modo landscape
+    DisposableEffect(Unit) {
+        onDispose {
+            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        }
+    }//---------------------------------------------------
 
 
 
-    Scaffold(
+
+
+    Scaffold(modifier = Modifier.fillMaxSize(),
         // barra de navegación superior con íconos
         topBar = {
             TopAppBar(
                 title = { Text("PymeTask", fontFamily = Poppins, fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
-                    IconButton(onClick = {}) {
-                        Icon(Icons.Default.Menu, contentDescription = "Menú")
+                    IconButton(onClick = {
+                        navController.navigate("perfil_user")
+                    }) {
+                        Icon(Icons.Default.AccountCircle, contentDescription = "Usuario")
                     }
                 },
                 actions = {
@@ -163,6 +182,9 @@ fun DashboardScreen(
             }
         }
     }
+
+    //desactivar modo landscape
+
 
     if (showLogoutDialog) {
         AlertDialog(

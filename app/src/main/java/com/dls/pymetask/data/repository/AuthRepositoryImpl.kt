@@ -20,15 +20,36 @@ class AuthRepositoryImpl(
             Result.failure(e)
         }
     }
-
-    override suspend fun register(email: String, password: String): Result<Unit> {
+    override suspend fun register(email: String, password: String, nombre: String, fotoUrl: String?): Result<Unit> {
         return try {
-            auth.createUserWithEmailAndPassword(email, password).await()
+            val result = auth.createUserWithEmailAndPassword(email, password).await()
+            val uid = result.user?.uid ?: return Result.failure(Exception("UID no disponible"))
+
+            val userMap = mapOf(
+                "nombre" to nombre,
+                "fotoUrl" to fotoUrl
+            )
+
+            firestore.collection("usuarios")
+                .document(uid)
+                .set(userMap)
+                .await()
+
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
+
+
+//    override suspend fun register(email: String, password: String, nombre: String, fotoUrl: String?): Result<Unit> {
+//        return try {
+//            auth.createUserWithEmailAndPassword(email, password).await()
+//            Result.success(Unit)
+//        } catch (e: Exception) {
+//            Result.failure(e)
+//        }
+//    }
 
     override fun logout() {
         auth.signOut()

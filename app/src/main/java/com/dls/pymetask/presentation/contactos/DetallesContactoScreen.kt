@@ -1,6 +1,9 @@
 package com.dls.pymetask.presentation.contactos
 
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -11,8 +14,13 @@ import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,6 +35,7 @@ import coil.compose.AsyncImage
 import com.dls.pymetask.R
 import androidx.core.net.toUri
 
+@SuppressLint("SourceLockedOrientationActivity")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetalleContactoScreen(
@@ -37,6 +46,24 @@ fun DetalleContactoScreen(
     val contactos by viewModel.contactos.collectAsState()
     val contacto = contactos.find { it.id == contactoId }
     val context = LocalContext.current
+    //desactivar modo landscape
+    val activity = context as? Activity
+    LaunchedEffect(Unit) {
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+    }
+    // reactivar modo landscape
+    DisposableEffect(Unit) {
+        onDispose {
+            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        }
+    }//---------------------------------------------------
+
+
+    // busqueda de contactos
+    var searchQuery by remember { mutableStateOf("") }
+
+
+
 
     if (contacto == null) {
         Text("Contacto no encontrado", modifier = Modifier.padding(16.dp))
@@ -61,6 +88,8 @@ fun DetalleContactoScreen(
                 }
             )
         }
+
+
     ) { padding ->
         Column(
             modifier = Modifier

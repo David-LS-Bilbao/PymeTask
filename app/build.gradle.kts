@@ -40,6 +40,7 @@ android {
     }
     kotlinOptions {
         jvmTarget = "11"
+        freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
     }
     buildFeatures {
         compose = true
@@ -102,6 +103,14 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
+
+    implementation(libs.androidx.lifecycle.viewmodel.compose) // o superior
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.runtime.livedata)
+
+    implementation(libs.androidx.datastore.preferences)
+
+
 
 
 

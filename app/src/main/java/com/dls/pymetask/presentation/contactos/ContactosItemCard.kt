@@ -1,5 +1,6 @@
 package com.dls.pymetask.presentation.contactos
 
+import android.R.attr.textStyle
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
@@ -72,7 +74,7 @@ fun ContactoItemCard(
                 ) {
                     Text(
                         text = contacto.nombre.firstOrNull()?.uppercase() ?: "?",
-                        fontSize = 20.sp,
+                        fontSize = 24.sp,
                         color = Color.White
                     )
                 }
@@ -81,9 +83,17 @@ fun ContactoItemCard(
             Spacer(modifier = Modifier.width(16.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text(contacto.nombre, style = MaterialTheme.typography.titleMedium)
-                Text("📞 ${contacto.telefono}", fontSize = 13.sp)
-                Text("📧 ${contacto.email}", fontSize = 13.sp)
+                Text(contacto.nombre,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp,
+                    color = Color.Black,
+                    modifier = Modifier.padding(bottom = 4.dp),
+                    maxLines = 1,)
+                Text(if (contacto.tipo == "Cliente") "Cliente" else "Proveedor", fontSize = 14.sp)
+
+//                Text("📞 ${contacto.telefono}", fontSize = 13.sp)
+//                Text("📧 ${contacto.email}", fontSize = 13.sp)
             }
         }
     }

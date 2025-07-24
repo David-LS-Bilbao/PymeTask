@@ -76,7 +76,7 @@ class LoginViewModel @Inject constructor(
         _errorMessage.value = null
 
         viewModelScope.launch {
-            val result = authRepository.register(email, password)
+            val result = authRepository.register(email, password, nombre = "")
             _isLoading.value = false
 
             result.onSuccess {

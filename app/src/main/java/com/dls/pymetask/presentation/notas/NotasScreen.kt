@@ -21,6 +21,8 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import com.dls.pymetask.domain.model.Nota
+import com.dls.pymetask.utils.Constants
+import com.dls.pymetask.utils.MyFab
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,17 +56,14 @@ fun NotasScreen(
                 }
             )
         },
+
+        //MyFab
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                navController.navigate("nota_form")
-            }) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Agregar Nota",
-                    tint = contentColorFor(MaterialTheme.colorScheme.primaryContainer)
-                )
-            }
+            MyFab.Default(
+                onClick = { navController.navigate("nota_form")}
+            )
         },
+
         containerColor = Color(0xFFE6E9F6)
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {

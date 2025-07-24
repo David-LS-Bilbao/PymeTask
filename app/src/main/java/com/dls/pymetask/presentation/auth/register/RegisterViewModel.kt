@@ -25,17 +25,18 @@ class RegisterViewModel @Inject constructor(
 
     // Función para registrar un nuevo usuario
 
-    fun register(email: String, password: String) {
+    fun register(email: String, password: String, nombre: String, fotoUrl: String? = null) {
         _isLoading.value = true
         _errorMessage.value = null
 
         viewModelScope.launch {
-            val result = authRepository.register(email, password)
+            val result = authRepository.register(email, password, nombre, fotoUrl)
             _isLoading.value = false
             result.onSuccess { _registerSuccess.value = true }
                 .onFailure { _errorMessage.value = it.message }
         }
     }
+
 
     fun setError(message: String) {
         _errorMessage.value = message

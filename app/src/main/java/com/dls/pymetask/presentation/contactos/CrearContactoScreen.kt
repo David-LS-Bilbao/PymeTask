@@ -1,5 +1,8 @@
 package com.dls.pymetask.presentation.contactos
 
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.ContactsContract
@@ -9,7 +12,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CameraAlt
@@ -32,6 +37,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.*
 
+@SuppressLint("SourceLockedOrientationActivity")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CrearContactoScreen(
@@ -54,6 +60,17 @@ fun CrearContactoScreen(
 
     val contactPermission = android.Manifest.permission.READ_CONTACTS
 
+    //desactivar modo landscape
+    val activity = context as? Activity
+    LaunchedEffect(Unit) {
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+    }
+    // reactivar modo landscape
+    DisposableEffect(Unit) {
+        onDispose {
+            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        }
+    }//---------------------------------------------------
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -145,7 +162,8 @@ fun CrearContactoScreen(
             modifier = Modifier
                 .padding(padding)
                 .padding(horizontal = 24.dp, vertical = 12.dp)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
