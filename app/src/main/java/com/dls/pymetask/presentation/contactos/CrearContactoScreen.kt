@@ -14,8 +14,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material3.*
@@ -25,6 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
@@ -152,7 +156,7 @@ fun CrearContactoScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
                 }
             )
@@ -215,6 +219,9 @@ fun CrearContactoScreen(
                 value = nombre,
                 onValueChange = { nombre = it },
                 label = { Text("Nombre") },
+                maxLines = 1,
+                // pasar al sigiente cuadro de texto al pulsar enter
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -222,6 +229,8 @@ fun CrearContactoScreen(
                 value = telefono,
                 onValueChange = { telefono = it },
                 label = { Text("Teléfono") },
+                // modo de texto para el teléfono
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Next),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -229,6 +238,7 @@ fun CrearContactoScreen(
                 value = correo,
                 onValueChange = { correo = it },
                 label = { Text("Correo electrónico") },
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -236,6 +246,9 @@ fun CrearContactoScreen(
                 value = direccion,
                 onValueChange = { direccion = it },
                 label = { Text("Dirección") },
+                maxLines = 1,
+                // pasar al sigiente cuadro de texto al pulsar enter
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -260,7 +273,7 @@ fun CrearContactoScreen(
                 } },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Importar desde contactos del dispositivo")
+                Text("Importar contacto")
             }
             // Botón Guardar
             Button(

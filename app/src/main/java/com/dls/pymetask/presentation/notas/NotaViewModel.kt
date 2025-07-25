@@ -51,4 +51,11 @@ class NotaViewModel @Inject constructor(
     fun limpiarNotaActual() {
         notaActual = null
     }
+    fun eliminarNotaPorId(id: String) {
+        viewModelScope.launch {
+            useCases.deleteNota(id)
+            cargarNotas()
+        }
+    }
+
 }

@@ -7,6 +7,7 @@ import android.app.Activity
 import android.content.pm.ActivityInfo
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -21,6 +22,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Euro
@@ -32,6 +34,7 @@ import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ViewAgenda
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AlertDialogDefaults.containerColor
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -81,6 +84,7 @@ fun DashboardScreen(
     var showLogoutDialog by remember { mutableStateOf(false) }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+
 //desactivar modo landscape
     val context = LocalContext.current
     val activity = context as? Activity
@@ -96,13 +100,14 @@ fun DashboardScreen(
 
 
 
-
-
     Scaffold(modifier = Modifier.fillMaxSize(),
         // barra de navegación superior con íconos
         topBar = {
             TopAppBar(
-                title = { Text("PymeTask", fontFamily = Poppins, fontWeight = FontWeight.SemiBold) },
+                title = { Text("PymeTask",
+                    fontSize = 26.sp,
+                    fontFamily = Poppins,
+                    fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
                     IconButton(onClick = {
                         navController.navigate("perfil_user")
@@ -112,7 +117,7 @@ fun DashboardScreen(
                 },
                 actions = {
                     IconButton(onClick = { showLogoutDialog = true }) {
-                        Icon(Icons.Default.Logout, contentDescription = "Cerrar sesión")
+                        Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = "Cerrar sesión")
                     }
                 }
 
@@ -143,7 +148,13 @@ fun DashboardScreen(
                 )
             }
         },
-        containerColor = Color(0xFFECEFF1) // background
+        // color de fondo segun modo claro o oscuro
+        containerColor = if (isSystemInDarkTheme()) {
+            Color.Black // background en modo oscuro
+        }else {
+            Color(0xFFE9EBFA) // background en modo claro
+        }
+
     ) { paddingValues ->
 
         Column(
@@ -158,14 +169,14 @@ fun DashboardScreen(
                 fontSize = 26.sp,
                 fontFamily = Poppins,
                 fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF263238)
+                color = if (isSystemInDarkTheme()) Color.White else Color(0xFF263238)
             )
 
             Text(
                 text = "Administra tu pyme fácilmente",
                 fontSize = 16.sp,
                 fontFamily = Roboto,
-                color = Color(0xFF546E7A)
+                color = if (isSystemInDarkTheme()) Color.White else Color(0xFF263238)
             )
 
             // cuadrícula de tarjetas con clics en cada una
@@ -183,9 +194,8 @@ fun DashboardScreen(
         }
     }
 
-    //desactivar modo landscape
 
-
+    // cuadro de diálogo de cierre de sesión
     if (showLogoutDialog) {
         AlertDialog(
             onDismissRequest = { showLogoutDialog = false },
@@ -211,57 +221,6 @@ fun DashboardScreen(
             title = { Text("¿Cerrar sesión?") },
             text = { Text("¿Estás seguro de que deseas cerrar sesión?") }
         )
-    }
-
-
+    }//---------------------------------------
 }
 
-
-@Composable
-fun DashboardCardItem(card: DashboardCard, onClick: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(140.dp)
-            .clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Icon(
-                imageVector = card.icon,
-                contentDescription = card.title,
-                tint = Color(0xFF1976D2),
-                modifier = Modifier
-                    .size(32.dp)
-                    .background(Color(0xFFBBDEFB), shape = CircleShape)
-                    .padding(4.dp)
-            )
-
-            Text(
-                text = card.title,
-                fontWeight = FontWeight.SemiBold,
-                fontFamily = Poppins,
-                fontSize = 16.sp,
-                color = Color(0xFF263238)
-            )
-
-            Text(
-                text = card.subtitle,
-                fontFamily = Roboto,
-                fontSize = 14.sp,
-                color = Color(0xFF546E7A)
-            )
-        }
-    }
-}
-
-data class DashboardCard(
-    val title: String,
-    val subtitle: String,
-    val icon: ImageVector
-)

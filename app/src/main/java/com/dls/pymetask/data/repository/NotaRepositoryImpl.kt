@@ -10,15 +10,6 @@ import kotlinx.coroutines.tasks.await
 class NotaRepositoryImpl(firestore: FirebaseFirestore) : NotaRepository {
     private val collection = firestore.collection("notas")
 
-//    override suspend fun inicializarPosicionesSiFaltan() {
-//        val snapshot = collection.get().await()
-//        val documentosSinPosicion = snapshot.documents.filter { it.getLong("posicion") == null }
-//
-//        documentosSinPosicion.forEachIndexed { index, doc ->
-//            doc.reference.update("posicion", index)
-//        }
-//    }
-
 
     override suspend fun getNotas(): List<Nota> {
         return collection
@@ -43,5 +34,10 @@ class NotaRepositoryImpl(firestore: FirebaseFirestore) : NotaRepository {
 
     override suspend fun deleteNota(id: String) {
         collection.document(id).delete().await()
+    }
+
+    override suspend fun eliminarNota(nota: Nota) {
+        collection.document(nota.id).delete().await()
+
     }
 }

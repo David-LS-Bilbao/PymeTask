@@ -30,6 +30,8 @@ object NotaModule {
             addNota = AddNota(repository),
             updateNota = UpdateNota(repository),
             deleteNota = DeleteNota(repository),
+            eliminarNota = EliminarNota(repository)
+
 
         )
     }

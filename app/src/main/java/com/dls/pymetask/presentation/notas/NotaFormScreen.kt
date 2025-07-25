@@ -324,11 +324,21 @@ fun NotaFormScreen(
                 onDismissRequest = { mostrarConfirmacionBorrado = false },
                 confirmButton = {
                     TextButton(onClick = {
-                        notaActual?.let {
-                            viewModel.eliminarNota(it)
+//                        notaActual?.let {
+//                            viewModel.eliminarNota(it)
+//                        }
+//                        mostrarConfirmacionBorrado = false
+//                        navController.popBackStack()
+                        val idNota = notaId ?: viewModel.notaActual?.id
+                        if (idNota != null) {
+                            viewModel.eliminarNotaPorId(idNota)
+                            Toast.makeText(context, "Nota eliminada", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "Error: nota no encontrada", Toast.LENGTH_SHORT).show()
                         }
                         mostrarConfirmacionBorrado = false
                         navController.popBackStack()
+
                     }) {
                         Text("Sí, borrar")
                     }
@@ -366,7 +376,7 @@ fun compartirNota(context: Context, titulo: String, contenido: String, via: Stri
 }
 
 
-// Guardado con Toast y salida
+// Guardado con Toast y salida----------------------------------------------------------------------
 fun guardarYSalir(
     context: Context,
     navController: NavController,

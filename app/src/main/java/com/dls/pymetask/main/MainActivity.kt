@@ -33,32 +33,4 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun PymeTaskAppRoot(
-    mainViewModel: MainViewModel = hiltViewModel(),
-    themeViewModel: ThemeViewModel = hiltViewModel()
-) {
-    val navController = rememberNavController()
-    val isUserLoggedIn by mainViewModel.isUserLoggedIn.collectAsState()
-    val themeMode by themeViewModel.themeMode.collectAsState()
-
-    // 🟢 APLICA el tema aquí:
-    PymeTaskTheme(themeMode = themeMode) {
-        Scaffold { innerPadding ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-            ) {
-                if (isUserLoggedIn != null) {
-                    PymeNavGraph(
-                        navController = navController,
-                        startDestination = if (isUserLoggedIn == true) "dashboard" else "login"
-                    )
-                }
-            }
-        }
-    }
-}
 

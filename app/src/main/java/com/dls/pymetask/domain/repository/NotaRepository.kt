@@ -9,6 +9,7 @@ interface NotaRepository {
     suspend fun addNota(nota: Nota)
     suspend fun updateNota(nota: Nota)
     suspend fun deleteNota(id: String)
-//    suspend fun inicializarPosicionesSiFaltan()
+    suspend fun eliminarNota(nota: Nota)
+
 
 }

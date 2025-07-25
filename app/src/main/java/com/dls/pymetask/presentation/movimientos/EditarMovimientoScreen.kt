@@ -52,6 +52,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 
 import com.dls.pymetask.domain.model.Movimiento
+import com.dls.pymetask.presentation.components.FechaSelector
 import com.dls.pymetask.ui.theme.Poppins
 import com.dls.pymetask.ui.theme.Roboto
 import java.util.UUID
@@ -84,6 +85,8 @@ fun EditarMovimientoScreen(
     var subtitulo by remember { mutableStateOf(movimiento?.subtitulo.orEmpty()) }
     var cantidad by remember { mutableStateOf(movimiento?.cantidad?.let { String.format("%.2f", it) }.orEmpty()) }
     var tipoIngreso by remember { mutableStateOf(movimiento?.ingreso ?: true) }
+
+    var fechaSeleccionada by remember { mutableStateOf(movimiento?.fecha?.toDate()) }
 
     LaunchedEffect(movimientoId) {
         if (movimiento != null) {
@@ -126,11 +129,20 @@ fun EditarMovimientoScreen(
                 title = {
                     Text("Editar movimiento", fontFamily = Poppins, fontSize = 20.sp)
                 },
+
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Atrás")
+                    IconButton(onClick = { navController.popBackStack()
+                    val popped = navController.popBackStack()
+                        if (!popped) {
+                            navController.navigate("movimientos") {
+                                popUpTo("movimientos") { inclusive = true }
+                            }
+                        }
+                    }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
                 },
+
                 actions = {
                     IconButton(onClick = { navController.navigate("dashboard") }) {
                         Icon(Icons.Filled.Home, contentDescription = "Inicio")
@@ -144,13 +156,22 @@ fun EditarMovimientoScreen(
             )
         }
     ) { padding ->
+
+
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
+        ) {    FechaSelector(
+            context = context,
+            fechaInicial = fechaSeleccionada,
+            onFechaSeleccionada = { fechaSeleccionada = it }
+        )
+
+
             OutlinedTextField(
                 value = titulo,
                 onValueChange = { titulo = it },
@@ -221,6 +242,7 @@ fun EditarMovimientoScreen(
                         subtitulo = subtitulo,
                         cantidad = nuevaCantidad,
                         ingreso = tipoIngreso,
+                        fecha = com.google.firebase.Timestamp(fechaSeleccionada ?: movimiento!!.fecha.toDate())
                     )
                     viewModel.updateMovimiento(actualizado)
                     Toast.makeText(context, "Movimiento actualizado", Toast.LENGTH_SHORT).show()
