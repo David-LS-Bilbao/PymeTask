@@ -1,6 +1,7 @@
 package com.dls.pymetask.presentation.notas
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -110,11 +111,15 @@ fun NotaCard(nota: Nota, elevation: Dp = 4.dp, modifier: Modifier = Modifier, on
             .clickable { onClick() }
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
-            Text(text = nota.titulo, style = MaterialTheme.typography.titleSmall)
+            Text(text = nota.titulo,
+                color = Color.Black,
+                style = MaterialTheme.typography.titleSmall)
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = nota.contenido.take(40),
                 style = MaterialTheme.typography.bodySmall,
+                // cambiar color de texto en modo oscuro
+                color =  Color.Black,
                 maxLines = 2
             )
         }

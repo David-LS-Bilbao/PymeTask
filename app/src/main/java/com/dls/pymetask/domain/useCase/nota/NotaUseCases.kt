@@ -9,7 +9,8 @@ data class NotaUseCases(
     val getNota: GetNota,
     val addNota: AddNota,
     val updateNota: UpdateNota,
-    val deleteNota: DeleteNota
+    val deleteNota: DeleteNota,
+    val eliminarNota: EliminarNota
 )
 
 class GetNotas(private val repo: NotaRepository) {
@@ -27,11 +28,7 @@ class UpdateNota(private val repo: NotaRepository) {
 class DeleteNota(private val repo: NotaRepository) {
     suspend operator fun invoke(id: String) = repo.deleteNota(id)
 }
-//class InicializarPosicionesSiFaltanUseCase(
-//    private val repository: NotaRepository
-//) {
-//    suspend operator fun invoke() {
-//        repository.inicializarPosicionesSiFaltan()
-//    }
-//}
+class EliminarNota(private val repo: NotaRepository) {
+    suspend operator fun invoke(nota: Nota) = repo.eliminarNota(nota)
+}
 

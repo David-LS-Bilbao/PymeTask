@@ -27,6 +27,10 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 
+
+
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditarPerfilScreen(
@@ -34,27 +38,20 @@ fun EditarPerfilScreen(
     viewModel: EditarPerfilViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    val perfil by viewModel.perfil.collectAsState()
     var nombre by remember { mutableStateOf("") }
     var telefono by remember { mutableStateOf("") }
     var direccion by remember { mutableStateOf("") }
     var imagenUri by remember { mutableStateOf<Uri?>(null) }
 
-    val perfil by viewModel.perfil.collectAsState()
-
-    val imageLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
+    val imageLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) imagenUri = uri
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.cargarDatosPerfil()
-    }
-
     LaunchedEffect(perfil) {
-        if (perfil.nombre.isNotBlank()) nombre = perfil.nombre
-        if (perfil.telefono.isNotBlank()) telefono = perfil.telefono
-        if (perfil.direccion.isNotBlank()) direccion = perfil.direccion
+        if (nombre.isBlank()) nombre = perfil.nombre
+        if (telefono.isBlank()) telefono = perfil.telefono
+        if (direccion.isBlank()) direccion = perfil.direccion
     }
 
     Scaffold(
@@ -72,23 +69,24 @@ fun EditarPerfilScreen(
         Column(
             modifier = Modifier
                 .padding(padding)
-                .padding(horizontal = 32.dp, vertical = 16.dp)
+                .padding(24.dp)
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            Box(modifier = Modifier.size(220.dp)) {
-                val imagePainter = rememberAsyncImagePainter(
+            // Imagen de perfil
+            Box(modifier = Modifier.size(200.dp)) {
+                val painter = rememberAsyncImagePainter(
                     ImageRequest.Builder(context)
                         .data(imagenUri ?: perfil.fotoUrl)
                         .crossfade(true)
                         .build()
                 )
                 Image(
-                    painter = imagePainter,
+                    painter = painter,
                     contentDescription = "Foto de perfil",
                     modifier = Modifier
-                        .size(220.dp)
+                        .size(200.dp)
                         .clip(CircleShape)
                         .align(Alignment.Center)
                 )
@@ -101,7 +99,7 @@ fun EditarPerfilScreen(
                         .size(40.dp)
                         .clip(CircleShape)
                         .clickable { imageLauncher.launch("image/*") }
-                        .background(Color(0xFF1976D2))
+                        .background(MaterialTheme.colorScheme.primary)
                         .padding(8.dp)
                 )
             }
@@ -129,7 +127,15 @@ fun EditarPerfilScreen(
 
             Button(
                 onClick = {
-                    viewModel.actualizarPerfil(nombre, telefono, direccion, imagenUri,
+                    if (nombre.isBlank()) {
+                        Toast.makeText(context, "El nombre es obligatorio", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+                    viewModel.actualizarPerfil(
+                        nuevoNombre = nombre,
+                        nuevoTelefono = telefono,
+                        nuevaDireccion = direccion,
+                        nuevaFotoUri = imagenUri,
                         onSuccess = {
                             Toast.makeText(context, "Perfil actualizado", Toast.LENGTH_SHORT).show()
                             onBack()
@@ -150,51 +156,7 @@ fun EditarPerfilScreen(
 
 
 
-//package com.dls.pymetask.presentation.perfil
-//
-//import android.net.Uri
-//import android.widget.Toast
-//import androidx.activity.compose.rememberLauncherForActivityResult
-//import androidx.activity.result.contract.ActivityResultContracts
-//import androidx.compose.foundation.Image
-//import androidx.compose.foundation.background
-//import androidx.compose.foundation.clickable
-//import androidx.compose.foundation.layout.Arrangement
-//import androidx.compose.foundation.layout.Box
-//import androidx.compose.foundation.layout.Column
-//import androidx.compose.foundation.layout.fillMaxSize
-//import androidx.compose.foundation.layout.fillMaxWidth
-//import androidx.compose.foundation.layout.padding
-//import androidx.compose.foundation.layout.size
-//import androidx.compose.foundation.shape.CircleShape
-//import androidx.compose.material.icons.Icons
-//import androidx.compose.material.icons.automirrored.filled.ArrowBack
-//import androidx.compose.material.icons.filled.ArrowBack
-//import androidx.compose.material.icons.filled.CameraAlt
-//import androidx.compose.material3.Button
-//import androidx.compose.material3.ExperimentalMaterial3Api
-//import androidx.compose.material3.Icon
-//import androidx.compose.material3.IconButton
-//import androidx.compose.material3.OutlinedTextField
-//import androidx.compose.material3.Scaffold
-//import androidx.compose.material3.Text
-//import androidx.compose.material3.TopAppBar
-//import androidx.compose.runtime.Composable
-//import androidx.compose.runtime.LaunchedEffect
-//import androidx.compose.runtime.collectAsState
-//import androidx.compose.runtime.getValue
-//import androidx.compose.runtime.mutableStateOf
-//import androidx.compose.runtime.remember
-//import androidx.compose.runtime.setValue
-//import androidx.compose.ui.Alignment
-//import androidx.compose.ui.Modifier
-//import androidx.compose.ui.draw.clip
-//import androidx.compose.ui.graphics.Color
-//import androidx.compose.ui.platform.LocalContext
-//import androidx.compose.ui.unit.dp
-//import androidx.hilt.navigation.compose.hiltViewModel
-//import coil.compose.rememberAsyncImagePainter
-//import coil.request.ImageRequest
+
 //
 //@OptIn(ExperimentalMaterial3Api::class)
 //@Composable
@@ -208,8 +170,7 @@ fun EditarPerfilScreen(
 //    var direccion by remember { mutableStateOf("") }
 //    var imagenUri by remember { mutableStateOf<Uri?>(null) }
 //
-//    val nombreFlow by viewModel.nombre.collectAsState()
-//    val fotoUrl by viewModel.fotoUrl.collectAsState()
+//    val perfil by viewModel.perfil.collectAsState()
 //
 //    val imageLauncher = rememberLauncherForActivityResult(
 //        contract = ActivityResultContracts.GetContent()
@@ -221,8 +182,10 @@ fun EditarPerfilScreen(
 //        viewModel.cargarDatosPerfil()
 //    }
 //
-//    LaunchedEffect(nombreFlow) {
-//        if (nombre.isBlank()) nombre = nombreFlow
+//    LaunchedEffect(perfil) {
+//        if (perfil.nombre.isNotBlank()) nombre = perfil.nombre
+//        if (perfil.telefono.isNotBlank()) telefono = perfil.telefono
+//        if (perfil.direccion.isNotBlank()) direccion = perfil.direccion
 //    }
 //
 //    Scaffold(
@@ -231,7 +194,7 @@ fun EditarPerfilScreen(
 //                title = { Text("Editar Perfil") },
 //                navigationIcon = {
 //                    IconButton(onClick = { onBack() }) {
-//                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
+//                        Icon(Icons.Default.ArrowBack, contentDescription = "Atrás")
 //                    }
 //                }
 //            )
@@ -240,15 +203,15 @@ fun EditarPerfilScreen(
 //        Column(
 //            modifier = Modifier
 //                .padding(padding)
-//                .padding(24.dp)
+//                .padding(horizontal = 32.dp, vertical = 16.dp)
 //                .fillMaxSize(),
 //            horizontalAlignment = Alignment.CenterHorizontally,
 //            verticalArrangement = Arrangement.spacedBy(24.dp)
 //        ) {
-//            Box(modifier = Modifier.size(150.dp)) {
+//            Box(modifier = Modifier.size(220.dp)) {
 //                val imagePainter = rememberAsyncImagePainter(
 //                    ImageRequest.Builder(context)
-//                        .data(imagenUri ?: fotoUrl)
+//                        .data(imagenUri ?: perfil.fotoUrl)
 //                        .crossfade(true)
 //                        .build()
 //                )
@@ -256,8 +219,9 @@ fun EditarPerfilScreen(
 //                    painter = imagePainter,
 //                    contentDescription = "Foto de perfil",
 //                    modifier = Modifier
-//                        .size(150.dp)
+//                        .size(220.dp)
 //                        .clip(CircleShape)
+//                        .align(Alignment.Center)
 //                )
 //                Icon(
 //                    imageVector = Icons.Default.CameraAlt,
@@ -265,11 +229,11 @@ fun EditarPerfilScreen(
 //                    tint = Color.White,
 //                    modifier = Modifier
 //                        .align(Alignment.BottomEnd)
-//                        .size(36.dp)
+//                        .size(40.dp)
 //                        .clip(CircleShape)
 //                        .clickable { imageLauncher.launch("image/*") }
 //                        .background(Color(0xFF1976D2))
-//                        .padding(6.dp)
+//                        .padding(8.dp)
 //                )
 //            }
 //
@@ -296,8 +260,7 @@ fun EditarPerfilScreen(
 //
 //            Button(
 //                onClick = {
-//                    viewModel.actualizarPerfil(nombre, imagenUri,
-//                        telefono, direccion,
+//                    viewModel.actualizarPerfil(nombre, telefono, direccion, imagenUri,
 //                        onSuccess = {
 //                            Toast.makeText(context, "Perfil actualizado", Toast.LENGTH_SHORT).show()
 //                            onBack()
@@ -314,4 +277,5 @@ fun EditarPerfilScreen(
 //        }
 //    }
 //}
+
 

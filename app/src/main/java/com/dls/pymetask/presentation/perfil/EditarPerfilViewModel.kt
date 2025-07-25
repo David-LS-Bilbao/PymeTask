@@ -23,6 +23,10 @@ class EditarPerfilViewModel @Inject constructor() : ViewModel() {
     private val _perfil = MutableStateFlow(PerfilUsuario())
     val perfil: StateFlow<PerfilUsuario> get() = _perfil
 
+    init {
+        cargarDatosPerfil()
+    }
+
     fun cargarDatosPerfil() {
         val uid = auth.currentUser?.uid ?: return
 
