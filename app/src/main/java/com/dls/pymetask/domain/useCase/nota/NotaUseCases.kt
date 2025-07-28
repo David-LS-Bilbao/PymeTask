@@ -1,9 +1,8 @@
-package com.dls.pymetask.domain.useCase.nota
+package com.dls.pymetask.domain.usecase.nota
 
 import com.dls.pymetask.domain.model.Nota
 import com.dls.pymetask.domain.repository.NotaRepository
 
-// domain.usecase.nota.UseCasesNota.kt
 data class NotaUseCases(
     val getNotas: GetNotas,
     val getNota: GetNota,

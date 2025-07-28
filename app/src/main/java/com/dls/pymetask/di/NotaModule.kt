@@ -3,7 +3,13 @@ package com.dls.pymetask.di
 
 import com.dls.pymetask.data.repository.NotaRepositoryImpl
 import com.dls.pymetask.domain.repository.NotaRepository
-import com.dls.pymetask.domain.useCase.nota.*
+import com.dls.pymetask.domain.usecase.nota.AddNota
+import com.dls.pymetask.domain.usecase.nota.DeleteNota
+import com.dls.pymetask.domain.usecase.nota.EliminarNota
+import com.dls.pymetask.domain.usecase.nota.GetNota
+import com.dls.pymetask.domain.usecase.nota.GetNotas
+import com.dls.pymetask.domain.usecase.nota.NotaUseCases
+import com.dls.pymetask.domain.usecase.nota.UpdateNota
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
