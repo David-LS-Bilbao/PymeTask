@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -252,13 +253,16 @@ fun NotaFormScreen(
                 }
             }
         },
-        containerColor = backgroundColor
+        //
+
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         Column(
             modifier = Modifier
                 .padding(padding)
                 .padding(16.dp)
                 .fillMaxSize()
+                .background(backgroundColor)
         ) {
             OutlinedTextField(
                 value = titulo,
@@ -271,6 +275,7 @@ fun NotaFormScreen(
                 },
                 label = { Text("Título") },
                 singleLine = true,
+                textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -285,7 +290,8 @@ fun NotaFormScreen(
                         contenido = it
                     }
                 },
-                label = { Text("Contenido") },
+                label = { Text("Contenido",color = Color.Black) },
+                textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),

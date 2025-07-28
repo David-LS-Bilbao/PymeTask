@@ -24,12 +24,13 @@ import androidx.navigation.NavController
 import com.dls.pymetask.domain.model.Nota
 import com.dls.pymetask.utils.Constants
 import com.dls.pymetask.utils.MyFab
+import androidx.core.graphics.toColorInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotasScreen(
     viewModel: NotaViewModel = hiltViewModel(),
-    navController: NavController
+    navController: NavController,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val notas by viewModel.notas.collectAsState()
@@ -64,8 +65,7 @@ fun NotasScreen(
                 onClick = { navController.navigate("nota_form")}
             )
         },
-
-        containerColor = Color(0xFFE6E9F6)
+        containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
             if (notas.isEmpty()) {
@@ -96,7 +96,7 @@ fun NotasScreen(
 @Composable
 fun NotaCard(nota: Nota, elevation: Dp = 4.dp, modifier: Modifier = Modifier, onClick: () -> Unit) {
     val safeColor = try {
-        Color(android.graphics.Color.parseColor(nota.colorHex.ifBlank { "#FFF9C4" }))
+        Color(nota.colorHex.ifBlank { "#FFF9C4" }.toColorInt())
     } catch (e: IllegalArgumentException) {
         Color(0xFFFFF9C4)
     }
@@ -112,14 +112,13 @@ fun NotaCard(nota: Nota, elevation: Dp = 4.dp, modifier: Modifier = Modifier, on
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Text(text = nota.titulo,
-                color = Color.Black,
+            color = Color.Black,
                 style = MaterialTheme.typography.titleSmall)
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = nota.contenido.take(40),
                 style = MaterialTheme.typography.bodySmall,
-                // cambiar color de texto en modo oscuro
-                color =  Color.Black,
+                color = Color.Black,
                 maxLines = 2
             )
         }

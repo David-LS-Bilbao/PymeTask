@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.BarChart
@@ -40,6 +41,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -79,7 +81,7 @@ fun DashboardScreen(
         DashboardCard("Movimientos", "Ver movimientos registrados", Icons.Default.Euro),
         DashboardCard("Archivos", "Ver archivos guardados", Icons.Default.Folder),
         DashboardCard("Agenda", "Agenda de tareas", Icons.Default.ViewAgenda),
-        DashboardCard("Notas", "Ver notas guardadas", Icons.Default.List)
+        DashboardCard("Notas", "Ver notas guardadas", Icons.AutoMirrored.Filled.List)
     )
     var showLogoutDialog by remember { mutableStateOf(false) }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -101,6 +103,7 @@ fun DashboardScreen(
 
 
     Scaffold(modifier = Modifier.fillMaxSize(),
+
         // barra de navegación superior con íconos
         topBar = {
             TopAppBar(
@@ -148,12 +151,9 @@ fun DashboardScreen(
                 )
             }
         },
-        // color de fondo segun modo claro o oscuro
-        containerColor = if (isSystemInDarkTheme()) {
-            Color.Black // background en modo oscuro
-        }else {
-            Color(0xFFE9EBFA) // background en modo claro
-        }
+        // fondo de la pantalla segun el tema
+        containerColor = MaterialTheme.colorScheme.background
+
 
     ) { paddingValues ->
 
@@ -169,14 +169,14 @@ fun DashboardScreen(
                 fontSize = 26.sp,
                 fontFamily = Poppins,
                 fontWeight = FontWeight.SemiBold,
-                color = if (isSystemInDarkTheme()) Color.White else Color(0xFF263238)
+                color = MaterialTheme.colorScheme.onBackground// color del texto segun el tema
             )
 
             Text(
                 text = "Administra tu pyme fácilmente",
                 fontSize = 16.sp,
                 fontFamily = Roboto,
-                color = if (isSystemInDarkTheme()) Color.White else Color(0xFF263238)
+                color =  MaterialTheme.colorScheme.onBackground
             )
 
             // cuadrícula de tarjetas con clics en cada una

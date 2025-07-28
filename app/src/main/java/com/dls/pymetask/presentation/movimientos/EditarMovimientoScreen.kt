@@ -3,6 +3,7 @@ package com.dls.pymetask.presentation.movimientos
 import android.annotation.SuppressLint
 import android.os.Build
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -59,6 +60,7 @@ import java.util.UUID
 
 
 
+@SuppressLint("DefaultLocale")
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -121,6 +123,28 @@ fun EditarMovimientoScreen(
             title = { Text("Confirmar eliminación") },
             text = { Text("¿Estás seguro de que deseas eliminar este movimiento?") }
         )
+    }
+
+    fun guardarMovimientoYVolver() {
+        val nuevaCantidad = cantidad.toDoubleOrNull()
+            ?: movimiento?.cantidad
+            ?: 0.0
+
+        if (movimiento != null) {
+            val actualizado = movimiento.copy(
+                titulo = titulo,
+                subtitulo = subtitulo,
+                cantidad = nuevaCantidad,
+                ingreso = tipoIngreso,
+                fecha = com.google.firebase.Timestamp(fechaSeleccionada ?: movimiento.fecha.toDate())
+            )
+            viewModel.updateMovimiento(actualizado)
+            Toast.makeText(context, "Movimiento actualizado", Toast.LENGTH_SHORT).show()
+        }
+
+        navController.navigate("movimientos") {
+            popUpTo("movimientos") { inclusive = true }
+        }
     }
 
     Scaffold(
@@ -234,29 +258,21 @@ fun EditarMovimientoScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Botón para guardar los cambios
             Button(
-                onClick = {
-                    val nuevaCantidad = cantidad.toDoubleOrNull() ?: 0.0
-                    val actualizado = movimiento!!.copy(
-                        titulo = titulo,
-                        subtitulo = subtitulo,
-                        cantidad = nuevaCantidad,
-                        ingreso = tipoIngreso,
-                        fecha = com.google.firebase.Timestamp(fechaSeleccionada ?: movimiento!!.fecha.toDate())
-                    )
-                    viewModel.updateMovimiento(actualizado)
-                    Toast.makeText(context, "Movimiento actualizado", Toast.LENGTH_SHORT).show()
-                    navController.navigate("movimientos") {
-                        popUpTo("movimientos") { inclusive = true }
-                    }
-                },
+                onClick = { guardarMovimientoYVolver() },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Guardar", fontFamily = Roboto)
             }
         }
     }
+    BackHandler {
+        guardarMovimientoYVolver()
+    }
 }
+
+
 
 
 
