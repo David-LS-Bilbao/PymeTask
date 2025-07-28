@@ -47,6 +47,7 @@ class ArchivoRepositoryImpl(
             nombre = nombre,
             url = url,
             tipo = tipoMime?.substringAfter("/") ?: "desconocido",
+            carpetaId = carpeta,
             fecha = metadata.updatedTimeMillis
         )
     }

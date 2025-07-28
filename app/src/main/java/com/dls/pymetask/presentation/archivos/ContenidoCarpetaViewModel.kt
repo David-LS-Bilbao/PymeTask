@@ -34,6 +34,8 @@ class ContenidoCarpetaViewModel @Inject constructor(
     private val _uiEvent = MutableSharedFlow<String>()
     val uiEvent: SharedFlow<String> = _uiEvent
 
+
+
     // Cargar archivos de una carpeta concreta
     fun cargarArchivosDeCarpeta(carpetaId: String) {
         viewModelScope.launch {

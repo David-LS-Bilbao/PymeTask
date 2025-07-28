@@ -71,20 +71,13 @@ dependencies {
 
     implementation(libs.androidx.foundation) // o versión actual
 
-
     implementation(libs.androidx.material.icons.extended)
 
     implementation(libs.google.auth)
 
     implementation(libs.coil.compose)
 
-
-
     implementation(libs.reorderable)
-
-
-
-
 
 
     // Hilt
