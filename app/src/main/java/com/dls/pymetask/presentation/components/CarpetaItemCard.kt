@@ -20,10 +20,8 @@ import com.dls.pymetask.domain.model.ArchivoUiModel
 @Composable
 fun CarpetaItemCard(
     archivo: ArchivoUiModel,
-    onClick: () -> Unit,
-    onEliminar: () -> Unit
+    onClick: () -> Unit
 ) {
-    var mostrarDialogo by remember { mutableStateOf(false) }
 
     Card(
         shape = RoundedCornerShape(12.dp),
@@ -45,46 +43,17 @@ fun CarpetaItemCard(
                     imageVector = Icons.Default.Folder,
                     contentDescription = "Carpeta",
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier.size(30.dp)
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
-                    text = archivo.nombre,
+                    text = archivo.nombre.take(20),//
+                    maxLines = 1,
+
                     style = MaterialTheme.typography.titleMedium
                 )
             }
-
-            IconButton(onClick = { mostrarDialogo = true }) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Eliminar carpeta",
-                    tint = Color.Red
-                )
-            }
         }
-    }
-
-    if (mostrarDialogo) {
-        AlertDialog(
-            onDismissRequest = { mostrarDialogo = false },
-            title = { Text("¿Eliminar carpeta?") },
-            text = {
-                Text("¿Estás seguro de que deseas eliminar la carpeta \"${archivo.nombre}\" y todos sus archivos?")
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    onEliminar()
-                    mostrarDialogo = false
-                }) {
-                    Text("Eliminar", color = Color.Red)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { mostrarDialogo = false }) {
-                    Text("Cancelar")
-                }
-            }
-        )
     }
 }
 

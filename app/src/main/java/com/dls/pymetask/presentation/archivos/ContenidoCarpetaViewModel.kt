@@ -1,3 +1,4 @@
+
 package com.dls.pymetask.presentation.archivos
 
 import android.net.Uri
@@ -6,10 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dls.pymetask.data.mappers.toUiModel
 import com.dls.pymetask.domain.model.ArchivoUiModel
-import com.dls.pymetask.domain.usecase.archivo.EliminarArchivoUseCase
-import com.dls.pymetask.domain.usecase.archivo.GuardarArchivoUseCase
-import com.dls.pymetask.domain.usecase.archivo.ObtenerArchivosPorCarpetaUseCase
-import com.dls.pymetask.domain.usecase.archivo.SubirArchivoUseCase
+import com.dls.pymetask.domain.usecase.archivo.*
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -23,7 +21,11 @@ import kotlinx.coroutines.tasks.await
 @HiltViewModel
 class ContenidoCarpetaViewModel @Inject constructor(
     private val obtenerArchivosPorCarpetaUseCase: ObtenerArchivosPorCarpetaUseCase,
-
+    private val subirArchivoUseCase: SubirArchivoUseCase,
+    private val guardarArchivoUseCase: GuardarArchivoUseCase,
+    private val eliminarArchivoUseCase: EliminarArchivoUseCase,
+    private val renombrarArchivoUseCase: RenombrarArchivoUseCase,
+    private val eliminarArchivosPorCarpetaUseCase: EliminarCarpetaUseCase
 ) : ViewModel() {
 
     private val _archivos = MutableStateFlow<List<ArchivoUiModel>>(emptyList())
@@ -32,8 +34,7 @@ class ContenidoCarpetaViewModel @Inject constructor(
     private val _uiEvent = MutableSharedFlow<String>()
     val uiEvent: SharedFlow<String> = _uiEvent
 
-
-
+    // Cargar archivos de una carpeta concreta
     fun cargarArchivosDeCarpeta(carpetaId: String) {
         viewModelScope.launch {
             try {
@@ -46,12 +47,7 @@ class ContenidoCarpetaViewModel @Inject constructor(
         }
     }
 
-    @Inject
-    lateinit var subirArchivoUseCase: SubirArchivoUseCase
-
-    @Inject
-    lateinit var guardarArchivoUseCase: GuardarArchivoUseCase
-
+    // Subir archivo dentro de una carpeta
     fun subirArchivo(uri: Uri, nombre: String, carpetaId: String) {
         viewModelScope.launch {
             try {
@@ -67,9 +63,7 @@ class ContenidoCarpetaViewModel @Inject constructor(
         }
     }
 
-    @Inject
-    lateinit var eliminarArchivoUseCase: EliminarArchivoUseCase
-
+    // Eliminar un archivo individual
     fun eliminarArchivo(archivoId: String, carpetaId: String) {
         viewModelScope.launch {
             eliminarArchivoUseCase(archivoId)
@@ -77,6 +71,7 @@ class ContenidoCarpetaViewModel @Inject constructor(
         }
     }
 
+    // Obtener el nombre actual de la carpeta
     fun obtenerNombreCarpeta(carpetaId: String, onResult: (String) -> Unit) {
         viewModelScope.launch {
             try {
@@ -91,10 +86,31 @@ class ContenidoCarpetaViewModel @Inject constructor(
         }
     }
 
+    // Renombrar la carpeta actual
+    fun renombrarCarpeta(id: String, nuevoNombre: String) {
+        viewModelScope.launch {
+            try {
+                renombrarArchivoUseCase(id, nuevoNombre)
+                _uiEvent.emit("Carpeta renombrada")
+            } catch (e: Exception) {
+                _uiEvent.emit("Error al renombrar: ${e.localizedMessage}")
+            }
+        }
+    }
 
-
-
-
-
-
+    // Eliminar la carpeta actual
+    fun eliminarCarpeta(id: String) {
+        viewModelScope.launch {
+            try {
+                eliminarArchivosPorCarpetaUseCase(id)       // eliminar hijos
+                eliminarArchivoUseCase(id)
+                _uiEvent.emit("Carpeta eliminada")
+            } catch (e: Exception) {
+                _uiEvent.emit("Error al eliminar: ${e.localizedMessage}")
+            }
+        }
+    }
 }
+
+
+

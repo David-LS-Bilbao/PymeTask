@@ -112,6 +112,25 @@ class ArchivoRepositoryImpl(
 
         snapshot.documents.forEach { it.reference.delete() }
     }
+    override suspend fun renombrarArchivo(id: String, nuevoNombre: String) {
+        val firestore = FirebaseFirestore.getInstance()
+        firestore.collection("archivos")
+            .document(id)
+            .update("nombre", nuevoNombre)
+            .await()
+    }
+
+    override suspend fun eliminarArchivosPorCarpeta(carpetaId: String) {
+        val firestore = FirebaseFirestore.getInstance()
+        val archivos = firestore.collection("archivos")
+            .whereEqualTo("carpetaId", carpetaId)
+            .get()
+            .await()
+
+        for (doc in archivos.documents) {
+            doc.reference.delete().await()
+        }
+    }
 
 
 

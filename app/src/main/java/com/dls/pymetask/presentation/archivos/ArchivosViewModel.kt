@@ -9,6 +9,7 @@ import com.dls.pymetask.domain.usecase.archivo.CrearCarpetaUseCase
 import com.dls.pymetask.domain.usecase.archivo.EliminarCarpetaUseCase
 import com.dls.pymetask.domain.usecase.archivo.GuardarArchivoUseCase
 import com.dls.pymetask.domain.usecase.archivo.ObtenerArchivosFirestoreUseCase
+import com.dls.pymetask.domain.usecase.archivo.RenombrarArchivoUseCase
 import com.dls.pymetask.domain.usecase.archivo.SubirArchivoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -87,6 +88,23 @@ class ArchivosViewModel @Inject constructor(
                 _uiEvent.emit("Carpeta eliminada")
             } catch (e: Exception) {
                 _uiEvent.emit("Error al eliminar carpeta: ${e.localizedMessage}")
+            }
+        }
+
+    }
+
+
+    @Inject
+    lateinit var renombrarArchivoUseCase: RenombrarArchivoUseCase
+
+    fun renombrarCarpeta(id: String, nuevoNombre: String) {
+        viewModelScope.launch {
+            try {
+                renombrarArchivoUseCase(id, nuevoNombre)
+                cargarArchivos()
+                _uiEvent.emit("Carpeta renombrada")
+            } catch (e: Exception) {
+                _uiEvent.emit("Error al renombrar: ${e.localizedMessage}")
             }
         }
     }

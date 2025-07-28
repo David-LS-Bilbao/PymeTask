@@ -1,6 +1,7 @@
 package com.dls.pymetask.presentation.archivos
 
 import android.content.Intent
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -10,18 +11,23 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -56,14 +62,29 @@ fun ContenidoCarpetaScreen(
     var mostrarMenu by remember { mutableStateOf(false) }
     var selectedArchivo by remember { mutableStateOf<ArchivoUiModel?>(null) }
     var nombreCarpeta by remember { mutableStateOf("Carpeta") }
+    var mostrarMenuTipoArchivo by remember { mutableStateOf(false) }
+    var mimeToLoad by remember { mutableStateOf("*/*") }
+    var expanded by remember { mutableStateOf(false) }
+    var mostrarDialogoRenombrar by remember { mutableStateOf(false) }
+    var mostrarDialogoEliminar by remember { mutableStateOf(false) }
+    var nuevoNombre by remember { mutableStateOf("") }
+
+
+
 
     LaunchedEffect(Unit) {
         viewModel.cargarArchivosDeCarpeta(carpetaId)
         viewModel.obtenerNombreCarpeta(carpetaId) { nombre ->
             nombreCarpeta = nombre
         }
+
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { mensaje ->
+            Toast.makeText(context, mensaje, Toast.LENGTH_SHORT).show()
+        }
+    }
 
 
     LaunchedEffect(Unit) {
@@ -84,20 +105,92 @@ fun ContenidoCarpetaScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(" $nombreCarpeta") },
+                title = { Text(nombreCarpeta) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
+                },
+                actions = {
+                    Box {
+                        IconButton(onClick = { expanded = true }) {
+                            Icon(Icons.Default.MoreVert, contentDescription = "Opciones")
+                        }
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Renombrar carpeta") },
+                                onClick = {
+                                    nuevoNombre = nombreCarpeta // si lo tienes disponible
+                                    mostrarDialogoRenombrar = true
+                                    expanded = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Eliminar carpeta") },
+                                onClick = {
+                                    mostrarDialogoEliminar = true
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
                 }
             )
+
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { launcher.launch("*/*") }) {
-                Icon(Icons.Default.Upload, contentDescription = "Subir archivo")
+            Box(modifier = Modifier
+                .wrapContentSize(Alignment.BottomEnd)
+                .padding(12.dp)) {
+                FloatingActionButton(onClick = { mostrarMenuTipoArchivo = true }) {
+                    Icon(Icons.Default.Upload, contentDescription = "Subir archivo")
+                }
+
+                DropdownMenu(
+                    expanded = mostrarMenuTipoArchivo,
+                    onDismissRequest = { mostrarMenuTipoArchivo = false }
+                ) {
+                    DropdownMenuItem(
+                        onClick = {
+                            mimeToLoad = "image/*"
+                            mostrarMenuTipoArchivo = false
+                            launcher.launch(mimeToLoad)
+                        },
+                        text = { Text("Imagen 📷") }
+                    )
+                    DropdownMenuItem(
+                        onClick = {
+                            mimeToLoad = "audio/*"
+                            mostrarMenuTipoArchivo = false
+                            launcher.launch(mimeToLoad)
+                        },
+                        text = { Text("Audio 🎧") }
+                    )
+                    DropdownMenuItem(
+                        onClick = {
+                            mimeToLoad = "video/*"
+                            mostrarMenuTipoArchivo = false
+                            launcher.launch(mimeToLoad)
+                        },
+                        text = { Text("Vídeo 🎥") }
+                    )
+                    DropdownMenuItem(
+                        onClick = {
+                            mimeToLoad = "*/*"
+                            mostrarMenuTipoArchivo = false
+                            launcher.launch(mimeToLoad)
+                        },
+                        text = { Text("Otro archivo 📄") }
+                    )
+                }
             }
         }
+
     ) { padding ->
+
 
         Box(
             modifier = Modifier
@@ -142,9 +235,10 @@ fun ContenidoCarpetaScreen(
                         )
                     }
                 }
-            }
-        }
+            } }
+
     }
+
 
     if (mostrarMenu && selectedArchivo != null) {
         AlertDialog(
@@ -200,5 +294,62 @@ fun ContenidoCarpetaScreen(
         )
     }
 
+
+    if (mostrarDialogoRenombrar) {
+        AlertDialog(
+            onDismissRequest = { mostrarDialogoRenombrar = false },
+            title = { Text("Renombrar carpeta") },
+            text = {
+                OutlinedTextField(
+                    value = nuevoNombre,
+                    onValueChange = { nuevoNombre = it },
+                    label = { Text("Nuevo nombre") }
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    if (nuevoNombre.isNotBlank()) {
+                        val nombreFinal = nuevoNombre.trim().take(20) // aseguras límite
+                        viewModel.renombrarCarpeta(carpetaId, nombreFinal)
+                        nombreCarpeta = nombreFinal // ✅ actualiza inmediatamente
+                        mostrarDialogoRenombrar = false
+                    }
+                }) {
+                    Text("Renombrar")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    mostrarDialogoRenombrar = false
+                }) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+
+    if (mostrarDialogoEliminar) {
+        AlertDialog(
+            onDismissRequest = { mostrarDialogoEliminar = false },
+            title = { Text("Eliminar carpeta") },
+            text = { Text("¿Seguro que deseas eliminar esta carpeta? Esto no borrará los archivos dentro.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.eliminarCarpeta(carpetaId)
+                    mostrarDialogoEliminar = false
+                    navController.popBackStack() // volver atrás tras borrar
+                }) {
+                    Text("Eliminar", color = Color.Red)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    mostrarDialogoEliminar = false
+                }) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
 
 }

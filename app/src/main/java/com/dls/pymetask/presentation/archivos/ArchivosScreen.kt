@@ -1,18 +1,13 @@
 package com.dls.pymetask.presentation.archivos
 
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CreateNewFolder
-import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,8 +25,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.dls.pymetask.presentation.components.CarpetaItemCard
 import com.dls.pymetask.ui.theme.Poppins
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,8 +34,6 @@ fun ArchivosScreen(
 ) {
     val archivos by viewModel.archivos.collectAsState()
     val context = LocalContext.current
-//
-//    val isDark = isSystemInDarkTheme()
     var mostrarDialogo by remember { mutableStateOf(false) }
     var nombreCarpeta by remember { mutableStateOf("") }
 
@@ -59,17 +49,6 @@ fun ArchivosScreen(
         viewModel.cargarArchivos()
     }
 
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
-        onResult = { uri ->
-            uri?.let {
-                val nombre = uri.lastPathSegment?.substringAfterLast("/")
-                    ?: "archivo_${System.currentTimeMillis()}"
-                viewModel.subirArchivo(uri, nombre)
-            }
-        }
-    )
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -84,11 +63,6 @@ fun ArchivosScreen(
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
-                },
-                actions = {
-                    IconButton(onClick = { launcher.launch("*/*") }) {
-                        Icon(Icons.Default.Upload, contentDescription = "Subir archivo")
-                    }
                 }
             )
         },
@@ -99,7 +73,7 @@ fun ArchivosScreen(
                 Icon(Icons.Default.CreateNewFolder, contentDescription = "Nueva carpeta")
             }
         },
-      //  containerColor = if (isDark) Color.Black else Color(0xFFF5F5F5)
+
     ) { padding ->
         Column(
             modifier = Modifier
@@ -147,29 +121,9 @@ fun ArchivosScreen(
                                 archivo = archivo,
                                 onClick = {
                                     navController.navigate("contenido_carpeta/${archivo.id}")
-                                },
-                                onEliminar = {
-                                    viewModel.eliminarCarpeta(archivo.id)
                                 }
                             )
                         }
-
-
-
-
-//                        items(archivos) { archivo ->
-//                            ArchivoItemCard(
-//                                archivo = archivo,
-//                                onClick = {
-//                                    if (archivo.tipo == "carpeta") {
-//                                        navController.navigate("contenido_carpeta/${archivo.id}")
-//                                    }
-//                                },
-//                                onEliminar = {
-//                                    viewModel.eliminarCarpeta(archivo.id)
-//                                }
-//                            )
-//                        }
                     }
                 }
             }
@@ -209,6 +163,7 @@ fun ArchivosScreen(
             }
         )
     }
+
 }
 
 

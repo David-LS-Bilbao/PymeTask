@@ -18,6 +18,10 @@ interface ArchivoRepository {
     suspend fun eliminarCarpeta(carpetaId: String)
     suspend fun obtenerArchivosPorCarpeta(carpetaId: String): List<Archivo>
     suspend fun eliminarArchivo(archivoId: String)
+    suspend fun renombrarArchivo(id: String, nuevoNombre: String)
+    suspend fun eliminarArchivosPorCarpeta(carpetaId: String)
+
+
 
 
 

@@ -4,11 +4,13 @@ import com.dls.pymetask.data.repository.ArchivoRepositoryImpl
 import com.dls.pymetask.domain.repository.ArchivoRepository
 import com.dls.pymetask.domain.usecase.archivo.CrearCarpetaUseCase
 import com.dls.pymetask.domain.usecase.archivo.EliminarArchivoUseCase
+import com.dls.pymetask.domain.usecase.archivo.EliminarArchivosPorCarpetaUseCase
 import com.dls.pymetask.domain.usecase.archivo.EliminarCarpetaUseCase
 import com.dls.pymetask.domain.usecase.archivo.GuardarArchivoUseCase
 import com.dls.pymetask.domain.usecase.archivo.ListarArchivosUseCase
 import com.dls.pymetask.domain.usecase.archivo.ObtenerArchivosFirestoreUseCase
 import com.dls.pymetask.domain.usecase.archivo.ObtenerArchivosPorCarpetaUseCase
+import com.dls.pymetask.domain.usecase.archivo.RenombrarArchivoUseCase
 import com.dls.pymetask.domain.usecase.archivo.SubirArchivoUseCase
 import com.google.firebase.storage.FirebaseStorage
 import dagger.Module
@@ -70,6 +72,16 @@ object ArchivoModule {
     fun provideEliminarCarpetaUseCase(
         repository: ArchivoRepository
     ): EliminarCarpetaUseCase = EliminarCarpetaUseCase(repository)
+    @Provides
+    fun provideRenombrarArchivoUseCase(
+        repository: ArchivoRepository
+    ): RenombrarArchivoUseCase = RenombrarArchivoUseCase(repository)
+
+    @Provides
+    fun provideEliminarArchivosPorCarpetaUseCase(
+        repository: ArchivoRepository
+    ): EliminarArchivosPorCarpetaUseCase = EliminarArchivosPorCarpetaUseCase(repository)
+
 
 
 
