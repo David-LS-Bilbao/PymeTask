@@ -1,22 +1,21 @@
 package com.dls.pymetask.presentation.ajustes
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.dls.pymetask.data.preferences.ThemeMode
-import androidx.compose.runtime.livedata.observeAsState
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -27,28 +26,136 @@ fun AjustesScreen(
 ) {
     val theme by viewModel.themeMode.collectAsState()
 
+    var showThemeDialog by remember { mutableStateOf(false) }
+    var showLanguageDialog by remember { mutableStateOf(false) }
+    var showFontSizeDialog by remember { mutableStateOf(false) }
+    var showInfoDialog by remember { mutableStateOf(false) }
+
+    val opcionesTema = listOf(
+        ThemeMode.LIGHT to "Claro",
+        ThemeMode.DARK to "Oscuro",
+        ThemeMode.SYSTEM to "Por sistema"
+    )
+
+    val idiomas = listOf("Español", "Inglés", "Francés")
+    val tamaniosFuente = listOf("Pequeño", "Mediano", "Grande")
+
+    var idiomaSeleccionado by remember { mutableStateOf(idiomas.first()) }
+    var fuenteSeleccionada by remember { mutableStateOf(tamaniosFuente[1]) }
 
     Column(modifier = Modifier.padding(16.dp)) {
 
-        Text("Tema de la aplicación", fontWeight = FontWeight.SemiBold)
-
-        Spacer(Modifier.height(8.dp))
-
-        listOf(
-            ThemeMode.LIGHT to "Claro",
-            ThemeMode.DARK to "Oscuro",
-            ThemeMode.SYSTEM to "Por sistema"
-        ).forEach { (mode, label) ->
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                RadioButton(
-                    selected = theme == mode,
-                    onClick = { viewModel.setTheme(mode) }
-                )
-                Text(label)
+        TopAppBar(
+            title = { Text("Ajustes") },
+            navigationIcon = {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                }
             }
-        }
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+
+        ListItem(
+            headlineContent = { Text("Tema de la aplicación") },
+            supportingContent = { Text(opcionesTema.firstOrNull { it.first == theme }?.second ?: "") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { showThemeDialog = true } // CAMBIADO AQUÍ
+        )
+
+        ListItem(
+            headlineContent = { Text("Idioma") },
+            supportingContent = { Text(idiomaSeleccionado) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { showLanguageDialog = true } // CAMBIADO AQUÍ
+        )
+
+        ListItem(
+            headlineContent = { Text("Tamaño de fuente") },
+            supportingContent = { Text(fuenteSeleccionada) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { showFontSizeDialog = true } // CAMBIADO AQUÍ
+        )
+
+        ListItem(
+            headlineContent = { Text("Preguntas frecuentes (FAQ)") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { /* navegar o mostrar FAQ */ } // CAMBIADO AQUÍ
+        )
+
+        ListItem(
+            headlineContent = { Text("Instrucciones de uso") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { /* navegar o mostrar instrucciones */ } // CAMBIADO AQUÍ
+        )
+
+        ListItem(
+            headlineContent = { Text("Información de la app") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { showInfoDialog = true } // CAMBIADO AQUÍ
+        )
+
+        HorizontalDivider(modifier = Modifier.fillMaxWidth()) // Ajustado para que ocupe el ancho
+    }
+
+    // Diálogos
+
+    if (showThemeDialog) {
+        OpcionesDialog(
+            titulo = "Seleccionar tema",
+            opciones = opcionesTema.map { it.second },
+            seleccionada = opcionesTema.indexOfFirst { it.first == theme },
+            onSeleccionar = {
+                viewModel.setTheme(opcionesTema[it].first)
+                showThemeDialog = false
+            },
+            onCerrar = { showThemeDialog = false }
+        )
+    }
+
+    if (showLanguageDialog) {
+        OpcionesDialog(
+            titulo = "Seleccionar idioma",
+            opciones = idiomas,
+            seleccionada = idiomas.indexOf(idiomaSeleccionado),
+            onSeleccionar = {
+                idiomaSeleccionado = idiomas[it]
+                showLanguageDialog = false
+            },
+            onCerrar = { showLanguageDialog = false }
+        )
+    }
+
+    if (showFontSizeDialog) {
+        OpcionesDialog(
+            titulo = "Seleccionar tamaño de fuente",
+            opciones = tamaniosFuente,
+            seleccionada = tamaniosFuente.indexOf(fuenteSeleccionada),
+            onSeleccionar = {
+                fuenteSeleccionada = tamaniosFuente[it]
+                showFontSizeDialog = false
+            },
+            onCerrar = { showFontSizeDialog = false }
+        )
+    }
+
+    if (showInfoDialog) {
+        AlertDialog(
+            onDismissRequest = { showInfoDialog = false },
+            title = { Text("Información") },
+            text = { Text("Versión 1.0\nAplicación creada por David\n© 2025") },
+            confirmButton = {
+                TextButton(onClick = { showInfoDialog = false }) {
+                    Text("Cerrar")
+                }
+            }
+        )
     }
 }
-
-
-
