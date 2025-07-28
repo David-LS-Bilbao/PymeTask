@@ -1,6 +1,7 @@
 package com.dls.pymetask.presentation.movimientos
 
 
+import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import com.dls.pymetask.presentation.components.FechaSelector
 
 
+@SuppressLint("DefaultLocale")
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -155,6 +157,7 @@ fun CrearMovimientoScreen(
                             }
                         }
                     },
+                maxLines = 1,
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done
                 )

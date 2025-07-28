@@ -4,9 +4,15 @@ package com.dls.pymetask.presentation.components
 import android.app.DatePickerDialog
 import android.content.Context
 import android.text.format.DateFormat
+import android.text.format.DateFormat.*
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import java.util.*
 
 @Composable
@@ -35,14 +41,29 @@ fun FechaSelector(
         )
     }
 
-    Button(
+
+
+    ElevatedButton(
+
         onClick = { datePickerDialog.show() },
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF64B5F6))
+        colors = ButtonDefaults.elevatedButtonColors(
+            containerColor = Color(0xFFC4CCD9),
+            contentColor = Color.White
+        ),
+        shape = MaterialTheme.shapes.medium
+
     ) {
+        Icon(
+            imageVector = Icons.Default.CalendarToday,
+            contentDescription = "Seleccionar fecha",
+            modifier = Modifier.padding(end = 8.dp)
+        )
         Text(
-            text = if (fecha != null)
-                "Fecha: ${DateFormat.format("dd/MM/yyyy", fecha)}"
-            else "Seleccionar fecha"
+            text = fecha?.let { "Fecha: ${format("dd/MM/yyyy", it)}"
+            } ?: "Fecha: ${format("dd/MM/yyyy", Date())}",// Muestra la fecha actual si 'fecha' es null
+            style = MaterialTheme.typography.bodyMedium,
+            // color del texto
+            color = Color.Black
         )
     }
 }

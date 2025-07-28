@@ -46,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -196,10 +197,14 @@ fun EditarMovimientoScreen(
         )
 
 
+            // Campos de edición de movimiento
+
             OutlinedTextField(
                 value = titulo,
                 onValueChange = { titulo = it },
                 label = { Text("Título") },
+                maxLines = 1,
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -207,6 +212,8 @@ fun EditarMovimientoScreen(
                 value = subtitulo,
                 onValueChange = { subtitulo = it },
                 label = { Text("Descripción / Cliente / Proveedor") },
+                maxLines = 1,
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -229,7 +236,9 @@ fun EditarMovimientoScreen(
                             }
                         }
                 },
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal)
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal,imeAction = ImeAction.Done),
+                maxLines = 1,
+
             )
 
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
