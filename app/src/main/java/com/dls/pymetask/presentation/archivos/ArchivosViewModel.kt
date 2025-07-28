@@ -1,20 +1,15 @@
 package com.dls.pymetask.presentation.archivos
 
-import android.app.Application
 import android.net.Uri
-import android.util.Log
-import android.widget.Toast
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dls.pymetask.data.mappers.toUiModel
 import com.dls.pymetask.domain.model.ArchivoUiModel
 import com.dls.pymetask.domain.usecase.archivo.CrearCarpetaUseCase
+import com.dls.pymetask.domain.usecase.archivo.EliminarCarpetaUseCase
 import com.dls.pymetask.domain.usecase.archivo.GuardarArchivoUseCase
-import com.dls.pymetask.domain.usecase.archivo.ListarArchivosUseCase
 import com.dls.pymetask.domain.usecase.archivo.ObtenerArchivosFirestoreUseCase
 import com.dls.pymetask.domain.usecase.archivo.SubirArchivoUseCase
-import dagger.hilt.android.internal.Contexts.getApplication
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -25,7 +20,6 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ArchivosViewModel @Inject constructor(
-    private val listarArchivosUseCase: ListarArchivosUseCase,
     private val subirArchivoUseCase: SubirArchivoUseCase,
     private val guardarArchivoUseCase: GuardarArchivoUseCase,
     private val obtenerArchivosFirestoreUseCase: ObtenerArchivosFirestoreUseCase,
@@ -33,16 +27,23 @@ class ArchivosViewModel @Inject constructor(
 
 ) : ViewModel() {
 
+
     private val _archivos = MutableStateFlow<List<ArchivoUiModel>>(emptyList())
     val archivos: StateFlow<List<ArchivoUiModel>> = _archivos
 
     private val _uiEvent = MutableSharedFlow<String>()
     val uiEvent: SharedFlow<String> = _uiEvent
 
+
+
+
     fun cargarArchivos() {
         viewModelScope.launch {
             try {
-                val lista = obtenerArchivosFirestoreUseCase().map { it.toUiModel() }
+                val lista = obtenerArchivosFirestoreUseCase()
+                    .filter { it.tipo == "carpeta" } // ✅ Solo mostrar carpetas
+                    .map { it.toUiModel() }
+
                 _archivos.value = lista
             } catch (e: Exception) {
                 _uiEvent.emit("Error al cargar archivos: ${e.localizedMessage}")
@@ -76,8 +77,18 @@ class ArchivosViewModel @Inject constructor(
         }
     }
 
+    @Inject lateinit var eliminarCarpetaUseCase: EliminarCarpetaUseCase
 
-    fun onArchivoClick(archivo: ArchivoUiModel) {
-        // TODO: abrir archivo, mostrar menú de envío (WhatsApp, email...)
+    fun eliminarCarpeta(carpetaId: String) {
+        viewModelScope.launch {
+            try {
+                eliminarCarpetaUseCase(carpetaId)
+                cargarArchivos()
+                _uiEvent.emit("Carpeta eliminada")
+            } catch (e: Exception) {
+                _uiEvent.emit("Error al eliminar carpeta: ${e.localizedMessage}")
+            }
+        }
     }
+
 }

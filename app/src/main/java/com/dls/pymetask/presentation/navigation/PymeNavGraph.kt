@@ -25,6 +25,7 @@ import com.dls.pymetask.presentation.movimientos.MovimientosScreen
 import com.dls.pymetask.presentation.estadisticas.EstadisticasScreen
 import com.dls.pymetask.presentation.ajustes.AjustesScreen
 import com.dls.pymetask.presentation.archivos.ArchivosScreen
+import com.dls.pymetask.presentation.archivos.ContenidoCarpetaScreen
 import com.dls.pymetask.presentation.contactos.CrearContactoScreen
 import com.dls.pymetask.presentation.contactos.DetalleContactoScreen
 import com.dls.pymetask.presentation.contactos.EditarContactoScreen
@@ -162,6 +163,12 @@ fun PymeNavGraph(
                 notaId = backStackEntry.arguments?.getString("notaId")
             )
         }
+
+        composable("contenido_carpeta/{carpetaId}") { backStackEntry ->
+            val carpetaId = backStackEntry.arguments?.getString("carpetaId") ?: ""
+            ContenidoCarpetaScreen(carpetaId = carpetaId, navController = navController)
+        }
+
 
 
     }

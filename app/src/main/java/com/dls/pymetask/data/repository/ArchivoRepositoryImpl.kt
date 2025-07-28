@@ -97,6 +97,22 @@ class ArchivoRepositoryImpl(
         return snapshot.documents.mapNotNull { it.toObject(Archivo::class.java)?.copy(id = it.id) }
     }
 
+    override suspend fun eliminarArchivo(archivoId: String) {
+        val firestore = FirebaseFirestore.getInstance()
+        firestore.collection("archivos").document(archivoId).delete().await()
+    }
+
+    override suspend fun eliminarCarpeta(carpetaId: String) {
+        val firestore = FirebaseFirestore.getInstance()
+        firestore.collection("archivos").document(carpetaId).delete().await()
+
+        // También puedes borrar sus archivos si lo deseas:
+        val snapshot = firestore.collection("archivos")
+            .whereEqualTo("carpetaId", carpetaId).get().await()
+
+        snapshot.documents.forEach { it.reference.delete() }
+    }
+
 
 
 }

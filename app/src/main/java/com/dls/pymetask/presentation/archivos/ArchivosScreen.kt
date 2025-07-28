@@ -21,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -28,7 +29,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.dls.pymetask.presentation.components.CarpetaItemCard
 import com.dls.pymetask.ui.theme.Poppins
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArchivosScreen(
@@ -36,9 +41,9 @@ fun ArchivosScreen(
     viewModel: ArchivosViewModel = hiltViewModel()
 ) {
     val archivos by viewModel.archivos.collectAsState()
-    val isDark = isSystemInDarkTheme()
     val context = LocalContext.current
-
+//
+//    val isDark = isSystemInDarkTheme()
     var mostrarDialogo by remember { mutableStateOf(false) }
     var nombreCarpeta by remember { mutableStateOf("") }
 
@@ -94,28 +99,81 @@ fun ArchivosScreen(
                 Icon(Icons.Default.CreateNewFolder, contentDescription = "Nueva carpeta")
             }
         },
-        containerColor = if (isDark) Color.Black else Color(0xFFF5F5F5)
+      //  containerColor = if (isDark) Color.Black else Color(0xFFF5F5F5)
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
         ) {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
+                    .padding(padding)
             ) {
-                items(archivos) { archivo ->
-                    ArchivoItemCard(
-                        archivo = archivo,
-                        onClick = { viewModel.onArchivoClick(archivo) }
-                    )
+                if (archivos.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(32.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "📁 No hay carpetas aún",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Pulsa el botón ➕ para crear una carpeta.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                        )
+                    }
+                } else {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp)
+                    ) {
+
+
+                        items(archivos) { archivo ->
+                            CarpetaItemCard(
+                                archivo = archivo,
+                                onClick = {
+                                    navController.navigate("contenido_carpeta/${archivo.id}")
+                                },
+                                onEliminar = {
+                                    viewModel.eliminarCarpeta(archivo.id)
+                                }
+                            )
+                        }
+
+
+
+
+//                        items(archivos) { archivo ->
+//                            ArchivoItemCard(
+//                                archivo = archivo,
+//                                onClick = {
+//                                    if (archivo.tipo == "carpeta") {
+//                                        navController.navigate("contenido_carpeta/${archivo.id}")
+//                                    }
+//                                },
+//                                onEliminar = {
+//                                    viewModel.eliminarCarpeta(archivo.id)
+//                                }
+//                            )
+//                        }
+                    }
                 }
             }
+
         }
     }
     if (mostrarDialogo) {

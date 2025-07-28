@@ -15,7 +15,10 @@ interface ArchivoRepository {
     suspend fun guardarArchivoEnFirestore(archivo: Archivo)
     suspend fun obtenerArchivosDesdeFirestore(): List<Archivo>
     suspend fun crearCarpeta(nombre: String)
+    suspend fun eliminarCarpeta(carpetaId: String)
     suspend fun obtenerArchivosPorCarpeta(carpetaId: String): List<Archivo>
+    suspend fun eliminarArchivo(archivoId: String)
+
 
 
 

@@ -34,7 +34,8 @@ import com.dls.pymetask.domain.model.ArchivoUiModel
 @Composable
 fun ArchivoItemCard(
     archivo: ArchivoUiModel,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onEliminar: () -> Unit
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
