@@ -1,14 +1,18 @@
 
 package com.dls.pymetask.presentation.archivos
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
+import android.webkit.MimeTypeMap
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dls.pymetask.data.mappers.toUiModel
 import com.dls.pymetask.domain.model.ArchivoUiModel
 import com.dls.pymetask.domain.usecase.archivo.*
 import com.google.firebase.firestore.FirebaseFirestore
+import dagger.hilt.android.internal.Contexts.getApplication
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -17,6 +21,8 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+
+
 
 @HiltViewModel
 class ContenidoCarpetaViewModel @Inject constructor(
@@ -50,10 +56,27 @@ class ContenidoCarpetaViewModel @Inject constructor(
     }
 
     // Subir archivo dentro de una carpeta
-    fun subirArchivo(uri: Uri, nombre: String, carpetaId: String) {
+
+    fun subirArchivo(
+        context: Context,
+        uri: Uri,
+        nombreOriginal: String,
+        carpetaId: String
+    ) {
         viewModelScope.launch {
             try {
-                val archivo = subirArchivoUseCase(uri, nombre).copy(carpetaId = carpetaId)
+                // Obtener MIME y extensión real
+                val mimeType = context.contentResolver.getType(uri) ?: "*/*"
+                val extension = MimeTypeMap.getSingleton()
+                    .getExtensionFromMimeType(mimeType) ?: "bin"
+
+                val nombreFinal = if (nombreOriginal.contains(".")) {
+                    nombreOriginal
+                } else {
+                    "${System.currentTimeMillis()}.$extension"
+                }
+
+                val archivo = subirArchivoUseCase(uri, nombreFinal).copy(carpetaId = carpetaId)
                 guardarArchivoUseCase(archivo)
                 cargarArchivosDeCarpeta(carpetaId)
                 Log.d("Archivos", "Archivo guardado en Firestore: ${archivo.nombre}")
@@ -64,6 +87,24 @@ class ContenidoCarpetaViewModel @Inject constructor(
             }
         }
     }
+
+
+
+
+//    fun subirArchivo(uri: Uri, nombre: String, carpetaId: String) {
+//        viewModelScope.launch {
+//            try {
+//                val archivo = subirArchivoUseCase(uri, nombre).copy(carpetaId = carpetaId)
+//                guardarArchivoUseCase(archivo)
+//                cargarArchivosDeCarpeta(carpetaId)
+//                Log.d("Archivos", "Archivo guardado en Firestore: ${archivo.nombre}")
+//                _uiEvent.emit("Archivo añadido correctamente")
+//            } catch (e: Exception) {
+//                Log.e("Archivos", "Error al subir o guardar archivo: ${e.localizedMessage}")
+//                _uiEvent.emit("Error al subir archivo")
+//            }
+//        }
+//    }
 
     // Eliminar un archivo individual
     fun eliminarArchivo(archivoId: String, carpetaId: String) {

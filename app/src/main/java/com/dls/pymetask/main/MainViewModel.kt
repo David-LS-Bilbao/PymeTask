@@ -2,6 +2,7 @@ package com.dls.pymetask.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dls.pymetask.data.preferences.DefaultAppPreferences
 import com.dls.pymetask.domain.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,4 +29,6 @@ class MainViewModel @Inject constructor(
             _isUserLoggedIn.value = authRepository.isUserLoggedIn()
         }
     }
+
+
 }

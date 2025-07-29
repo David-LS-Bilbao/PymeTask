@@ -64,6 +64,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.dls.pymetask.data.preferences.DefaultAppPreferences
 import com.dls.pymetask.presentation.auth.login.LoginViewModel
 import com.dls.pymetask.presentation.navigation.Routes
 import com.dls.pymetask.ui.theme.Poppins
@@ -99,6 +100,15 @@ fun DashboardScreen(
             activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         }
     }//---------------------------------------------------
+
+
+//    // limpiar referencias antiguas
+//    val prefs = DefaultAppPreferences(context)
+//    prefs.obtenerTodas().forEach { (mime, _) ->
+//        if (mime.contains("*") || mime.contains("octet-stream")) {
+//            prefs.eliminarApp(mime)
+//        }
+//    }
 
 
 

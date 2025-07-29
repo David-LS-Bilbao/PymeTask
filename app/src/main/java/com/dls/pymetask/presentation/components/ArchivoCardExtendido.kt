@@ -36,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,18 +46,24 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.dls.pymetask.domain.model.ArchivoUiModel
+import com.dls.pymetask.presentation.archivos.abrirArchivoLocal
 import com.dls.pymetask.utils.esAudio
 import com.dls.pymetask.utils.esVideo
 import com.dls.pymetask.utils.iconoPorTipo
+import kotlinx.coroutines.launch
+import java.io.File
+import java.net.URLConnection
+import androidx.core.net.toUri
 
 
 @Composable
 fun ArchivoCardExtendido(
     archivo: ArchivoUiModel,
-    onEliminar: () -> Unit
+    onEliminar: () -> Unit,
 ) {
     val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
 
 
@@ -65,7 +72,12 @@ fun ArchivoCardExtendido(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
-            .clickable { abrirArchivo(context, archivo.url) },
+            .clickable {
+
+                    scope.launch {
+                        abrirArchivoLocal(context, archivo.nombre, archivo.url)
+                    }
+                       },
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Row(
@@ -77,7 +89,7 @@ fun ArchivoCardExtendido(
 
 
             if (esImagen(archivo.tipo)) {
-                androidx.compose.foundation.Image(
+                Image(
                     painter = rememberAsyncImagePainter(archivo.url),
                     contentDescription = archivo.nombre,
                     modifier = Modifier
@@ -181,7 +193,7 @@ fun ArchivoCardExtendido(
 }
 
 private fun abrirArchivo(context: Context, url: String) {
-    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+    val intent = Intent(Intent.ACTION_VIEW, url.toUri())
     context.startActivity(intent)
 }
 
@@ -196,7 +208,7 @@ private fun compartirPorWhatsApp(context: Context, url: String) {
 
 private fun compartirPorEmail(context: Context, url: String) {
     val intent = Intent(Intent.ACTION_SENDTO).apply {
-        data = Uri.parse("mailto:")
+        data = "mailto:".toUri()
         putExtra(Intent.EXTRA_SUBJECT, "Archivo desde PymeTask")
         putExtra(Intent.EXTRA_TEXT, url)
     }
@@ -208,3 +220,35 @@ fun esImagen(tipo: String): Boolean {
     val extensionesImagen = listOf("jpg", "jpeg", "png", "gif", "bmp", "webp", "heic")
     return tipo.lowercase() in extensionesImagen
 }
+
+fun getMimeTypeFromFile(file: File): String {
+    val extension = file.extension.lowercase()
+
+    return when (extension) {
+        "jpg", "jpeg" -> "image/jpeg"
+        "png" -> "image/png"
+        "gif" -> "image/gif"
+        "webp", "bmp", "heic" -> "image/$extension"
+        "mp4" -> "video/mp4"
+        "mkv" -> "video/x-matroska"
+        "avi" -> "video/x-msvideo"
+        "mov" -> "video/quicktime"
+        "mp3" -> "audio/mpeg"
+        "wav" -> "audio/wav"
+        "ogg" -> "audio/ogg"
+        "pdf" -> "application/pdf"
+        "txt" -> "text/plain"
+        "doc" -> "application/msword"
+        "docx" -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        "xls" -> "application/vnd.ms-excel"
+        "xlsx" -> "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        else -> {
+            // Último intento con URLConnection (pero no confiar ciegamente)
+            val guess = URLConnection.guessContentTypeFromName(file.name)
+            if (!guess.isNullOrEmpty() && !guess.contains("octet-stream")) guess
+            else "*/*" // último recurso
+        }
+    }
+}
+
+

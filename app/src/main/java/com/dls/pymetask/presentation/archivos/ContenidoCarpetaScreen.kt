@@ -96,7 +96,7 @@ fun ContenidoCarpetaScreen(
         onResult = { uri ->
             uri?.let {
                 val nombre = uri.lastPathSegment?.substringAfterLast("/")?: "archivo_${System.currentTimeMillis()}"
-                viewModel.subirArchivo(uri, nombre, carpetaId)
+                viewModel.subirArchivo(context,uri, nombre, carpetaId)
             }
         }
     )
