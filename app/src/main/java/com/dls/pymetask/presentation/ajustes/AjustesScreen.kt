@@ -1,9 +1,11 @@
 package com.dls.pymetask.presentation.ajustes
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -12,9 +14,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.dls.pymetask.data.preferences.DefaultAppPreferences
 import com.dls.pymetask.data.preferences.ThemeMode
 
 
@@ -25,7 +29,7 @@ fun AjustesScreen(
     viewModel: ThemeViewModel = hiltViewModel()
 ) {
     val theme by viewModel.themeMode.collectAsState()
-
+    val context = LocalContext.current
     var showThemeDialog by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showFontSizeDialog by remember { mutableStateOf(false) }
@@ -65,6 +69,8 @@ fun AjustesScreen(
                 .clickable { showThemeDialog = true } // CAMBIADO AQUÍ
         )
 
+
+
         ListItem(
             headlineContent = { Text("Idioma") },
             supportingContent = { Text(idiomaSeleccionado) },
@@ -102,6 +108,28 @@ fun AjustesScreen(
                 .clickable { showInfoDialog = true } // CAMBIADO AQUÍ
         )
 
+        ListItem(
+            headlineContent = { Text("Restablecer Preferencias") },
+            supportingContent = { Text("__") },
+            leadingContent = {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Reset MIME",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    val prefs = DefaultAppPreferences(context)
+                    prefs.obtenerTodas().forEach { (mime, _) ->
+                        if (mime.contains("*") || mime.contains("octet-stream")) {
+                            prefs.eliminarApp(mime)
+                        }
+                    }
+                    Toast.makeText(context, "Preferencias de archivo restablecidas", Toast.LENGTH_SHORT).show()
+                }
+        )
         HorizontalDivider(modifier = Modifier.fillMaxWidth()) // Ajustado para que ocupe el ancho
     }
 
@@ -158,4 +186,5 @@ fun AjustesScreen(
             }
         )
     }
+
 }

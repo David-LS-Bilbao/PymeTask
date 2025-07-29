@@ -38,18 +38,6 @@ fun NotasScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val notas by viewModel.notas.collectAsState()
 
-    //desactivar modo landscape
-    val context = LocalContext.current
-    val activity = context as? Activity
-    LaunchedEffect(Unit) {
-        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-    }
-    // reactivar modo landscape
-    DisposableEffect(Unit) {
-        onDispose {
-            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-        }
-    }//---------------------------------------------------
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->

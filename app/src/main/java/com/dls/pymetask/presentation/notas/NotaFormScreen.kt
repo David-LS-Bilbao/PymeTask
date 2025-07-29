@@ -1,7 +1,9 @@
 package com.dls.pymetask.presentation.notas
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -40,6 +42,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -87,6 +90,22 @@ fun NotaFormScreen(
     val coloresDisponibles = Constants.coloresDisponibles
 
     var mostrarSelectorColor by remember { mutableStateOf(false) }
+
+
+    //desactivar modo landscape
+    val context = LocalContext.current
+    val activity = context as? Activity
+    LaunchedEffect(Unit) {
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+    }
+    // reactivar modo landscape
+    DisposableEffect(Unit) {
+        onDispose {
+            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        }
+    }//---------------------------------------------------
+
+
 
     // Carga de nota si notaId está presente
     LaunchedEffect(notaId) {
