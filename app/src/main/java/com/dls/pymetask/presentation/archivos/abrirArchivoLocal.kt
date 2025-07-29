@@ -14,22 +14,36 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
+import java.net.URL
 import java.net.URLConnection
 
 suspend fun abrirArchivoLocal(context: Context, archivoNombre: String, archivoUrl: String) {
     val carpetaDescargas = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
+
+    // Detectar extensión si no está incluida en el nombre
+    val extension = archivoNombre.substringAfterLast('.', missingDelimiterValue = "")
+        .ifEmpty {
+            Uri.parse(archivoUrl).lastPathSegment
+                ?.substringAfterLast(".", "bin")
+                ?.substringBefore("?") ?: "bin"
+        }
+
     val nombreConExtension = if (archivoNombre.contains(".")) {
         archivoNombre
     } else {
-        "$archivoNombre.${archivoTipoSinPunto(archivoUrl)}"
+        "$archivoNombre.$extension"
     }
+
     val archivoLocal = File(carpetaDescargas, nombreConExtension)
 
+    // Crear carpeta si no existe
+    archivoLocal.parentFile?.mkdirs()
 
+    // Descargar si no existe
     if (!archivoLocal.exists()) {
         try {
             withContext(Dispatchers.IO) {
-                val input = java.net.URL(archivoUrl).openStream()
+                val input = URL(archivoUrl).openStream()
                 val output = FileOutputStream(archivoLocal)
                 input.use { inputStream ->
                     output.use { outputStream ->
@@ -39,79 +53,33 @@ suspend fun abrirArchivoLocal(context: Context, archivoNombre: String, archivoUr
             }
             Toast.makeText(context, "Archivo descargado", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
-            Log.e("AbrirArchivo", "Error al descargar", e)
+            Log.e("AbrirArchivo", "Error al descargar ($nombreConExtension)", e)
             Toast.makeText(context, "Error al descargar archivo", Toast.LENGTH_SHORT).show()
             return
         }
+    } else {
+        Toast.makeText(context, "Archivo abierto desde caché", Toast.LENGTH_SHORT).show()
     }
 
+    // Abrir archivo con tipo correcto
     try {
         val uri = FileProvider.getUriForFile(
             context,
             context.packageName + ".fileprovider",
             archivoLocal
         )
-        val mime = getMimeTypeFromFile(archivoLocal)
-        Log.d("AbrirArchivo", "MIME detectado: $mime para archivo: ${archivoLocal.name}")
 
+        val mime = URLConnection.guessContentTypeFromName(nombreConExtension) ?: "*/*"
+        Log.d("AbrirArchivo", "MIME detectado: $mime para archivo: $nombreConExtension")
 
         val intent = Intent(Intent.ACTION_VIEW).apply {
             setDataAndType(uri, mime)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
 
-        val prefs = DefaultAppPreferences(context)
-        val appPreferida = prefs.obtenerApp(mime)
-
-        if (appPreferida != null) {
-            intent.setPackage(appPreferida)
-            if (intent.resolveActivity(context.packageManager) != null) {
-                context.startActivity(intent)
-            } else {
-                Toast.makeText(
-                    context,
-                    "La app predeterminada ya no está disponible",
-                    Toast.LENGTH_SHORT
-                ).show()
-                prefs.eliminarApp(mime)
-            }
-        } else {
-            val apps = context.packageManager.queryIntentActivities(intent, 0)
-
-            if (apps.isNotEmpty()) {
-                val nombres = apps.map { it.loadLabel(context.packageManager).toString() }
-                val paquetes = apps.map { it.activityInfo.packageName }
-
-                android.app.AlertDialog.Builder(context)
-                    .setTitle("Selecciona una app para abrir este tipo de archivo")
-                    .setItems(nombres.toTypedArray()) { _, index ->
-                        val paqueteSeleccionado = paquetes[index]
-
-                        if (!mime.contains("*") && !mime.contains("octet-stream")) {
-                            prefs.guardarApp(mime, paqueteSeleccionado)
-                        }
-
-
-                        intent.setPackage(paqueteSeleccionado)
-                        context.startActivity(intent)
-                    }
-                    .setNegativeButton("Cancelar", null)
-                    .show()
-            } else {
-                Toast.makeText(
-                    context,
-                    "No hay apps compatibles para abrir este archivo",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
+        context.startActivity(intent)
     } catch (e: ActivityNotFoundException) {
-        Log.e("AbrirArchivo", "Error al abrir el archivo", e)
-        Toast.makeText(context, "Error al abrir el archivo", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "No hay app para abrir este tipo de archivo", Toast.LENGTH_SHORT).show()
     }
-}
-
-fun archivoTipoSinPunto(url: String): String {
-    return Uri.parse(url).lastPathSegment?.substringAfterLast(".")?.substringBefore("?") ?: "bin"
 }
 
