@@ -1,9 +1,12 @@
 package com.dls.pymetask.main
 
+import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dls.pymetask.data.preferences.DefaultAppPreferences
 import com.dls.pymetask.domain.repository.AuthRepository
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,16 +22,16 @@ class MainViewModel @Inject constructor(
     val isUserLoggedIn = _isUserLoggedIn.asStateFlow()
 
 
+    fun checkLoginStatus(context: Context) {
+        val user = FirebaseAuth.getInstance().currentUser
+        val marcada = authRepository.sesionMarcada(context)
 
-    init {
-        checkLoginStatus()
+        Log.d("AuthCheck", "UID: ${user?.uid}, Email: ${user?.email}, Marcada=$marcada")
+        _isUserLoggedIn.value = (user != null || marcada)
     }
 
-    private fun checkLoginStatus() {
-        viewModelScope.launch {
-            _isUserLoggedIn.value = authRepository.isUserLoggedIn()
-        }
-    }
+
+
 
 
 }

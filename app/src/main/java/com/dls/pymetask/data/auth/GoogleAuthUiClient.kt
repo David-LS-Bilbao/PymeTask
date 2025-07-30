@@ -24,10 +24,12 @@ class GoogleAuthUiClient(
             oneTapClient.beginSignIn(
                 BeginSignInRequest.builder()
                     .setGoogleIdTokenRequestOptions(
-                        BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
+                        BeginSignInRequest
+                            .GoogleIdTokenRequestOptions.builder()
                             .setSupported(true)
                             .setServerClientId(context.getString(R.string.default_web_client_id))
                             .setFilterByAuthorizedAccounts(false)
+
                             .build()
                     )
                     .build()

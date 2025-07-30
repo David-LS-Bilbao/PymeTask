@@ -69,7 +69,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    implementation(libs.androidx.foundation) // o versión actual
+    implementation(libs.androidx.foundation)
 
     implementation(libs.androidx.material.icons.extended)
 
@@ -78,6 +78,8 @@ dependencies {
     implementation(libs.coil.compose)
 
     implementation(libs.reorderable)
+
+
 
 
     // Hilt

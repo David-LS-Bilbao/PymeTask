@@ -50,6 +50,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,6 +66,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.dls.pymetask.data.preferences.DefaultAppPreferences
+import com.dls.pymetask.main.MainViewModel
 import com.dls.pymetask.presentation.auth.login.LoginViewModel
 import com.dls.pymetask.presentation.navigation.Routes
 import com.dls.pymetask.ui.theme.Poppins
@@ -88,6 +90,8 @@ fun DashboardScreen(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
+
+
 //desactivar modo landscape
     val context = LocalContext.current
     val activity = context as? Activity
@@ -102,13 +106,6 @@ fun DashboardScreen(
     }//---------------------------------------------------
 
 
-//    // limpiar referencias antiguas
-//    val prefs = DefaultAppPreferences(context)
-//    prefs.obtenerTodas().forEach { (mime, _) ->
-//        if (mime.contains("*") || mime.contains("octet-stream")) {
-//            prefs.eliminarApp(mime)
-//        }
-//    }
 
 
 
@@ -213,7 +210,7 @@ fun DashboardScreen(
                 Text(
                     "Cerrar sesión",
                     modifier = Modifier.clickable {
-                        viewModel.logout()
+                        viewModel.logout(context)
                         showLogoutDialog = false
                         navController.navigate("login") {
                             popUpTo("dashboard") { inclusive = true }

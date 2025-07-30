@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.dls.pymetask.presentation.ajustes.ThemeViewModel
@@ -22,9 +24,15 @@ fun PymeTaskAppRoot(
     mainViewModel: MainViewModel = hiltViewModel(),
     themeViewModel: ThemeViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val navController = rememberNavController()
     val isUserLoggedIn by mainViewModel.isUserLoggedIn.collectAsState()
     val themeMode by themeViewModel.themeMode.collectAsState()
+
+    // Llama explícitamente a checkLoginStatus
+    LaunchedEffect(Unit) {
+        mainViewModel.checkLoginStatus(context)
+    }
 
     // 🟢 APLICA el tema aquí:
     PymeTaskTheme(themeMode = themeMode) {

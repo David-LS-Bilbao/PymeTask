@@ -1,6 +1,5 @@
 package com.dls.pymetask.presentation.archivos
 
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dls.pymetask.data.mappers.toUiModel
@@ -21,8 +20,7 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ArchivosViewModel @Inject constructor(
-    private val subirArchivoUseCase: SubirArchivoUseCase,
-    private val guardarArchivoUseCase: GuardarArchivoUseCase,
+
     private val obtenerArchivosFirestoreUseCase: ObtenerArchivosFirestoreUseCase,
     private val crearCarpetaUseCase: CrearCarpetaUseCase
 
@@ -53,19 +51,6 @@ class ArchivosViewModel @Inject constructor(
     }
 
 
-    fun subirArchivo(uri: Uri, nombre: String) {
-        viewModelScope.launch {
-            try {
-                val archivo = subirArchivoUseCase(uri, nombre)
-                guardarArchivoUseCase(archivo) // << nuevo paso
-                _archivos.value = _archivos.value + archivo.toUiModel()
-            } catch (e: Exception) {
-                _uiEvent.emit("Error al subir: ${e.localizedMessage}")
-
-            }
-        }
-    }
-
     fun crearCarpeta(nombre: String) {
         viewModelScope.launch {
             try {
@@ -80,33 +65,8 @@ class ArchivosViewModel @Inject constructor(
 
     @Inject lateinit var eliminarCarpetaUseCase: EliminarCarpetaUseCase
 
-    fun eliminarCarpeta(carpetaId: String) {
-        viewModelScope.launch {
-            try {
-                eliminarCarpetaUseCase(carpetaId)
-                cargarArchivos()
-                _uiEvent.emit("Carpeta eliminada")
-            } catch (e: Exception) {
-                _uiEvent.emit("Error al eliminar carpeta: ${e.localizedMessage}")
-            }
-        }
-
-    }
-
 
     @Inject
     lateinit var renombrarArchivoUseCase: RenombrarArchivoUseCase
-
-    fun renombrarCarpeta(id: String, nuevoNombre: String) {
-        viewModelScope.launch {
-            try {
-                renombrarArchivoUseCase(id, nuevoNombre)
-                cargarArchivos()
-                _uiEvent.emit("Carpeta renombrada")
-            } catch (e: Exception) {
-                _uiEvent.emit("Error al renombrar: ${e.localizedMessage}")
-            }
-        }
-    }
 
 }

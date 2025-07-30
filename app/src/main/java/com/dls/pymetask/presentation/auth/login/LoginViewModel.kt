@@ -1,6 +1,7 @@
 package com.dls.pymetask.presentation.auth.login
 
 
+import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import androidx.lifecycle.ViewModel
@@ -41,10 +42,11 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun onGoogleSignInResult(intent: Intent) {
+    fun onGoogleSignInResult(context: Context, intent: Intent) {
         viewModelScope.launch {
             val result = googleAuthClient.signInWithIntent(intent)
             if (result.user != null) {
+                authRepository.marcarSesionActiva(context) // Marcar sesión persistente
                 _loginSuccess.value = true
             } else {
                 _errorMessage.value = result.errorMessage
@@ -90,10 +92,11 @@ class LoginViewModel @Inject constructor(
         _errorMessage.value = message
     }
 
-    fun logout() {
+    fun logout(context: Context) {
         viewModelScope.launch {
-            authRepository.logout()
+            authRepository.logout(context)
         }
     }
+
 
 }
