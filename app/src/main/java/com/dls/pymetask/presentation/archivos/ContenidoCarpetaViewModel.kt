@@ -5,14 +5,12 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.webkit.MimeTypeMap
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dls.pymetask.data.mappers.toUiModel
 import com.dls.pymetask.domain.model.ArchivoUiModel
 import com.dls.pymetask.domain.usecase.archivo.*
 import com.google.firebase.firestore.FirebaseFirestore
-import dagger.hilt.android.internal.Contexts.getApplication
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -89,22 +87,27 @@ class ContenidoCarpetaViewModel @Inject constructor(
     }
 
 
+    // Renombrar un archivo individual
+    fun renombrarArchivo(archivo: ArchivoUiModel, nuevoNombre: String) {
+        viewModelScope.launch {
+            try {
+                // 1. Subir copia con nuevo nombre
+                val nuevoArchivo = renombrarArchivoUseCase(archivo, nuevoNombre)
 
+                // 2. Eliminar el original de Storage y Firestore
+                eliminarArchivoUseCase(archivo)
 
-//    fun subirArchivo(uri: Uri, nombre: String, carpetaId: String) {
-//        viewModelScope.launch {
-//            try {
-//                val archivo = subirArchivoUseCase(uri, nombre).copy(carpetaId = carpetaId)
-//                guardarArchivoUseCase(archivo)
-//                cargarArchivosDeCarpeta(carpetaId)
-//                Log.d("Archivos", "Archivo guardado en Firestore: ${archivo.nombre}")
-//                _uiEvent.emit("Archivo añadido correctamente")
-//            } catch (e: Exception) {
-//                Log.e("Archivos", "Error al subir o guardar archivo: ${e.localizedMessage}")
-//                _uiEvent.emit("Error al subir archivo")
-//            }
-//        }
-//    }
+                // 3. Recargar la lista de archivos
+                cargarArchivosDeCarpeta(archivo.carpetaId)
+
+                _uiEvent.emit("Archivo renombrado correctamente")
+            } catch (e: Exception) {
+                Log.e("Archivos", "Error al renombrar: ${e.localizedMessage}")
+                _uiEvent.emit("Error al renombrar archivo")
+            }
+        }
+    }
+
 
     // Eliminar un archivo individual
     fun eliminarArchivo(archivoId: String, carpetaId: String) {

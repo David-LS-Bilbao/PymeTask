@@ -1,15 +1,19 @@
 package com.dls.pymetask.data.repository
 
 import android.net.Uri
+import androidx.core.net.toUri
 import com.dls.pymetask.domain.model.Archivo
+import com.dls.pymetask.domain.model.ArchivoUiModel
 import com.dls.pymetask.domain.repository.ArchivoRepository
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
+import java.io.File
 import java.net.URLConnection
 
 class ArchivoRepositoryImpl(
-    private val storage: FirebaseStorage
+    private val storage: FirebaseStorage,
+    private val firestore: FirebaseFirestore
 ) : ArchivoRepository {
 
     override suspend fun listarArchivos(carpeta: String): List<Archivo> {
@@ -131,6 +135,45 @@ class ArchivoRepositoryImpl(
         for (doc in archivos.documents) {
             doc.reference.delete().await()
         }
+    }
+    override suspend fun renombrarCarpetaFirestore(archivo: ArchivoUiModel, nuevoNombre: String): ArchivoUiModel {
+        val documentoRef = firestore.collection("archivos").document(archivo.id)
+
+        // Actualiza el campo 'nombre' en Firestore
+        documentoRef.update("nombre", nuevoNombre).await()
+
+        // Devuelve una copia del archivo con el nuevo nombre
+        return archivo.copy(nombre = nuevoNombre)
+    }
+
+
+    override suspend fun renombrarArchivoStorageYFirestore(archivo: ArchivoUiModel, nuevoNombre: String): ArchivoUiModel {
+        val nuevaRuta = "archivos/$nuevoNombre"
+        val originalRef = storage.reference.child("archivos/${archivo.nombre}")
+        val nuevoRef = storage.reference.child(nuevaRuta)
+
+        // 1. Descargar archivo original a archivo temporal
+        val tempFile = File.createTempFile("archivo_temp", null)
+        originalRef.getFile(tempFile).await()
+
+        // 2. Subir archivo con nuevo nombre
+        nuevoRef.putFile(tempFile.toUri()).await()
+        val nuevoUrl = nuevoRef.downloadUrl.await().toString()
+
+        // 3. Actualiza Firestore con nuevo nombre y URL
+        val documentoRef = firestore.collection("archivos").document(archivo.id)
+        documentoRef.update(
+            mapOf(
+                "nombre" to nuevoNombre,
+                "url" to nuevoUrl
+            )
+        ).await()
+
+        // 4. Elimina el archivo antiguo del Storage
+        originalRef.delete().await()
+
+        // 5. Devuelve el archivo actualizado
+        return archivo.copy(nombre = nuevoNombre, url = nuevoUrl)
     }
 
 

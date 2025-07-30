@@ -60,10 +60,15 @@ import androidx.core.net.toUri
 fun ArchivoCardExtendido(
     archivo: ArchivoUiModel,
     onEliminar: () -> Unit,
+    onRenombrarArchivo: suspend (ArchivoUiModel, String) -> Unit
 ) {
     val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+
+    var mostrarDialogoRenombrar by remember { mutableStateOf(false) }
+    var nuevoNombre by remember { mutableStateOf(archivo.nombre) }
+
 
 
 
@@ -177,6 +182,13 @@ fun ArchivoCardExtendido(
                         }
                     )
                     DropdownMenuItem(
+                        text = { Text("Renombrar") },
+                        onClick = {
+                            mostrarDialogoRenombrar = true
+                            expanded = false
+                        }
+                    )
+                    DropdownMenuItem(
                         text = { Text("Eliminar") },
                         onClick = {
                             onEliminar()
@@ -190,6 +202,38 @@ fun ArchivoCardExtendido(
             }
         }
     }
+    if (mostrarDialogoRenombrar) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { mostrarDialogoRenombrar = false },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    scope.launch {
+                        onRenombrarArchivo(archivo, nuevoNombre)
+                        mostrarDialogoRenombrar = false
+                    }
+                }) {
+                    Text("Renombrar")
+                }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    mostrarDialogoRenombrar = false
+                }) {
+                    Text("Cancelar")
+                }
+            },
+            title = { Text("Renombrar archivo") },
+            text = {
+                androidx.compose.material3.OutlinedTextField(
+                    value = nuevoNombre,
+                    onValueChange = { nuevoNombre = it },
+                    singleLine = true,
+                    label = { Text("Nuevo nombre") }
+                )
+            }
+        )
+    }
+
 }
 
 private fun abrirArchivo(context: Context, url: String) {
