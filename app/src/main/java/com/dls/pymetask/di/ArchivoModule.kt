@@ -2,6 +2,7 @@ package com.dls.pymetask.di
 
 import com.dls.pymetask.data.repository.ArchivoRepositoryImpl
 import com.dls.pymetask.domain.repository.ArchivoRepository
+import com.dls.pymetask.domain.usecase.archivo.ArchivoUseCase
 import com.dls.pymetask.domain.usecase.archivo.CrearCarpetaUseCase
 import com.dls.pymetask.domain.usecase.archivo.EliminarArchivoUseCase
 import com.dls.pymetask.domain.usecase.archivo.EliminarArchivosPorCarpetaUseCase
@@ -82,6 +83,31 @@ object ArchivoModule {
         repository: ArchivoRepository
     ): EliminarArchivosPorCarpetaUseCase = EliminarArchivosPorCarpetaUseCase(repository)
 
+
+    @Provides
+    fun provideArchivoUseCase(
+        crearCarpeta: CrearCarpetaUseCase,
+        eliminarCarpeta: EliminarCarpetaUseCase,
+        obtenerArchivos: ObtenerArchivosFirestoreUseCase,
+        renombrarArchivo: RenombrarArchivoUseCase,
+        subirArchivo: SubirArchivoUseCase,
+        guardarArchivo: GuardarArchivoUseCase,
+        eliminarArchivo: EliminarArchivoUseCase,
+        obtenerPorCarpeta: ObtenerArchivosPorCarpetaUseCase,
+        eliminarArchivosPorCarpeta: EliminarArchivosPorCarpetaUseCase
+    ): ArchivoUseCase {
+        return ArchivoUseCase(
+            crearCarpeta = crearCarpeta,
+            eliminarCarpeta = eliminarCarpeta,
+            obtenerArchivos = obtenerArchivos,
+            renombrarArchivo = renombrarArchivo,
+            subirArchivo = subirArchivo,
+            guardarArchivo = guardarArchivo,
+            eliminarArchivo = eliminarArchivo,
+            obtenerPorCarpeta = obtenerPorCarpeta,
+            eliminarArchivosPorCarpeta = eliminarArchivosPorCarpeta
+        )
+    }
 
 
 

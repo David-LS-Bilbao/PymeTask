@@ -39,6 +39,8 @@ fun ArchivosScreen(
     val context = LocalContext.current
     var mostrarDialogo by remember { mutableStateOf(false) }
     var nombreCarpeta by remember { mutableStateOf("") }
+    val estaCargando by viewModel.cargando.collectAsState()
+
 
 
 
@@ -47,7 +49,7 @@ fun ArchivosScreen(
 
     val activity = context as? Activity
     LaunchedEffect(Unit) {
-        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
     // reactivar modo landscape
     DisposableEffect(Unit) {
@@ -108,7 +110,11 @@ fun ArchivosScreen(
                     .fillMaxSize()
                     .padding(padding)
             ) {
-                if (archivos.isEmpty()) {
+                if (estaCargando) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                } else if (archivos.isEmpty()) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()

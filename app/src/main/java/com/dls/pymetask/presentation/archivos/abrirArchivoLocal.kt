@@ -16,6 +16,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.net.URL
 import java.net.URLConnection
+import androidx.core.net.toUri
 
 suspend fun abrirArchivoLocal(context: Context, archivoNombre: String, archivoUrl: String) {
     val carpetaDescargas = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
@@ -23,7 +24,7 @@ suspend fun abrirArchivoLocal(context: Context, archivoNombre: String, archivoUr
     // Detectar extensión si no está incluida en el nombre
     val extension = archivoNombre.substringAfterLast('.', missingDelimiterValue = "")
         .ifEmpty {
-            Uri.parse(archivoUrl).lastPathSegment
+            archivoUrl.toUri().lastPathSegment
                 ?.substringAfterLast(".", "bin")
                 ?.substringBefore("?") ?: "bin"
         }
@@ -58,7 +59,7 @@ suspend fun abrirArchivoLocal(context: Context, archivoNombre: String, archivoUr
             return
         }
     } else {
-        Toast.makeText(context, "Archivo abierto desde caché", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "Archivo abierto", Toast.LENGTH_SHORT).show()
     }
 
     // Abrir archivo con tipo correcto

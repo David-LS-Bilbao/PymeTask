@@ -42,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
@@ -54,38 +55,41 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.net.URLConnection
 import androidx.core.net.toUri
+import com.dls.pymetask.R
 
 
 @Composable
 fun ArchivoCardExtendido(
     archivo: ArchivoUiModel,
     onEliminar: () -> Unit,
+    onRenombrar:() -> Unit
 ) {
     val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    var cargando by remember { mutableStateOf(false) }
 
 
 
     Card(
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(4.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
-            .clickable {
-
-                    scope.launch {
-                        abrirArchivoLocal(context, archivo.nombre, archivo.url)
-                    }
-                       },
-        elevation = CardDefaults.cardElevation(4.dp)
+            .clickable(enabled = !cargando) {
+                scope.launch {
+                    cargando = true
+                    abrirArchivoLocal(context, archivo.nombre, archivo.url)
+                    cargando = false
+                }
+            },
+        elevation = CardDefaults.cardElevation(2.dp),
+        colors = CardDefaults.cardColors(containerColor = colorResource(R.color.blueCard) )
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-
-            Log.d("ArchivoCard", "tipo = ${archivo.tipo}, url = ${archivo.url}")
 
 
             if (esImagen(archivo.tipo)) {
@@ -156,11 +160,13 @@ fun ArchivoCardExtendido(
                     onDismissRequest = { expanded = false }
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Abrir") },
+
+                        text = { Text("Renombrar") },
                         onClick = {
-                            abrirArchivo(context, archivo.url)
+                            onRenombrar() // 🔹 Llama al callback
                             expanded = false
                         }
+
                     )
                     DropdownMenuItem(
                         text = { Text("Enviar por WhatsApp") },

@@ -14,7 +14,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
+import com.dls.pymetask.R
 import com.dls.pymetask.domain.model.ArchivoUiModel
 
 @Composable
@@ -24,12 +26,13 @@ fun CarpetaItemCard(
 ) {
 
     Card(
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(4.dp),
         modifier = Modifier
             .fillMaxWidth()
             .height(100.dp)
             .clickable { onClick() },
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(2.dp),
+        colors = CardDefaults.cardColors(containerColor = colorResource(R.color.blueCard))
     ) {
         Row(
             modifier = Modifier
