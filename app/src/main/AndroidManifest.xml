@@ -10,8 +10,7 @@
     </queries>
 
 
-
-
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <application
         android:name=".PymeTaskApp"
         android:allowBackup="true"
@@ -32,7 +31,7 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-
+        <receiver android:name=".presentation.agenda.AlarmReceiver" />
 
         <activity
             android:name=".main.MainActivity"

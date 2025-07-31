@@ -65,10 +65,13 @@ fun ContactosScreen(
     var showConfirmDialog by remember { mutableStateOf(false) }
 
     // Lista filtrada por búsqueda en tiempo real (nombre, puedes añadir teléfono/email)
-    val contactosFiltrados = contactos.filter {
-        it.nombre.contains(searchQuery, ignoreCase = true)
-        || it.telefono.contains(searchQuery) // Si quieres buscar también por teléfono
-    }
+    val contactosFiltrados = contactos
+        .sortedBy { it.nombre.lowercase() } // Orden alfabético ignorando mayúsculas
+        .filter {
+            it.nombre.contains(searchQuery, ignoreCase = true) ||
+                    it.telefono.contains(searchQuery)
+        }
+
 
     Scaffold(
         topBar = {
@@ -177,113 +180,5 @@ fun ContactosScreen(
     }
 }
 
-
-
-
-
-//
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun ContactosScreen(
-//    navController: NavController,
-//    viewModel: ContactoViewModel = hiltViewModel()
-//) {
-//    val contactos by viewModel.contactos.collectAsState()
-//    val isLoading by viewModel.isLoading.collectAsState()
-//    val error by viewModel.errorMessage.collectAsState()
-//    var searchQuery by remember { mutableStateOf("") }
-//    var contactoSeleccionado by remember { mutableStateOf<Contacto?>(null) }
-//    var showConfirmDialog by remember { mutableStateOf(false) }
-//
-//    // Filtro de contactos en tiempo real según la búsqueda por nombre
-//    val contactosFiltrados = contactos.filter {
-//        it.nombre.contains(searchQuery, ignoreCase = true)
-//    }
-//
-//    Scaffold(
-//        topBar = {
-//            TopAppBar(
-//                title = { Text("Contactos")},
-//                navigationIcon = {
-//                    IconButton(onClick = { navController.popBackStack() }) {
-//                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
-//                    }
-//                },
-//                actions = {
-//                    // Botón para crear un nuevo contacto
-//                    IconButton(onClick = { navController.navigate("crear_contacto") }) {
-//                        Icon(Icons.Default.Add, contentDescription = "Nuevo contacto")
-//                    }
-//                }
-//            )// Botones de acción en la Barra de navegación superior
-//        }// Barra de navegación superior
-//    ) { padding ->
-//        // Campo de búsqueda
-//
-//        Box(modifier = Modifier.padding(padding).fillMaxSize()) {
-//            when {
-//                isLoading -> {
-//                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-//                }
-//                error != null -> {
-//                    Text(
-//                        text = error ?: "Error desconocido",
-//                        color = MaterialTheme.colorScheme.error,
-//                        modifier = Modifier.align(Alignment.Center)
-//                    )
-//                }
-//                else -> {
-//                    LazyColumn(
-//                        modifier = Modifier.fillMaxSize().padding(16.dp),
-//                        verticalArrangement = Arrangement.spacedBy(12.dp)
-//                    ) {
-//                        items(contactos) { contacto ->
-//                            ContactoItemCard(
-//                                contacto = contacto,
-//                                onClick = {
-//                                    navController.navigate("detalle_contacto/${contacto.id}")
-//                                },
-//                                onDeleteClick = {
-//                                    contactoSeleccionado = contacto
-//                                    showConfirmDialog = true
-//                                }
-//                            )
-//                        }
-//                    }
-//
-//                    if (showConfirmDialog && contactoSeleccionado != null) {
-//                        AlertDialog(
-//                            onDismissRequest = { showConfirmDialog = false },
-//                            title = { Text("Eliminar contacto") },
-//                            text = { Text("¿Estás seguro de que deseas eliminar a ${contactoSeleccionado?.nombre}?") },
-//                            confirmButton = {
-//                                TextButton(onClick = {
-//                                    // Si hay foto, eliminar de Firebase Storage
-//                                    contactoSeleccionado?.fotoUrl?.let { url ->
-//                                        if (url.contains("firebasestorage")) {
-//                                            val ref = FirebaseStorage.getInstance().getReferenceFromUrl(url)
-//                                            ref.delete() // opcional: .addOnFailureListener { ... }
-//                                        }
-//                                    }
-//
-//                                    // Eliminar de Firestore
-//                                    viewModel.onDeleteContacto(contactoSeleccionado!!.id)
-//                                    showConfirmDialog = false
-//                                }) {
-//                                    Text("Eliminar", color = Color.Red)
-//                                }
-//                            },
-//                            dismissButton = {
-//                                TextButton(onClick = { showConfirmDialog = false }) {
-//                                    Text("Cancelar")
-//                                }
-//                            }
-//                        )
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
 
 

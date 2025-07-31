@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.dls.pymetask.presentation.agenda.AgendaScreen
+import com.dls.pymetask.presentation.agenda.TareaFormScreen
 import com.dls.pymetask.presentation.auth.login.LoginScreen
 import com.dls.pymetask.presentation.auth.login.LoginViewModel
 import com.dls.pymetask.presentation.auth.register.RegisterScreen
@@ -168,6 +169,20 @@ fun PymeNavGraph(
             val carpetaId = backStackEntry.arguments?.getString("carpetaId") ?: ""
             ContenidoCarpetaScreen(carpetaId = carpetaId, navController = navController)
         }
+
+
+        composable(
+            route = "tarea_form?taskId={taskId}",
+            arguments = listOf(navArgument("taskId") {
+                nullable = true
+                defaultValue = null
+            })
+        ) {
+            val taskId = it.arguments?.getString("taskId")
+            TareaFormScreen(taskId = taskId, navController = navController)
+        }
+
+
 
 
 

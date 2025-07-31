@@ -12,10 +12,6 @@ import androidx.compose.material.icons.filled.TableChart
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.ui.graphics.vector.ImageVector
 
-//fun esImagen(extension: String): Boolean {
-//    val tipos = listOf("jpg", "jpeg", "png", "bmp", "webp", "gif", "heic")
-//    return extension.lowercase() in tipos
-//}
 
 fun esVideo(extension: String): Boolean {
     val tipos = listOf("mp4", "avi", "mov", "mkv", "webm")
