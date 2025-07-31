@@ -13,6 +13,7 @@ import com.dls.pymetask.domain.usecase.archivo.ObtenerArchivosFirestoreUseCase
 import com.dls.pymetask.domain.usecase.archivo.ObtenerArchivosPorCarpetaUseCase
 import com.dls.pymetask.domain.usecase.archivo.RenombrarArchivoUseCase
 import com.dls.pymetask.domain.usecase.archivo.SubirArchivoUseCase
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import dagger.Module
 import dagger.Provides
@@ -32,8 +33,9 @@ object ArchivoModule {
     @Provides
     @Singleton
     fun provideArchivoRepository(
-        storage: FirebaseStorage
-    ): ArchivoRepository = ArchivoRepositoryImpl(storage)
+        storage: FirebaseStorage,
+        firestore: FirebaseFirestore
+    ): ArchivoRepository = ArchivoRepositoryImpl(storage, firestore)
 
     @Provides
     fun provideListarArchivosUseCase(

@@ -1,5 +1,6 @@
 package com.dls.pymetask.presentation.notas
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -60,6 +61,7 @@ import com.dls.pymetask.domain.model.Nota
 import com.dls.pymetask.utils.Constants
 import java.util.UUID
 
+@SuppressLint("SourceLockedOrientationActivity")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotaFormScreen(
@@ -272,17 +274,45 @@ fun NotaFormScreen(
                 }
             }
         },
-        //
 
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         Column(
             modifier = Modifier
                 .padding(padding)
-                .padding(16.dp)
+                .padding(4.dp) // Aumenta el padding de la columna
                 .fillMaxSize()
                 .background(backgroundColor)
         ) {
+            // boton color
+            if (mostrarSelectorColor) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text("Color de fondo", style = MaterialTheme.typography.labelSmall)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    coloresDisponibles.forEach { (_,hex) ->
+                        val color = Color(hex.toColorInt())
+                        Surface(
+                            shape = CircleShape,
+                            color = color,
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clickable { backgroundColor = color }
+                                .border(
+                                    width = 2.dp,
+                                    color = if (color == backgroundColor) Color.Black else Color.Transparent,
+                                    shape = CircleShape
+                                )
+                        ) {}
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            // titulo
             OutlinedTextField(
                 value = titulo,
                 onValueChange = {
@@ -316,31 +346,6 @@ fun NotaFormScreen(
                     .weight(1f),
                 maxLines = Int.MAX_VALUE
             )
-
-            if (mostrarSelectorColor) {
-                Spacer(modifier = Modifier.height(12.dp))
-                Text("Color de fondo", style = MaterialTheme.typography.labelSmall)
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    coloresDisponibles.forEach { (_,hex) ->
-                        val color = Color(hex.toColorInt())
-                        Surface(
-                            shape = CircleShape,
-                            color = color,
-                            modifier = Modifier
-                                .size(36.dp)
-                                .clickable { backgroundColor = color }
-                                .border(
-                                    width = 2.dp,
-                                    color = if (color == backgroundColor) Color.Black else Color.Transparent,
-                                    shape = CircleShape
-                                )
-                        ) {}
-                    }
-                }
-            }
         }
 
         // Diálogo de confirmación para borrar
@@ -349,11 +354,6 @@ fun NotaFormScreen(
                 onDismissRequest = { mostrarConfirmacionBorrado = false },
                 confirmButton = {
                     TextButton(onClick = {
-//                        notaActual?.let {
-//                            viewModel.eliminarNota(it)
-//                        }
-//                        mostrarConfirmacionBorrado = false
-//                        navController.popBackStack()
                         val idNota = notaId ?: viewModel.notaActual?.id
                         if (idNota != null) {
                             viewModel.eliminarNotaPorId(idNota)

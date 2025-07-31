@@ -37,6 +37,7 @@ fun NotasScreen(
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val notas by viewModel.notas.collectAsState()
+    val isLoading by viewModel.isLoading
 
 
     DisposableEffect(lifecycleOwner) {
@@ -72,23 +73,36 @@ fun NotasScreen(
         containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
-            if (notas.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("No hay notas aún", color = Color.Gray)
+
+
+            when {// Loading
+                isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(12.dp)
-                ) {
-                    items(notas, key = { it.id }) { nota ->
-                        NotaCard(nota = nota) {
-                            viewModel.seleccionarNota(nota.id)
-                            navController.navigate("nota_form?notaId=${nota.id}")
+                notas.isEmpty() -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("No hay notas aún", color = Color.Gray)
+                    }
+                }
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        contentPadding = PaddingValues(12.dp)
+                    ) {
+                        items(notas, key = { it.id }) { nota ->
+                            NotaCard(nota = nota) {
+                                viewModel.seleccionarNota(nota.id)
+                                navController.navigate("nota_form?notaId=${nota.id}")
+                            }
                         }
                     }
                 }

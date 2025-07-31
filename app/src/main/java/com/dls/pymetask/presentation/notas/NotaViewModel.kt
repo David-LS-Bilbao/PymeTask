@@ -19,14 +19,23 @@ class NotaViewModel @Inject constructor(
     private val _notas = MutableStateFlow<List<Nota>>(emptyList())
     val notas: StateFlow<List<Nota>> = _notas
 
+
     var notaActual: Nota? by mutableStateOf(null)
         private set
 
+
+    private val _isLoading = mutableStateOf(false)
+    val isLoading: State<Boolean> = _isLoading
+
     fun cargarNotas() {
         viewModelScope.launch {
+            _isLoading.value = true
             _notas.value = useCases.getNotas()
+            _isLoading.value = false
         }
     }
+
+
 
     fun seleccionarNota(id: String) {
         viewModelScope.launch {
