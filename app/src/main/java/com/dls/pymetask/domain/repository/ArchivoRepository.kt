@@ -2,6 +2,7 @@ package com.dls.pymetask.domain.repository
 
 import android.net.Uri
 import com.dls.pymetask.domain.model.Archivo
+import com.dls.pymetask.domain.model.ArchivoUiModel
 
 interface ArchivoRepository {
     suspend fun listarArchivos(carpeta: String = "archivos"): List<Archivo>
@@ -20,6 +21,10 @@ interface ArchivoRepository {
     suspend fun eliminarArchivo(archivoId: String)
     suspend fun renombrarArchivo(id: String, nuevoNombre: String)
     suspend fun eliminarArchivosPorCarpeta(carpetaId: String)
+
+    suspend fun renombrarCarpetaFirestore(archivo: ArchivoUiModel, nuevoNombre: String): ArchivoUiModel
+    suspend fun renombrarArchivoStorageYFirestore(archivo: ArchivoUiModel, nuevoNombre: String): ArchivoUiModel
+
 
 
 
