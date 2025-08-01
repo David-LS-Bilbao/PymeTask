@@ -3,6 +3,7 @@ package com.dls.pymetask.presentation.agenda
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -43,7 +44,7 @@ class AgendaViewModel @Inject constructor(
     /**
      * Carga todas las tareas del usuario autenticado.
      */
-    private fun cargarTareas() {
+    fun cargarTareas() {
         viewModelScope.launch {
             tareaUseCases.obtenerTareas(userId).collect { lista ->
                 _tareas.value = lista.sortedBy { it.fecha }
@@ -65,24 +66,28 @@ class AgendaViewModel @Inject constructor(
 
     @SuppressLint("ScheduleExactAlarm")
     fun guardarTarea(tarea: Tarea, activarAlarma: Boolean) {
-        val finalId = tarea.id.ifBlank {
-            firestore.collection("tareas").document().id
+        val docRef = if (tarea.id.isNotBlank()) {
+            firestore.collection("tareas").document(tarea.id) // actualización
+        } else {
+            firestore.collection("tareas").document() // nueva tarea
         }
 
-        val tareaFinal = tarea.copy(id = finalId, userId = userId)
+        val tareaConId = if (tarea.id.isBlank()) {
+            tarea.copy(id = docRef.id)
+        } else {
+            tarea
+        }
 
-        firestore.collection("tareas").document(finalId)
-            .set(tareaFinal)
-            .addOnSuccessListener  {
-                if (activarAlarma && tareaFinal.fecha.isNotBlank() && tareaFinal.hora.isNotBlank()) {
-                    alarmUtils.programarAlarma(tareaFinal)
-                }
+        docRef.set(tareaConId)
+            .addOnSuccessListener {
+                Log.d("GuardarTarea", "Tarea guardada con ID: ${tareaConId.id}")
+                _uiState.value = Tarea() // limpiar
             }
             .addOnFailureListener {
-                // aquí podrías lanzar un Toast con el error
-
+                Log.e("GuardarTarea", "Error al guardar", it)
             }
     }
+
 
 
 
@@ -104,21 +109,57 @@ class AgendaViewModel @Inject constructor(
 
         firestore.collection("tareas").document(id).get()
             .addOnSuccessListener { doc ->
-                doc.toObject(Tarea::class.java)?.let {
-                    _uiState.value = it
+                val tarea = doc.toObject(Tarea::class.java)
+                if (tarea != null) {
+                    val tareaConId = tarea.copy(id = doc.id) // ✅ Asignar ID del documento
+                    _uiState.value = tareaConId
+                    Log.d("CargarTarea", "Tarea cargada correctamente: ${tareaConId.titulo}")
+                } else {
+                    Log.w("CargarTarea", "El documento existe pero no se pudo convertir a Tarea")
                 }
                 _loading.value = false
             }
-            .addOnFailureListener {
-                // Aquí podrías loguear o notificar el error
+            .addOnFailureListener { e ->
+                Log.e("CargarTarea", "Error al cargar la tarea con ID $id", e)
                 _loading.value = false
             }
     }
+
+
 
 
     fun reiniciarFormulario() {
         _uiState.value = Tarea() // una nueva instancia vacía
     }
+
+    fun actualizarTitulo(nuevo: String) {
+        _uiState.update { it.copy(titulo = nuevo) }
+    }
+
+    fun actualizarDescripcion(nuevo: String) {
+        _uiState.update { it.copy(descripcion = nuevo) }
+    }
+
+    fun actualizarDescripcionLarga(nuevo: String) {
+        _uiState.update { it.copy(descripcionLarga = nuevo) }
+    }
+
+    fun actualizarFecha(nueva: String) {
+        _uiState.update { it.copy(fecha = nueva) }
+    }
+
+    fun actualizarHora(nueva: String) {
+        _uiState.update { it.copy(hora = nueva) }
+    }
+
+    fun actualizarCompletado(valor: Boolean) {
+        _uiState.update { it.copy(completado = valor) }
+    }
+
+    fun actualizarActivarAlarma(valor: Boolean) {
+        _uiState.update { it.copy(activarAlarma = valor) }
+    }
+
 
 
 

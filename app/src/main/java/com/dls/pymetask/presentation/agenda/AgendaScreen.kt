@@ -1,25 +1,30 @@
 package com.dls.pymetask.presentation.agenda
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.dls.pymetask.domain.model.Tarea
 import com.dls.pymetask.ui.theme.Poppins
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,6 +35,11 @@ fun AgendaScreen(
 ) {
     val tareas by viewModel.tareas.collectAsState()
     val isLoading by viewModel.loading.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.cargarTareas()
+    }
+
 
     Scaffold(
         floatingActionButton = {
@@ -66,8 +76,8 @@ fun AgendaScreen(
                         TareaCard(
                             tarea = tarea,
                             onEditar = {
-                                viewModel.seleccionarTarea(tarea)
-                                navController.navigate("tarea_form")
+                              //  viewModel.seleccionarTarea(tarea)
+                                navController.navigate("tarea_form?taskId=${tarea.id}")
                             },
                             onEliminar = { viewModel.eliminarTarea(tarea.id) }
                         )
