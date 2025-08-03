@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dls.pymetask.domain.model.Tarea
 import com.dls.pymetask.domain.usecase.tarea.TareaUseCases
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -57,7 +58,9 @@ class AgendaViewModel @Inject constructor(
     }
     fun guardarTarea(tarea: Tarea) {
         viewModelScope.launch {
-            tareaUseCases.addTarea(tarea)
+            val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@launch
+            val tareaConUsuario = tarea.copy(userId = userId)
+            tareaUseCases.addTarea(tareaConUsuario)
             cargarTareas()
         }
     }

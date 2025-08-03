@@ -87,34 +87,23 @@ fun TareaFormScreen(
     }
 
     // copiar los datos de la tarea seleccionada al formulario
-    LaunchedEffect(tareaActual) {
-        tareaActual?.let { tarea ->
-            if (titulo.isBlank() && descripcion.isBlank() && descripcionLarga.isBlank() && fecha.isBlank() && hora.isBlank() && !completado && !activarAlarma) {
-                titulo = tarea.titulo
-                descripcion = tarea.descripcion
-                descripcionLarga = tarea.descripcionLarga
-                fecha = tarea.fecha
-                hora = tarea.hora
-                completado = tarea.completado
+    val tareaCargada = tareaActual != null
 
-//                if (tareaActual.titulo.isBlank()) {
-//                    Toast.makeText(context, "El título es obligatorio", Toast.LENGTH_SHORT).show()
-//                    return@LaunchedEffect
-//                }
+    LaunchedEffect(taskId, tareaCargada) {
+        if (taskId != null && tareaCargada) {
+            val tarea = tareaActual
+            titulo = tarea.titulo
+            descripcion = tarea.descripcion
+            descripcionLarga = tarea.descripcionLarga
+            fecha = tarea.fecha
+            hora = tarea.hora
+            completado = tarea.completado
+           // activarAlarma = tarea.activarAlarma ?: true
 
-              //  activarAlarma = tarea.activarAlarma ?: false
-                viewModel.actualizarFecha(tarea.fecha)
-                viewModel.actualizarHora(tarea.hora)
-            }
-            Log.d("TareaForm", "Campos actualizados con TITULO: ${tarea.titulo}")
-            Log.d("TareaForm", "Campos actualizados con DESCRIPCION: ${tarea.descripcion}")
-            Log.d("TareaForm", "Campos actualizados con DESCLARGA: ${tarea.descripcionLarga}")
-            Log.d("TareaForm", "Campos actualizados con FECHA: ${tarea.fecha}")
-            Log.d("TareaForm", "Campos actualizados con HORA: ${tarea.hora}")
-            Log.d("TareaForm", "Campos actualizados con COMPLETADO: ${tarea.completado}")
-            Log.d("TareaForm", "Campos actualizados con ALARMA: ${tarea.activarAlarma}")
+            Log.d("TareaForm", "✅ Datos de tarea cargados correctamente")
         }
     }
+
         // guardar al pulsar atrás físico
     BackHandler {
        guardarYSalirAgenda(
@@ -136,14 +125,33 @@ fun TareaFormScreen(
             TopAppBar(
                 title = { Text("Tarea", fontFamily = Poppins) },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = {
+                        if (titulo.isBlank()) {
+                            Toast.makeText(context, "El título es obligatorio", Toast.LENGTH_SHORT).show()
+                            return@IconButton
+                        }
+                        // guardamos
+                        viewModel.guardarTarea(
+                            Tarea(
+                                id = taskId ?:UUID.randomUUID().toString(),
+                                titulo = titulo,
+                                descripcion = descripcion,
+                                descripcionLarga = descripcionLarga,
+                                fecha = fecha,
+                                hora = hora,
+                                completado = completado,
+                            )
+                        )
+                        Toast.makeText(context, "Tarea guardada", Toast.LENGTH_SHORT).show()
+                        navController.popBackStack()
+                    }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
                     }
                 },
                 actions = {
                     // Botón guardar
                     IconButton(onClick = {
-                        if (tareaActual?.titulo?.isBlank() == true) {
+                        if (titulo.isBlank()) {
                             Toast.makeText(context, "El título es obligatorio", Toast.LENGTH_SHORT).show()
                             return@IconButton
                         }
@@ -339,8 +347,10 @@ fun guardarYSalirAgenda(
 
         )
         Toast.makeText(context, "Tarea guardada", Toast.LENGTH_SHORT).show()
+        navController.popBackStack()
+    }else {
+        Toast.makeText(context, "El título es obligatorio", Toast.LENGTH_SHORT).show()
     }
-    navController.popBackStack()
 }
 
 

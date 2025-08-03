@@ -20,6 +20,7 @@ import javax.inject.Inject // Para inyección de constructor si lo necesitas
 
 
 
+@Suppress("DEPRECATION")
 class AlarmUtils @Inject constructor(@ApplicationContext private val context: Context) {
 
 
