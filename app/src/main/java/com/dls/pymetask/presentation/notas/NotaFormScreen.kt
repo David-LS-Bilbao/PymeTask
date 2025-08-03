@@ -67,11 +67,11 @@ import java.util.UUID
 fun NotaFormScreen(
     navController: NavController,
     notaId: String? = null,
-    viewModel: NotaViewModel = hiltViewModel(),
-    context: Context = LocalContext.current,
+    viewModel: NotaViewModel = hiltViewModel()
 ) {
     val notaActual = viewModel.notaActual
 
+    // Datos de la nota
     var titulo by remember { mutableStateOf("") }
     var contenido by remember { mutableStateOf("") }
     var backgroundColor by remember { mutableStateOf(Color(0xFFFFF9C4)) }

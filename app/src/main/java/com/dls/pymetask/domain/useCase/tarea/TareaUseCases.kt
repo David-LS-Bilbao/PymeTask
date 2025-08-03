@@ -4,22 +4,28 @@ import com.dls.pymetask.domain.model.Tarea
 import com.dls.pymetask.domain.repository.TareaRepository
 
 data class TareaUseCases(
-    val guardarTarea: GuardarTarea,
-    val eliminarTarea: EliminarTarea,
-    val obtenerTareas: ObtenerTareas,
-    val obtenerTareaPorId: ObtenerTareaPorId
+    val getTareas: GetTareas,
+    val getTarea: GetTarea,
+    val addTarea: AddTarea,
+    val updateTarea: UpdateTarea,
+    val deleteTarea: DeleteTarea,
+    val eliminarTarea: EliminarTarea
 )
-class GuardarTarea(private val repository: TareaRepository) {
-    suspend operator fun invoke(tarea: Tarea) = repository.guardarTarea(tarea)
+class GetTareas(private val repo: TareaRepository) {
+    suspend operator fun invoke() = repo.getTareas()
 }
-
-class EliminarTarea(private val repository: com.dls.pymetask.domain.repository.TareaRepository) {
-    suspend operator fun invoke(tareaId: String) = repository.eliminarTarea(tareaId)
+class GetTarea(private val repo: TareaRepository) {
+    suspend operator fun invoke(id: String) = repo.getTareaById(id)
 }
-class ObtenerTareas(private val repository: TareaRepository) {
-    operator fun invoke(userId: String) = repository.obtenerTareas(userId)
+class AddTarea(private val repo: TareaRepository) {
+    suspend operator fun invoke(tarea: Tarea) = repo.addTarea(tarea)
 }
-
-class ObtenerTareaPorId(private val repository: TareaRepository) {
-    suspend operator fun invoke(tareaId: String) = repository.obtenerTareaPorId(tareaId)
+class UpdateTarea(private val repo: TareaRepository) {
+    suspend operator fun invoke(tarea: Tarea) = repo.updateTarea(tarea)
+}
+class DeleteTarea(private val repo: TareaRepository) {
+    suspend operator fun invoke(id: String) = repo.deleteTarea(id)
+}
+class EliminarTarea(private val repo: TareaRepository) {
+    suspend operator fun invoke(tarea: Tarea) = repo.eliminarTarea(tarea)
 }

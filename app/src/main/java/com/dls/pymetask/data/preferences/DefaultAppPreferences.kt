@@ -3,6 +3,7 @@ package com.dls.pymetask.data.preferences
 import android.content.Context
 import androidx.core.content.edit
 
+@Suppress("UNCHECKED_CAST")
 class DefaultAppPreferences(context: Context) {
 
     private val prefs = context.getSharedPreferences("preferencias_archivos", Context.MODE_PRIVATE)

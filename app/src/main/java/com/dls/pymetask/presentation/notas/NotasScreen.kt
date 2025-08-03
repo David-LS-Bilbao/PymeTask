@@ -2,6 +2,7 @@ package com.dls.pymetask.presentation.notas
 
 import android.app.Activity
 import android.content.pm.ActivityInfo
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -35,9 +36,9 @@ fun NotasScreen(
     viewModel: NotaViewModel = hiltViewModel(),
     navController: NavController,
 ) {
-    val lifecycleOwner = LocalLifecycleOwner.current
-    val notas by viewModel.notas.collectAsState()
-    val isLoading by viewModel.isLoading
+    val lifecycleOwner = LocalLifecycleOwner.current // Obtiene el propietario del ciclo de vida actual ( escuchador de eventos)
+    val notas by viewModel.notas.collectAsState()  // Lista de notas del VM
+    val isLoading by viewModel.isLoading // variable de carga del VM
 
 
     DisposableEffect(lifecycleOwner) {
@@ -102,6 +103,7 @@ fun NotasScreen(
                             NotaCard(nota = nota) {
                                 viewModel.seleccionarNota(nota.id)
                                 navController.navigate("nota_form?notaId=${nota.id}")
+                                Log.d("NotasScreen", "Nota seleccionada: ${nota.id}")
                             }
                         }
                     }

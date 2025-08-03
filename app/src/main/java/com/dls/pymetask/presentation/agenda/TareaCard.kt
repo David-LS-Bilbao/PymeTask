@@ -1,5 +1,6 @@
 package com.dls.pymetask.presentation.agenda
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,8 +31,7 @@ import com.dls.pymetask.ui.theme.Poppins
 @Composable
 fun TareaCard(
     tarea: Tarea,
-    onEditar: () -> Unit,
-    onEliminar: () -> Unit
+    onClick: () -> Unit,
 ) {
     Card(
         shape = RoundedCornerShape(12.dp),
@@ -39,7 +39,9 @@ fun TareaCard(
             containerColor = if (tarea.completado) Color(0xFFD0F0C0) else MaterialTheme.colorScheme.surface
         ),
         modifier = Modifier.fillMaxWidth()
+            .clickable { onClick() }
     ) {
+        // Contenido de la tarjeta
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
@@ -62,12 +64,7 @@ fun TareaCard(
                 horizontalArrangement = Arrangement.End,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                IconButton(onClick = onEditar) {
-                    Icon(Icons.Default.Edit, contentDescription = "Editar")
-                }
-                IconButton(onClick = onEliminar) {
-                    Icon(Icons.Default.Delete, contentDescription = "Eliminar", tint = Color.Red)
-                }
+
             }
         }
     }

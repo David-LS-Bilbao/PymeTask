@@ -17,18 +17,21 @@ object TareaModule {
 
     @Provides
     @Singleton
-    fun provideTareaRepository(
-        firestore: FirebaseFirestore
-    ): TareaRepository = TareaRepositoryImpl(firestore)
+    fun provideTareaRepository(): TareaRepository {
+        return TareaRepositoryImpl(FirebaseFirestore.getInstance())
+    }
 
     @Provides
     @Singleton
-    fun provideTareaUseCases(
-        repository: TareaRepository
-    ): TareaUseCases = TareaUseCases(
-        guardarTarea = GuardarTarea(repository),
-        eliminarTarea = EliminarTarea(repository),
-        obtenerTareas = ObtenerTareas(repository),
-        obtenerTareaPorId = ObtenerTareaPorId(repository)
-    )
+    fun provideTareaUseCases(repository: TareaRepository): TareaUseCases{
+
+        return TareaUseCases(
+           getTareas = GetTareas(repository),
+            getTarea = GetTarea(repository),
+            addTarea = AddTarea(repository),
+            updateTarea = UpdateTarea(repository),
+            deleteTarea = DeleteTarea(repository),
+            eliminarTarea = EliminarTarea(repository)
+        )
+    }
 }

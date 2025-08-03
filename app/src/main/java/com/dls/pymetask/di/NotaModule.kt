@@ -37,8 +37,6 @@ object NotaModule {
             updateNota = UpdateNota(repository),
             deleteNota = DeleteNota(repository),
             eliminarNota = EliminarNota(repository)
-
-
         )
     }
 }

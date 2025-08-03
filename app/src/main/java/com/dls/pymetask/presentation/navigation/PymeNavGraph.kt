@@ -137,6 +137,7 @@ fun PymeNavGraph(
                 EditarContactoScreen(navController = navController, contactoId = it)
             }
         }
+        // contactos----------------------------------------------------------------------------------
         composable("crear_contacto") {
             CrearContactoScreen(navController = navController)
         }
@@ -148,6 +149,9 @@ fun PymeNavGraph(
                 DetalleContactoScreen(navController = navController, contactoId = it)
             }
         }
+
+
+        // Notas -----------------------------------------------------------------------------------
         composable("nota_form") {
             NotaFormScreen(navController = navController)
         }
@@ -165,11 +169,10 @@ fun PymeNavGraph(
             )
         }
 
-        composable("contenido_carpeta/{carpetaId}") { backStackEntry ->
-            val carpetaId = backStackEntry.arguments?.getString("carpetaId") ?: ""
-            ContenidoCarpetaScreen(carpetaId = carpetaId, navController = navController)
+        // tarea -----------------------------------------------------------------------------------
+        composable("tarea_form") {
+            TareaFormScreen(navController = navController)
         }
-
 
         composable(
             route = "tarea_form?taskId={taskId}",
@@ -177,15 +180,21 @@ fun PymeNavGraph(
                 nullable = true
                 defaultValue = null
             })
-        ) {
-            val taskId = it.arguments?.getString("taskId")
-            TareaFormScreen(taskId = taskId, navController = navController)
+        ) {backStackEntry ->
+            TareaFormScreen(
+                navController = navController,
+                taskId = backStackEntry.arguments?.getString("taskId"))
+
         }
 
 
 
 
-
+        // archivos --------------------------------------------------------------------------------
+        composable("contenido_carpeta/{carpetaId}") { backStackEntry ->
+            val carpetaId = backStackEntry.arguments?.getString("carpetaId") ?: ""
+            ContenidoCarpetaScreen(carpetaId = carpetaId, navController = navController)
+        }
     }
 }
 

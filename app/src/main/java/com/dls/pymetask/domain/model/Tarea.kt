@@ -10,9 +10,9 @@ data class Tarea(
     val fecha: String = "",            // Fecha en formato "yyyy-MM-dd"
     val hora: String = "",             // Hora opcional, formato "HH:mm"
     val completado: Boolean = false,   // Estado de la tarea
-    val userId: String = "",            // ID del usuario propietario (FirebaseAuth.uid)
-    val activarAlarma: Boolean = false, // Estado de la tarea
-    val descripcionLarga: String = ""  // Descripción larga opcional
+    val activarAlarma: String? = null, // ID del usuario propietario (FirebaseAuth.uid), // Estado de la tarea
+    val descripcionLarga: String = "" , // Descripción larga opcional
+    //val userId: String? = null,
 
 )
 

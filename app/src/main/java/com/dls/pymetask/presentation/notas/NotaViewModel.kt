@@ -21,7 +21,7 @@ class NotaViewModel @Inject constructor(
 
 
     var notaActual: Nota? by mutableStateOf(null)
-        private set
+    private set
 
 
     private val _isLoading = mutableStateOf(false)
@@ -46,13 +46,6 @@ class NotaViewModel @Inject constructor(
     fun guardarNota(nota: Nota) {
         viewModelScope.launch {
             useCases.addNota(nota)
-            cargarNotas()
-        }
-    }
-
-    fun eliminarNota(nota: Nota) {
-        viewModelScope.launch {
-            useCases.deleteNota(nota.toString())
             cargarNotas()
         }
     }
