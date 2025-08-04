@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dls.pymetask.domain.model.Tarea
 import com.dls.pymetask.domain.usecase.tarea.TareaUseCases
+import com.dls.pymetask.utils.AlarmUtils
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -18,6 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AgendaViewModel @Inject constructor(
     private val tareaUseCases: TareaUseCases,
+    private val alarmUtils: AlarmUtils
 ) : ViewModel() {
 
     private val _tareas = MutableStateFlow<List<Tarea>>(emptyList())
@@ -61,6 +63,11 @@ class AgendaViewModel @Inject constructor(
             val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@launch
             val tareaConUsuario = tarea.copy(userId = userId)
             tareaUseCases.addTarea(tareaConUsuario)
+
+            if (tareaConUsuario.activarAlarma) {
+                alarmUtils.programarAlarma(tareaConUsuario)
+            }
+
             cargarTareas()
         }
     }
@@ -82,6 +89,8 @@ class AgendaViewModel @Inject constructor(
     fun actualizarHora(nuevaHora: String) {
         tareaActual = tareaActual?.copy(hora = nuevaHora)
     }
+
+
 
 }
 

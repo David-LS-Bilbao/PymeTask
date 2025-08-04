@@ -16,7 +16,7 @@ data class TareaDto(
     val fecha: String = "",
     val hora: String = "",
     val completado: Boolean = false,
-    val activarAlarma: String? = null,
+    val activarAlarma: Boolean = true,
     val userId: String = ""
 
 

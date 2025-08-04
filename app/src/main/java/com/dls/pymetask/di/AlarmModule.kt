@@ -15,7 +15,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AlarmModule {
 
-
     @Provides
     @Singleton
     fun provideAlarmScheduler(@ApplicationContext context: Context): AlarmUtils {
