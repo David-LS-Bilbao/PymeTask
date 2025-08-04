@@ -21,4 +21,8 @@ val coloresDisponibles = listOf(
 "Lila" to "#D1C4E9",
 "Blanco" to "#FFFFFF"
 )
+
+
+
+
 }

@@ -21,7 +21,7 @@ data class TareaDto(
 
 
 ) {
-    fun toDomain() = Tarea(id, titulo, descripcion, descripcionLarga, fecha, hora, completado)// userId)
+    fun toDomain() = Tarea(id, titulo, descripcion, descripcionLarga, fecha, hora, completado, activarAlarma, userId)
 
 
     companion object {

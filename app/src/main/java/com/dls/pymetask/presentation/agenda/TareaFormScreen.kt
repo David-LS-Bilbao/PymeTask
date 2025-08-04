@@ -51,7 +51,21 @@ fun TareaFormScreen(
     var fecha by remember { mutableStateOf("") }
     var hora by remember { mutableStateOf("") }
     var completado by remember { mutableStateOf(false) }
-    var activarAlarma by remember { mutableStateOf(true) }
+//    var activarAlarma by remember { mutableStateOf(true) }
+
+    val activarAlarmaState = remember { mutableStateOf(true) }
+
+    LaunchedEffect(viewModel.tareaActual) {
+        viewModel.tareaActual?.let {
+            activarAlarmaState.value = it.activarAlarma
+        }
+    }
+
+
+
+
+
+
 
     // Diálogo de confirmación para eliminar
     var mostrarConfirmacionBorrado by remember { mutableStateOf(false) }
@@ -97,20 +111,19 @@ fun TareaFormScreen(
     // copiar los datos de la tarea seleccionada al formulario
     val tareaCargada = tareaActual != null
 
-    LaunchedEffect(taskId, tareaCargada) {
-        if (taskId != null && tareaCargada) {
-            val tarea = tareaActual
+    LaunchedEffect(tareaActual) {
+        tareaActual?.let { tarea ->
             titulo = tarea.titulo
             descripcion = tarea.descripcion
             descripcionLarga = tarea.descripcionLarga
             fecha = tarea.fecha
             hora = tarea.hora
             completado = tarea.completado
-           activarAlarma = tarea.activarAlarma
-
+            activarAlarmaState.value = tarea.activarAlarma
             Log.d("TareaForm", "✅ Datos de tarea cargados correctamente")
         }
     }
+
 
         // guardar al pulsar atrás físico
     BackHandler {
@@ -125,7 +138,7 @@ fun TareaFormScreen(
            fecha = fecha,
            hora = hora,
            completado = completado,
-           activarAlarma = activarAlarma
+           activarAlarma = activarAlarmaState.value
        )
     }
 
@@ -140,18 +153,20 @@ fun TareaFormScreen(
                             return@IconButton
                         }
                         // guardamos
-                        viewModel.guardarTarea(
-                            Tarea(
-                                id = taskId ?:UUID.randomUUID().toString(),
-                                titulo = titulo,
-                                descripcion = descripcion,
-                                descripcionLarga = descripcionLarga,
-                                fecha = fecha,
-                                hora = hora,
-                                completado = completado,
-                                activarAlarma = activarAlarma
-                            )
+                        guardarYSalirAgenda(
+                            context = context,
+                            navController = navController,
+                            viewModel = viewModel,
+                            taskId = taskId,
+                            titulo = titulo,
+                            descripcion = descripcion,
+                            descripcionLarga = descripcionLarga,
+                            fecha = fecha,
+                            hora = hora,
+                            completado = completado,
+                            activarAlarma = activarAlarmaState.value
                         )
+
                         Toast.makeText(context, "Tarea guardada", Toast.LENGTH_SHORT).show()
                         navController.popBackStack()
                     }) {
@@ -166,17 +181,18 @@ fun TareaFormScreen(
                             return@IconButton
                         }
                         // guardamos
-                        viewModel.guardarTarea(
-                            Tarea(
-                                id = taskId ?:UUID.randomUUID().toString(),
-                                titulo = titulo,
-                                descripcion = descripcion,
-                                descripcionLarga = descripcionLarga,
-                                fecha = fecha,
-                                hora = hora,
-                                completado = completado,
-                                activarAlarma = activarAlarma
-                            )
+                        guardarYSalirAgenda(
+                            context = context,
+                            navController = navController,
+                            viewModel = viewModel,
+                            taskId = taskId,
+                            titulo = titulo,
+                            descripcion = descripcion,
+                            descripcionLarga = descripcionLarga,
+                            fecha = fecha,
+                            hora = hora,
+                            completado = completado,
+                            activarAlarma = activarAlarmaState.value
                         )
                         Toast.makeText(context, "Tarea guardada", Toast.LENGTH_SHORT).show()
                         navController.popBackStack()
@@ -292,9 +308,11 @@ fun TareaFormScreen(
 
                     Text("Activar alarma  ")
                 // CAMPO: SWITCH "Activar alarma"
+                    Log.d("SwitchEstado", "activarAlarma = $activarAlarmaState")
+
                     Switch(
-                        checked = activarAlarma,
-                        onCheckedChange = {  activarAlarma = it  }
+                        checked = activarAlarmaState.value,
+                        onCheckedChange = { activarAlarmaState.value = it }
                     )
                 }
             }
@@ -350,24 +368,32 @@ fun guardarYSalirAgenda(
     completado: Boolean,
     activarAlarma: Boolean = true
 ) {
-    if (titulo.isNotBlank()){
-        viewModel.guardarTarea(
-            Tarea(
-                id = taskId ?: UUID.randomUUID().toString(),
-                titulo = titulo,
-                descripcion = descripcion,
-                descripcionLarga = descripcionLarga,
-                fecha = fecha,
-                hora = hora,
-                completado = completado,
-                activarAlarma = activarAlarma
+    when {
+        titulo.isBlank() -> {
+            Toast.makeText(context, "El título es obligatorio", Toast.LENGTH_SHORT).show()
+        }
+        fecha.isBlank() -> {
+            Toast.makeText(context, "La fecha es obligatoria", Toast.LENGTH_SHORT).show()
+        }
+        hora.isBlank() -> {
+            Toast.makeText(context, "La hora es obligatoria", Toast.LENGTH_SHORT).show()
+        }
+        else -> {
+            viewModel.guardarTarea(
+                Tarea(
+                    id = taskId ?: UUID.randomUUID().toString(),
+                    titulo = titulo,
+                    descripcion = descripcion,
+                    descripcionLarga = descripcionLarga,
+                    fecha = fecha,
+                    hora = hora,
+                    completado = completado,
+                    activarAlarma = activarAlarma
                 )
-
-        )
-        Toast.makeText(context, "Tarea guardada", Toast.LENGTH_SHORT).show()
-        navController.popBackStack()
-    }else {
-        Toast.makeText(context, "El título es obligatorio", Toast.LENGTH_SHORT).show()
+            )
+            Toast.makeText(context, "Tarea guardada", Toast.LENGTH_SHORT).show()
+            navController.popBackStack()
+        }
     }
 }
 
