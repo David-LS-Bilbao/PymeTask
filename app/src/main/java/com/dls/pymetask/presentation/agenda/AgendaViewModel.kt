@@ -60,7 +60,16 @@ class AgendaViewModel @Inject constructor(
     }
     fun guardarTarea(tarea: Tarea) {
         viewModelScope.launch {
-            val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@launch
+          //  val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@launch
+
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
+            if (userId == null) {
+                Log.e("AgendaViewModel", "❌ Usuario no autenticado en este dispositivo.")
+                return@launch
+            }
+
+
+
             val tareaConUsuario = tarea.copy(userId = userId)
             tareaUseCases.addTarea(tareaConUsuario)
 
