@@ -167,8 +167,6 @@ fun TareaFormScreen(
                             activarAlarma = activarAlarmaState.value
                         )
 
-                        Toast.makeText(context, "Tarea guardada", Toast.LENGTH_SHORT).show()
-                        navController.popBackStack()
                     }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
                     }
@@ -194,8 +192,7 @@ fun TareaFormScreen(
                             completado = completado,
                             activarAlarma = activarAlarmaState.value
                         )
-                        Toast.makeText(context, "Tarea guardada", Toast.LENGTH_SHORT).show()
-                        navController.popBackStack()
+
                     }) {
                         Icon(Icons.Default.Save, contentDescription = "Guardar")
                     }
