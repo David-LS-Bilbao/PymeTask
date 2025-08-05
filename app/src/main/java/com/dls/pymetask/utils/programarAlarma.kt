@@ -33,10 +33,11 @@ import java.util.*
 //        )
 //
 //        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-//        alarmManager.setExactAndAllowWhileIdle(
-//            AlarmManager.RTC_WAKEUP,
-//            date.time,
-//            pendingIntent
-//        )
+//
+////        alarmManager.setExactAndAllowWhileIdle(
+////            AlarmManager.RTC_WAKEUP,
+////            date.time,
+////            pendingIntent
+////        )
 //    }
 //}

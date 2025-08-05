@@ -1,5 +1,6 @@
 package com.dls.pymetask.presentation.agenda
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,6 +39,7 @@ import androidx.navigation.NavController
 import com.dls.pymetask.ui.theme.Poppins
 import com.dls.pymetask.utils.MyFab
 
+@SuppressLint("NewApi")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AgendaScreen(
@@ -49,7 +51,6 @@ fun AgendaScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
 
 
-    // Nuevo----------------------------------------------------------
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
@@ -60,12 +61,9 @@ fun AgendaScreen(
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
-    }// ------------------------------------------------------------
-
-
+    }
     // DISEÑO DE PANTALLA========================================================================
     Scaffold(
-
         topBar = {
             TopAppBar(
                 title = { Text("Agenda", fontFamily = Poppins, fontWeight = FontWeight.SemiBold) },
@@ -74,9 +72,12 @@ fun AgendaScreen(
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                 }
             }
-                // BOTON BORRAR TODAS LAS TAREAS
+                // BOTON OPCIONES DE ALARMA
                 , actions = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = {
+                        // MENU DE OPCIONES DE ALARMA
+
+                    }) {
                         Icon(Icons.Default.Delete, contentDescription = "Eliminar todas las tareas")
                     }
                 }
@@ -95,7 +96,6 @@ fun AgendaScreen(
 
              Column(modifier = Modifier.padding(padding)) {
 
-
                  when{
                      isLoading -> {
                          Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -110,18 +110,31 @@ fun AgendaScreen(
                      }
                      else -> {
                          LazyColumn(
-                             contentPadding = padding,
-                             verticalArrangement = Arrangement.spacedBy(8.dp),
-                             modifier = Modifier.padding(16.dp)
+                           verticalArrangement = Arrangement.spacedBy(8.dp),
+                             modifier = Modifier.padding(8.dp)
                          ) {
 
-                             items(tareas, key = { it.id }) { tarea ->
+                             // Ordenar las tareas por fecha y hora para mostrarlas en el orden correcto
+                             val tareasOrdenadas = tareas.sortedWith(compareBy({ it.fecha }, { it.hora }))
+                             items(tareasOrdenadas, key = { it.id }) { tarea ->
                                  TareaCard(tarea = tarea) {
                                      viewModel.seleccionarTarea(tarea.id)
                                      navController.navigate("tarea_form?taskId=${tarea.id}")
                                      Log.d("AgendaScreen", "Tarea seleccionada: ${tarea.id}")
                                  }
                              }
+
+
+
+
+
+//                             items(tareas, key = { it.id }) { tarea ->
+//                                 TareaCard(tarea = tarea) {
+//                                     viewModel.seleccionarTarea(tarea.id)
+//                                     navController.navigate("tarea_form?taskId=${tarea.id}")
+//                                     Log.d("AgendaScreen", "Tarea seleccionada: ${tarea.id}")
+//                                 }
+//                             }
                          }
                      }
                  }

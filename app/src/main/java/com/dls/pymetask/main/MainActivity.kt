@@ -1,34 +1,59 @@
 package com.dls.pymetask.main
 
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.compose.rememberNavController
-import com.dls.pymetask.presentation.ajustes.ThemeViewModel
-import com.dls.pymetask.presentation.navigation.PymeNavGraph
-import com.dls.pymetask.ui.theme.PymeTaskTheme
+import androidx.core.content.ContextCompat
+import com.dls.pymetask.utils.NotificationHelper
 import dagger.hilt.android.AndroidEntryPoint
+import android.Manifest
+
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    // Lanzador para pedir permiso de notificaciones (Android 13+)
+    private val notifPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            Log.d("MainActivity", "Permiso POST_NOTIFICATIONS = $granted")
+        }
+
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        // 0) Si Android 13+, pedir permiso de notificaciones
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this, Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                notifPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+
+        // 1) Crear canal de notificaciones (con sonido + vibración)
+        NotificationHelper.createNotificationChannel(this)
+
+        // 2) Si venimos de la notificación de alarma, detenemos el sonido
+        if (intent?.action == "com.dls.pymetask.STOP_ALARM") {
+            Log.d("MainActivity", "🛑 Deteniendo sonido de alarma")
+            NotificationHelper.stopAlarmSound()
+        }
+
+        // 3) Recuperar taskId (si abrimos desde la alarma)
+        val taskIdFromAlarm = intent.getStringExtra("taskId")
+
+
         setContent {
-            PymeTaskAppRoot()
+            PymeTaskAppRoot(taskIdInicial = taskIdFromAlarm)
         }
     }
 }

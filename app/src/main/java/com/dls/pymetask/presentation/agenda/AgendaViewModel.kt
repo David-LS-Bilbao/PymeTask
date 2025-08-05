@@ -1,7 +1,9 @@
 package com.dls.pymetask.presentation.agenda
 
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -15,7 +17,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 @HiltViewModel
 class AgendaViewModel @Inject constructor(
     private val tareaUseCases: TareaUseCases,
@@ -31,14 +35,22 @@ class AgendaViewModel @Inject constructor(
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading
 
-
     /**
-     * Carga todas las tareas del usuario autenticado.
+     * Carga todas las tareas del usuario autenticado
+     * ordenadas por fecha y hora.
      */
+    @RequiresApi(Build.VERSION_CODES.O)
     fun cargarTareas() {
         viewModelScope.launch {
             _loading.value = true
-            _tareas.value = tareaUseCases.getTareas()
+            val tareasCrudas = tareaUseCases.getTareas()
+
+            val tareasOrdenadas = tareasCrudas.sortedWith(compareBy(
+                { it.fecha.toLocalDateOrNull() ?: LocalDate.MAX },
+                { it.hora.toLocalTimeOrNull() ?: LocalTime.MAX }
+            ))
+
+            _tareas.value = tareasOrdenadas
             _loading.value = false
         }
     }
@@ -58,38 +70,31 @@ class AgendaViewModel @Inject constructor(
         }
 
     }
+    @RequiresApi(Build.VERSION_CODES.O)
     fun guardarTarea(tarea: Tarea) {
         viewModelScope.launch {
-            //  val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@launch
 
-//            val userId = FirebaseAuth.getInstance().currentUser?.uid
-//            if (userId == null) {
-//                Log.e("AgendaViewModel", "❌ Usuario no autenticado en este dispositivo.")
-//                return@launch
-//            }
-//            val tareaConUsuario = tarea.copy(userId = userId)
-//            tareaUseCases.addTarea(tareaConUsuario)
-//
-//            if (tareaConUsuario.activarAlarma) {
-//                alarmUtils.programarAlarma(tareaConUsuario)
-//            }
-//            cargarTareas()
-//        }
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
+            if (userId == null) {
+                Log.e("AgendaViewModel", "❌ Usuario no autenticado en este dispositivo.")
+                return@launch
+            }
+            val tareaConUsuario = tarea.copy(userId = userId)
+            tareaUseCases.addTarea(tareaConUsuario)
 
-
-            tareaUseCases.addTarea(tarea)
-            if (tarea.activarAlarma) {
-                alarmUtils.programarAlarma(tarea)
+            if (tareaConUsuario.activarAlarma) {
+                alarmUtils.programarAlarma(tareaConUsuario)
             }
             cargarTareas()
-
         }
+
     }
 
     fun limpiarTareaActual() {
         tareaActual = null
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun eliminarTareaPorId(id: String) {
         viewModelScope.launch {
             tareaUseCases.deleteTarea(id)
@@ -103,10 +108,25 @@ class AgendaViewModel @Inject constructor(
     fun actualizarHora(nuevaHora: String) {
         tareaActual = tareaActual?.copy(hora = nuevaHora)
     }
+}
 
 
 
 
+@RequiresApi(Build.VERSION_CODES.O)
+fun String.toLocalDateOrNull(): LocalDate? =
+    try {
+        LocalDate.parse(this, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+    } catch (e: Exception) {
+        null
+    }
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun String.toLocalTimeOrNull(): LocalTime? =
+    try {
+        LocalTime.parse(this, DateTimeFormatter.ofPattern("HH:mm"))
+    } catch (e: Exception) {
+        null
 }
 
 

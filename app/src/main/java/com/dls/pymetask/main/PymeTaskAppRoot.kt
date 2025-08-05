@@ -22,12 +22,21 @@ import com.dls.pymetask.ui.theme.PymeTaskTheme
 @Composable
 fun PymeTaskAppRoot(
     mainViewModel: MainViewModel = hiltViewModel(),
-    themeViewModel: ThemeViewModel = hiltViewModel()
+    themeViewModel: ThemeViewModel = hiltViewModel(),
+    taskIdInicial: String? = null
 ) {
     val context = LocalContext.current
     val navController = rememberNavController()
     val isUserLoggedIn by mainViewModel.isUserLoggedIn.collectAsState()
     val themeMode by themeViewModel.themeMode.collectAsState()
+
+    LaunchedEffect(taskIdInicial, isUserLoggedIn) {
+        if (taskIdInicial != null && isUserLoggedIn == true) {
+            navController.navigate("tarea_form?taskId=$taskIdInicial")
+        }
+    }
+
+
 
     // Llama explícitamente a checkLoginStatus
     LaunchedEffect(Unit) {

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -27,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.dls.pymetask.domain.model.Tarea
 import com.dls.pymetask.ui.theme.Poppins
+import com.dls.pymetask.utils.formatAsDayMonth
 
 @Composable
 fun TareaCard(
@@ -38,11 +40,30 @@ fun TareaCard(
         colors = CardDefaults.cardColors(
             containerColor = if (tarea.completado) Color(0xFFD0F0C0) else MaterialTheme.colorScheme.surface
         ),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .clickable { onClick() }
     ) {
-        // Contenido de la tarjeta
         Column(modifier = Modifier.padding(16.dp)) {
+
+            // 🗓 Fecha y Hora
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = tarea.fecha.formatAsDayMonth(),
+                    style = MaterialTheme.typography.labelSmall.copy(fontFamily = Poppins)
+                )
+                Text(
+                    text = tarea.hora,
+                    style = MaterialTheme.typography.labelSmall.copy(fontFamily = Poppins)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // ✅ Título y estado
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Default.CheckCircle,
@@ -55,17 +76,94 @@ fun TareaCard(
                     style = MaterialTheme.typography.titleMedium.copy(fontFamily = Poppins)
                 )
             }
+
+            // 📝 Descripción
             if (tarea.descripcion.isNotBlank()) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(tarea.descripcion, style = MaterialTheme.typography.bodySmall)
             }
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                horizontalArrangement = Arrangement.End,
-                modifier = Modifier.fillMaxWidth()
-            ) {
 
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // 🔔 Icono de alarma
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                if (tarea.activarAlarma) {
+                    Icon(
+                        imageVector = Icons.Default.Alarm, // Puedes cambiar por otro como Icons.Default.Alarm
+                        contentDescription = "Alarma activa",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//
+//@Composable
+//fun TareaCard(
+//    tarea: Tarea,
+//    onClick: () -> Unit,
+//) {
+//    Card(
+//        shape = RoundedCornerShape(12.dp),
+//        colors = CardDefaults.cardColors(
+//            containerColor = if (tarea.completado) Color(0xFFD0F0C0) else MaterialTheme.colorScheme.surface
+//        ),
+//        modifier = Modifier.fillMaxWidth()
+//            .clickable { onClick() }
+//    ) {
+//        // Contenido de la tarjeta
+//        Column(modifier = Modifier.padding(16.dp)) {
+//            Row(verticalAlignment = Alignment.CenterVertically) {
+//                Icon(
+//                    imageVector = Icons.Default.CheckCircle,
+//                    contentDescription = "Estado",
+//                    tint = if (tarea.completado) Color(0xFF4CAF50) else Color.Gray
+//                )
+//                Spacer(Modifier.width(8.dp))
+//                Text(
+//                    text = tarea.titulo,
+//                    style = MaterialTheme.typography.titleMedium.copy(fontFamily = Poppins)
+//                )
+//            }
+//            if (tarea.descripcion.isNotBlank()) {
+//                Spacer(modifier = Modifier.height(4.dp))
+//                Text(tarea.descripcion, style = MaterialTheme.typography.bodySmall)
+//            }
+//            Spacer(modifier = Modifier.height(8.dp))
+//            Row(
+//                horizontalArrangement = Arrangement.End,
+//                modifier = Modifier.fillMaxWidth()
+//            ) {
+//
+//            }
+//        }
+//    }
+//}

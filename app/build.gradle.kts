@@ -79,14 +79,14 @@ dependencies {
 
     implementation(libs.reorderable)
 
-
+    implementation(libs.gson)
 
 
     // Hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
         // Opcional - Para integración con ViewModel de Jetpack
-         implementation(libs.androidx.hilt.navigation.compose) // Si usas Navigation Compose
+         implementation(libs.androidx.hilt.navigation.compose)
 
     // Navigation
     implementation(libs.navigation.compose)

@@ -26,9 +26,11 @@ import androidx.navigation.NavController
 import com.dls.pymetask.domain.model.Tarea
 import com.dls.pymetask.ui.theme.Poppins
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.*
 
-@SuppressLint("DefaultLocale")
+@SuppressLint("DefaultLocale", "NewApi")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TareaFormScreen(
@@ -43,7 +45,6 @@ fun TareaFormScreen(
     val calendar = Calendar.getInstance()
     val dateFormatter = SimpleDateFormat("dd 'de' MMMM 'de' yyyy", Locale("es", "ES"))
 
-
     // Datos de la tarea
     var titulo by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
@@ -51,8 +52,6 @@ fun TareaFormScreen(
     var fecha by remember { mutableStateOf("") }
     var hora by remember { mutableStateOf("") }
     var completado by remember { mutableStateOf(false) }
-//    var activarAlarma by remember { mutableStateOf(true) }
-
     val activarAlarmaState = remember { mutableStateOf(true) }
 
     LaunchedEffect(viewModel.tareaActual) {
@@ -60,12 +59,6 @@ fun TareaFormScreen(
             activarAlarmaState.value = it.activarAlarma
         }
     }
-
-
-
-
-
-
 
     // Diálogo de confirmación para eliminar
     var mostrarConfirmacionBorrado by remember { mutableStateOf(false) }
@@ -75,9 +68,16 @@ fun TareaFormScreen(
         context,
         { _, year, month, dayOfMonth ->
             calendar.set(year, month, dayOfMonth)
-            val nuevaFecha = dateFormatter.format(calendar.time)
-            fecha = nuevaFecha                      // ⬅️ actualizar UI
-            viewModel.actualizarFecha(nuevaFecha)   // ⬅️ actualizar ViewModel
+//            val nuevaFecha = dateFormatter.format(calendar.time)
+//            fecha = nuevaFecha                      // ⬅️ actualizar UI
+//            viewModel.actualizarFecha(nuevaFecha)   // ⬅️ actualizar ViewModel
+            val selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
+            val nuevaFecha = selectedDate.format(formatter)
+
+            fecha = nuevaFecha                      // ⬅️ para el campo
+            viewModel.actualizarFecha(nuevaFecha)  // ⬅️ para el ViewModel
+
 
         },
         calendar.get(Calendar.YEAR),
@@ -352,6 +352,7 @@ fun TareaFormScreen(
     }
 
 
+@SuppressLint("NewApi")
 fun guardarYSalirAgenda(
     context: Context,
     navController: NavController,
