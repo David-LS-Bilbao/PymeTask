@@ -63,22 +63,31 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.dls.pymetask.data.preferences.DefaultAppPreferences
 import com.dls.pymetask.main.MainViewModel
+import com.dls.pymetask.presentation.agenda.AgendaViewModel
 import com.dls.pymetask.presentation.auth.login.LoginViewModel
 import com.dls.pymetask.presentation.navigation.Routes
 import com.dls.pymetask.ui.theme.Poppins
 import com.dls.pymetask.ui.theme.Roboto
+import com.google.firebase.auth.FirebaseAuth
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
-@SuppressLint("SourceLockedOrientationActivity")
+@SuppressLint("SourceLockedOrientationActivity", "NewApi")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
     onCardClick: (String) -> Unit = {},
     viewModel: LoginViewModel = hiltViewModel(),
-    navController: NavController
+    navController: NavController,
+    agendaViewModel: AgendaViewModel = hiltViewModel()
 ) {
     val cards = listOf(
         DashboardCard("Movimientos", "Ver movimientos registrados", Icons.Default.Euro),
@@ -105,8 +114,47 @@ fun DashboardScreen(
         }
     }//---------------------------------------------------
 
+    // Recargar tareas cada vez que se reanude este destino
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                agendaViewModel.cargarTareas()
+
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
 
 
+
+    // Preparar datos para el saludo
+    val tareas by agendaViewModel.tareas.collectAsState()
+    val cal = Calendar.getInstance()
+    val formatter = SimpleDateFormat("dd 'de' MMMM 'de' yyyy", Locale("es", "ES"))
+    val today = formatter.format(cal.time)
+    val tomorrow = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, 1) }
+    val tomorrowStr = formatter.format(tomorrow.time)
+    val tareasHoy = tareas.filter { it.fecha == today }
+    val tareasManana = tareas.filter { it.fecha == tomorrowStr }
+    val hour = cal.get(Calendar.HOUR_OF_DAY)
+    val user = FirebaseAuth.getInstance().currentUser
+    val userName = user?.displayName ?: user?.email?.substringBefore('@') ?: "Usuario"
+
+    val saludo = remember(hour, tareasHoy, tareasManana) {
+        when {
+            hour in 8..20 -> if (tareasHoy.isNotEmpty())
+                "Buenos días $userName, hoy tienes ${tareasHoy.size} tareas"
+            else
+                "Buenos días $userName, no tienes tareas hoy"
+            hour >= 21 -> if (tareasManana.isNotEmpty())
+                "Buenas noches $userName. Para mañana tienes ${tareasManana.size} tareas programadas"
+            else
+                "Buenas noches $userName. No tienes tareas para mañana"
+            else -> "Hola $userName"
+        }
+    }
 
 
     Scaffold(modifier = Modifier.fillMaxSize(),
@@ -185,6 +233,17 @@ fun DashboardScreen(
                 fontFamily = Roboto,
                 color =  MaterialTheme.colorScheme.onBackground
             )
+            // Card de saludo
+            Card(
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    saludo,
+                    modifier = Modifier.padding(16.dp),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
 
             // cuadrícula de tarjetas con clics en cada una
             LazyVerticalGrid(
@@ -229,5 +288,7 @@ fun DashboardScreen(
             text = { Text("¿Estás seguro de que deseas cerrar sesión?") }
         )
     }//---------------------------------------
+
+
 }
 
