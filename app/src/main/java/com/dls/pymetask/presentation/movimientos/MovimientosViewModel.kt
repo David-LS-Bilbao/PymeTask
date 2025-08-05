@@ -88,5 +88,4 @@ class MovimientosViewModel @Inject constructor(
             repository.deleteMovimiento(id)
         }
     }
-
 }

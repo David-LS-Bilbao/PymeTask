@@ -10,7 +10,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dls.pymetask.domain.model.Tarea
-import com.dls.pymetask.domain.usecase.tarea.TareaUseCases
+import com.dls.pymetask.domain.useCase.tarea.TareaUseCases
 import com.dls.pymetask.utils.AlarmUtils
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel

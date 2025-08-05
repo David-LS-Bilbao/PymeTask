@@ -1,21 +1,34 @@
+
 package com.dls.pymetask.data.repository
 
+import android.content.Context
+import android.util.Log
 import com.dls.pymetask.domain.model.Movimiento
 import com.dls.pymetask.domain.repository.MovimientoRepository
+import com.dls.pymetask.utils.Constants
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
-
 class MovimientoRepositoryImpl(
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val context: Context
 ) : MovimientoRepository {
-
-    private val collection = firestore.collection("movimientos")
-
+    private fun userCollection() = Constants.getUserIdSeguro(context)?.let { userId ->
+        firestore.collection("usuarios").document(userId).collection("movimientos")
+    } ?: run {
+        Log.e("MovimientoRepo", "❌ userId no disponible, abortando operación")
+        null
+    }
     override fun getMovimientos(): Flow<List<Movimiento>> = callbackFlow {
+        val collection = userCollection()
+        if (collection == null) {
+            trySend(emptyList())
+            close()
+            return@callbackFlow
+        }
         val listener = collection.addSnapshotListener { snapshot, _ ->
             if (snapshot != null) {
                 val list = snapshot.documents.mapNotNull { it.toObject<Movimiento>() }
@@ -24,28 +37,84 @@ class MovimientoRepositoryImpl(
         }
         awaitClose { listener.remove() }
     }
-
     override suspend fun addMovimiento(movimiento: Movimiento) {
-        collection.document(movimiento.id).set(movimiento).await()
+        userCollection()?.document(movimiento.id)?.set(movimiento)?.await()
     }
-
     override suspend fun updateMovimiento(movimiento: Movimiento) {
-        collection.document(movimiento.id).set(movimiento).await()
+        userCollection()?.document(movimiento.id)?.set(movimiento)?.await()
     }
-
     override suspend fun getMovimientoById(id: String): Movimiento? {
-        val doc = collection.document(id).get().await()
-        return doc.toObject()
+        val doc = userCollection()?.document(id)?.get()?.await()
+        return doc?.toObject()
     }
-
     override suspend fun insertMovimiento(mov: Movimiento) {
-        firestore.collection("movimientos")
-            .document(mov.id)
-            .set(mov)
+        userCollection()?.document(mov.id)?.set(mov)?.await()
     }
     override suspend fun deleteMovimiento(id: String) {
-        collection.document(id).delete().await()
+        userCollection()?.document(id)?.delete()?.await()
     }
-
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//package com.dls.pymetask.data.repository
+//
+//import com.dls.pymetask.domain.model.Movimiento
+//import com.dls.pymetask.domain.repository.MovimientoRepository
+//import com.google.firebase.firestore.FirebaseFirestore
+//import com.google.firebase.firestore.ktx.toObject
+//import kotlinx.coroutines.channels.awaitClose
+//import kotlinx.coroutines.flow.Flow
+//import kotlinx.coroutines.flow.callbackFlow
+//import kotlinx.coroutines.tasks.await
+//
+//class MovimientoRepositoryImpl(
+//    private val firestore: FirebaseFirestore
+//) : MovimientoRepository {
+//
+//    private val collection = firestore.collection("movimientos")
+//    override fun getMovimientos(): Flow<List<Movimiento>> = callbackFlow {
+//        val listener = collection.addSnapshotListener { snapshot, _ ->
+//            if (snapshot != null) {
+//                val list = snapshot.documents.mapNotNull { it.toObject<Movimiento>() }
+//                trySend(list)
+//            }
+//        }
+//        awaitClose { listener.remove() }
+//    }
+//    override suspend fun addMovimiento(movimiento: Movimiento) {
+//        collection.document(movimiento.id).set(movimiento).await()
+//    }
+//    override suspend fun updateMovimiento(movimiento: Movimiento) {
+//        collection.document(movimiento.id).set(movimiento).await()
+//    }
+//    override suspend fun getMovimientoById(id: String): Movimiento? {
+//        val doc = collection.document(id).get().await()
+//        return doc.toObject()
+//    }
+//    override suspend fun insertMovimiento(mov: Movimiento) {
+//        firestore.collection("movimientos")
+//            .document(mov.id)
+//            .set(mov)
+//    }
+//    override suspend fun deleteMovimiento(id: String) {
+//        collection.document(id).delete().await()
+//    }
+//}

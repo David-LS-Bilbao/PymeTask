@@ -140,7 +140,7 @@ fun DashboardScreen(
 
 
     val displayFormatter = DateTimeFormatter.ofPattern("dd 'de' MMMM 'de' yyyy", Locale("es","ES"))
-// Ejemplo: val fechaBonita = parseFechaOrNull(it.fecha)?.format(displayFormatter) ?: ""
+    //val fechaBonita = parseFechaOrNull(it.fecha)?.format(displayFormatter) ?: ""
 
 
     Log.d("DashboardScreen", "Tareas Hoy: ${tareasHoy.size}, Tareas Mañana: ${tareasManana.size}")

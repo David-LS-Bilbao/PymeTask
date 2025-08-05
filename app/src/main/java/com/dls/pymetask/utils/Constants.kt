@@ -1,14 +1,7 @@
 package com.dls.pymetask.utils
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.contentColorFor
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import android.content.Context
+import com.google.firebase.auth.FirebaseAuth
 
 
 object Constants{
@@ -22,6 +15,15 @@ val coloresDisponibles = listOf(
 "Blanco" to "#FFFFFF"
 )
 
+    fun getUserIdSeguro(context: Context): String? {
+        val auth = FirebaseAuth.getInstance()
+        val firebaseUserId = auth.currentUser?.uid
+        if (!firebaseUserId.isNullOrBlank()) return firebaseUserId
+
+        // Si no está disponible en FirebaseAuth, usar la copia local
+        val prefs = context.getSharedPreferences("prefs", Context.MODE_PRIVATE)
+        return prefs.getString("user_id", null)
+    }
 
 
 

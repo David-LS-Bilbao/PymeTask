@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
@@ -50,10 +51,11 @@ fun MovimientosScreen(
     val selectedYear by viewModel.selectedYear.collectAsState()
 
     val movimientosFiltrados = movimientos.filter {
-        val date = it.fecha.toDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+        val date = Date(it.fecha).toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
         date.monthValue == selectedMonth && date.year == selectedYear
     }.sortedByDescending {
-        it.fecha.toDate()
+        //it.fecha
+        Date(it.fecha)
     }
 
     Scaffold(
@@ -62,7 +64,7 @@ fun MovimientosScreen(
                 title = { Text("Tus movimientos") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Atrás")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
                     }
                 },
                 actions = {
@@ -125,8 +127,9 @@ fun MovimientosScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             val movimientosPorDia = movimientosFiltrados.groupBy {
-                it.fecha.toDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().dayOfMonth
+                Date(it.fecha).toInstant().atZone(ZoneId.systemDefault()).toLocalDate().dayOfMonth
             }
+
 
             LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 movimientosPorDia.toSortedMap(reverseOrder()).forEach { (dia, listaMovimientos) ->

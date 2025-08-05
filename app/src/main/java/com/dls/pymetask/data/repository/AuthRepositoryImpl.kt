@@ -83,4 +83,5 @@ class AuthRepositoryImpl(
             .getBoolean("sesion_activa", false)
     }
 
+
 }

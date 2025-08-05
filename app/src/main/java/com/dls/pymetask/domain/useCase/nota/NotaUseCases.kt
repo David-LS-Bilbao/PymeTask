@@ -1,4 +1,4 @@
-package com.dls.pymetask.domain.usecase.nota
+package com.dls.pymetask.domain.useCase.nota
 
 import com.dls.pymetask.domain.model.Nota
 import com.dls.pymetask.domain.repository.NotaRepository

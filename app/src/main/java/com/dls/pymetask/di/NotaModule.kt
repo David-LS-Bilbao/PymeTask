@@ -1,19 +1,21 @@
 // di/NotaModule.kt
 package com.dls.pymetask.di
 
+import android.content.Context
 import com.dls.pymetask.data.repository.NotaRepositoryImpl
 import com.dls.pymetask.domain.repository.NotaRepository
-import com.dls.pymetask.domain.usecase.nota.AddNota
-import com.dls.pymetask.domain.usecase.nota.DeleteNota
-import com.dls.pymetask.domain.usecase.nota.EliminarNota
-import com.dls.pymetask.domain.usecase.nota.GetNota
-import com.dls.pymetask.domain.usecase.nota.GetNotas
-import com.dls.pymetask.domain.usecase.nota.NotaUseCases
-import com.dls.pymetask.domain.usecase.nota.UpdateNota
+import com.dls.pymetask.domain.useCase.nota.AddNota
+import com.dls.pymetask.domain.useCase.nota.DeleteNota
+import com.dls.pymetask.domain.useCase.nota.EliminarNota
+import com.dls.pymetask.domain.useCase.nota.GetNota
+import com.dls.pymetask.domain.useCase.nota.GetNotas
+import com.dls.pymetask.domain.useCase.nota.NotaUseCases
+import com.dls.pymetask.domain.useCase.nota.UpdateNota
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -23,8 +25,11 @@ object NotaModule {
 
     @Provides
     @Singleton
-    fun provideNotaRepository(): NotaRepository {
-        return NotaRepositoryImpl(FirebaseFirestore.getInstance())
+    fun provideNotaRepository(
+        @ApplicationContext context: Context
+    ): NotaRepository {
+        return NotaRepositoryImpl(
+            FirebaseFirestore.getInstance(),context)
     }
 
     @Provides
