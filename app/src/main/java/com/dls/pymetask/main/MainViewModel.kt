@@ -27,7 +27,15 @@ class MainViewModel @Inject constructor(
         val marcada = authRepository.sesionMarcada(context)
 
         Log.d("AuthCheck", "UID: ${user?.uid}, Email: ${user?.email}, Marcada=$marcada")
-        _isUserLoggedIn.value = (user != null || marcada)
+
+       // _isUserLoggedIn.value = (user != null || marcada)
+
+        // nueva funcion para mantener login en firebase con dispositivos nuevos
+        if (user != null || marcada) {
+            _isUserLoggedIn.value = true
+        } else {
+            _isUserLoggedIn.value = false
+        }
     }
 
 

@@ -5,6 +5,7 @@ package com.dls.pymetask.data.auth
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
+import android.util.Log
 import com.dls.pymetask.R
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
@@ -49,6 +50,15 @@ class GoogleAuthUiClient(
         val firebaseCredential = GoogleAuthProvider.getCredential(token, null)
         return try {
             auth.signInWithCredential(firebaseCredential).await()
+            // Log
+            val firebaseUser = auth.currentUser
+            if (firebaseUser != null) {
+                Log.d("GoogleLogin", "✅ Usuario autenticado: ${firebaseUser.uid}")
+            } else {
+                Log.e("GoogleLogin", "❌ Usuario no autenticado tras login")
+            }
+
+
             SignInResult(user = auth.currentUser)
         } catch (e: Exception) {
             SignInResult(errorMessage = e.message)
