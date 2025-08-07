@@ -74,7 +74,7 @@ fun AgendaScreen(
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                viewModel.cargarTareas()
+                viewModel.cargarTareas(context)
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -145,17 +145,6 @@ fun AgendaScreen(
                                  }
                              }
 
-
-
-
-
-//                             items(tareas, key = { it.id }) { tarea ->
-//                                 TareaCard(tarea = tarea) {
-//                                     viewModel.seleccionarTarea(tarea.id)
-//                                     navController.navigate("tarea_form?taskId=${tarea.id}")
-//                                     Log.d("AgendaScreen", "Tarea seleccionada: ${tarea.id}")
-//                                 }
-//                             }
                          }
                      }
                  }

@@ -18,4 +18,3 @@ fun getUserIdSeguro(context: Context): String? {
     return prefs.getString("user_id", null)
 }
 
-// subelooo

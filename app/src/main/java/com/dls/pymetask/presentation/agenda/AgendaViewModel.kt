@@ -1,6 +1,7 @@
 package com.dls.pymetask.presentation.agenda
 
 
+import android.content.Context
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -12,6 +13,7 @@ import androidx.lifecycle.viewModelScope
 import com.dls.pymetask.domain.model.Tarea
 import com.dls.pymetask.domain.useCase.tarea.TareaUseCases
 import com.dls.pymetask.utils.AlarmUtils
+import com.dls.pymetask.utils.getUserIdSeguro
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -35,14 +37,24 @@ class AgendaViewModel @Inject constructor(
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading
 
+
+
     /**
      * Carga todas las tareas del usuario autenticado
      * ordenadas por fecha y hora.
      */
     @RequiresApi(Build.VERSION_CODES.O)
-    fun cargarTareas() {
+    fun cargarTareas(context: Context) {
         viewModelScope.launch {
             _loading.value = true
+            val userId = getUserIdSeguro(context)
+
+            if (userId == null) {
+                Log.e("AgendaViewModel", "❌ Usuario no autenticado en este dispositivo.")
+                _loading.value = false
+                return@launch
+            }
+
             val tareasCrudas = tareaUseCases.getTareas()
 
             val tareasOrdenadas = tareasCrudas.sortedWith(compareBy(
@@ -71,10 +83,14 @@ class AgendaViewModel @Inject constructor(
 
     }
     @RequiresApi(Build.VERSION_CODES.O)
-    fun guardarTarea(tarea: Tarea) {
+    fun guardarTarea(context: Context, tarea: Tarea) {
         viewModelScope.launch {
 
-            val userId = FirebaseAuth.getInstance().currentUser?.uid
+          // val userId = FirebaseAuth.getInstance().currentUser?.uid
+
+            // obtenemos el id del usuario autenticado
+            val userId = getUserIdSeguro(context)
+
             if (userId == null) {
                 Log.e("AgendaViewModel", "❌ Usuario no autenticado en este dispositivo.")
                 return@launch
@@ -85,7 +101,7 @@ class AgendaViewModel @Inject constructor(
             if (tareaConUsuario.activarAlarma) {
                 alarmUtils.programarAlarma(tareaConUsuario)
             }
-            cargarTareas()
+            cargarTareas(context)
         }
 
     }
@@ -95,10 +111,10 @@ class AgendaViewModel @Inject constructor(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun eliminarTareaPorId(id: String) {
+    fun eliminarTareaPorId(context: Context, id: String) {
         viewModelScope.launch {
             tareaUseCases.deleteTarea(id)
-            cargarTareas()
+            cargarTareas(context)
         }
     }
     fun actualizarFecha(nuevaFecha: String) {

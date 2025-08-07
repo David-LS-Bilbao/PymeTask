@@ -321,7 +321,7 @@ fun TareaFormScreen(
                         TextButton(onClick = {
                             val idTarea = taskId ?: viewModel.tareaActual?.id
                             if (idTarea != null) {
-                                viewModel.eliminarTareaPorId(idTarea)
+                                viewModel.eliminarTareaPorId(context, idTarea)
                                 Toast.makeText(context, "Tarea eliminada", Toast.LENGTH_SHORT)
                                     .show()
                             } else {
@@ -377,7 +377,7 @@ fun guardarYSalirAgenda(
             Toast.makeText(context, "La hora es obligatoria", Toast.LENGTH_SHORT).show()
         }
         else -> {
-            viewModel.guardarTarea(
+            viewModel.guardarTarea(context,
                 Tarea(
                     id = taskId ?: UUID.randomUUID().toString(),
                     titulo = titulo,
