@@ -17,3 +17,5 @@ fun getUserIdSeguro(context: Context): String? {
     val prefs = context.getSharedPreferences("prefs", Context.MODE_PRIVATE)
     return prefs.getString("user_id", null)
 }
+
+// subelooo
