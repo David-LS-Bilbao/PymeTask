@@ -1,4 +1,4 @@
-package com.dls.pymetask.domain.usecase.tarea
+package com.dls.pymetask.domain.useCase.tarea
 
 import com.dls.pymetask.domain.model.Tarea
 import com.dls.pymetask.domain.repository.TareaRepository

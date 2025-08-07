@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dls.pymetask.data.mappers.toUiModel
 import com.dls.pymetask.domain.model.ArchivoUiModel
-import com.dls.pymetask.domain.usecase.archivo.*
+import com.dls.pymetask.domain.useCase.archivo.ArchivoUseCase
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject

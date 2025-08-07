@@ -202,16 +202,30 @@ fun CrearMovimientoScreen(
 //                        val fechaFinal = fechaSeleccionada ?: Date()
 //                        val timestamp = com.google.firebase.Timestamp(fechaFinal)
 
+                        val userIdSeguro = com.dls.pymetask.utils.Constants.getUserIdSeguro(context) ?: ""
                         val nuevo = Movimiento(
                             id = UUID.randomUUID().toString(),
                             titulo = titulo,
                             subtitulo = subtitulo,
                             cantidad = cantidad.toDoubleOrNull() ?: 0.0,
                             ingreso = tipoIngreso,
-                            fecha = com.google.firebase.Timestamp(fechaSeleccionada ?: Date())
-
-//                            fecha = timestamp
+                            fecha = com.google.firebase.Timestamp(fechaSeleccionada ?: Date()).toDate().time,
+                            userId = userIdSeguro
                         )
+
+
+
+
+//                        val nuevo = Movimiento(
+//                            id = UUID.randomUUID().toString(),
+//                            titulo = titulo,
+//                            subtitulo = subtitulo,
+//                            cantidad = cantidad.toDoubleOrNull() ?: 0.0,
+//                            ingreso = tipoIngreso,
+//                            fecha = com.google.firebase.Timestamp(fechaSeleccionada ?: Date())
+//                                .toDate().time,
+//                            userId = userId
+//                        )
                         viewModel.addMovimiento(nuevo)
                         navController.popBackStack()
                     },

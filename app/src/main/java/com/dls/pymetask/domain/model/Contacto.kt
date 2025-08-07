@@ -7,5 +7,6 @@ data class Contacto(
     val tipo: String = "",
     val direccion: String = "",
     val fotoUrl: String? = null,
-    val email: String = ""
+    val email: String = "",
+    val userId: String = ""
 )

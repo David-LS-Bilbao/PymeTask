@@ -6,5 +6,6 @@ data class Archivo(
     val url: String = "",
     val tipo: String = "", // "pdf", "jpg", "png"
     val fecha: Long = System.currentTimeMillis(),
-    val carpetaId: String? = null
+    val carpetaId: String? = null,
+    val userId: String = ""
 )

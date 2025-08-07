@@ -1,4 +1,4 @@
-package com.dls.pymetask.domain.usecase.archivo
+package com.dls.pymetask.domain.useCase.archivo
 
 import android.net.Uri
 import com.dls.pymetask.domain.model.Archivo
@@ -79,9 +79,9 @@ class RenombrarArchivoUseCase(
     suspend operator fun invoke(id: String, nuevoNombre: String) {
         repository.renombrarArchivo(id, nuevoNombre)
     }
-    suspend operator fun invoke(id: String) {
-        repository.eliminarArchivo(id)
-    }
+//    suspend operator fun invoke(id: String) {
+//        repository.eliminarArchivo(id)
+//    }
 }
 class SubirArchivoUseCase @Inject constructor(
     private val repository: ArchivoRepository
