@@ -12,20 +12,24 @@ data class TareaUseCases(
     val eliminarTarea: EliminarTarea
 )
 class GetTareas(private val repo: TareaRepository) {
-    suspend operator fun invoke() = repo.getTareas()
+    suspend operator fun invoke(userId: String) = repo.getTareas(userId)
 }
 class GetTarea(private val repo: TareaRepository) {
-    suspend operator fun invoke(id: String) = repo.getTareaById(id)
+    /** Ahora recibe userId para filtrar en el repositorio */
+
+    suspend operator fun invoke(id: String, userId: String) = repo.getTareaById(id,userId)
 }
 class AddTarea(private val repo: TareaRepository) {
-    suspend operator fun invoke(tarea: Tarea) = repo.addTarea(tarea)
+    /** Ahora recibe la tarea y el userId */
+    suspend operator fun invoke(tarea: Tarea, userId: String) =
+        repo.addTarea(tarea, userId)
 }
 class UpdateTarea(private val repo: TareaRepository) {
-    suspend operator fun invoke(tarea: Tarea) = repo.updateTarea(tarea)
+    suspend operator fun invoke(tarea: Tarea, userId: String) = repo.updateTarea(tarea, userId)
 }
 class DeleteTarea(private val repo: TareaRepository) {
-    suspend operator fun invoke(id: String) = repo.deleteTarea(id)
+    suspend operator fun invoke(id: String, userId: String) = repo.deleteTarea(id, userId)
 }
 class EliminarTarea(private val repo: TareaRepository) {
-    suspend operator fun invoke(tarea: Tarea) = repo.eliminarTarea(tarea)
+    suspend operator fun invoke(tarea: Tarea, userId: String) = repo.eliminarTarea(tarea, userId)
 }

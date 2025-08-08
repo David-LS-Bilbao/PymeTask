@@ -14,8 +14,8 @@ import com.dls.pymetask.domain.model.Tarea
 import com.dls.pymetask.domain.useCase.tarea.TareaUseCases
 import com.dls.pymetask.utils.AlarmUtils
 import com.dls.pymetask.utils.getUserIdSeguro
-import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,7 +25,8 @@ import java.time.format.DateTimeFormatter
 @HiltViewModel
 class AgendaViewModel @Inject constructor(
     private val tareaUseCases: TareaUseCases,
-    private val alarmUtils: AlarmUtils
+    private val alarmUtils: AlarmUtils,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val _tareas = MutableStateFlow<List<Tarea>>(emptyList())
@@ -38,85 +39,131 @@ class AgendaViewModel @Inject constructor(
     val loading: StateFlow<Boolean> = _loading
 
 
+    // obtenemos el userId UNA sola vez
+    private val userId: String = getUserIdSeguro(context)
+        ?: throw IllegalStateException("Usuario no autenticado")
+
 
     /**
      * Carga todas las tareas del usuario autenticado
      * ordenadas por fecha y hora.
      */
+
     @RequiresApi(Build.VERSION_CODES.O)
-    fun cargarTareas(context: Context) {
+    fun cargarTareas() {
         viewModelScope.launch {
             _loading.value = true
-            val userId = getUserIdSeguro(context)
-
-            if (userId == null) {
-                Log.e("AgendaViewModel", "❌ Usuario no autenticado en este dispositivo.")
-                _loading.value = false
-                return@launch
-            }
-
-            val tareasCrudas = tareaUseCases.getTareas()
-
-            val tareasOrdenadas = tareasCrudas.sortedWith(compareBy(
-                { it.fecha.toLocalDateOrNull() ?: LocalDate.MAX },
-                { it.hora.toLocalTimeOrNull() ?: LocalTime.MAX }
-            ))
-
-            _tareas.value = tareasOrdenadas
+            val lista = tareaUseCases.getTareas(userId)
+            _tareas.value = lista
+                .sortedWith(compareBy(
+                    { it.fecha.toLocalDateOrNull() ?: LocalDate.MAX },
+                    { it.hora.toLocalTimeOrNull() ?: LocalTime.MAX }
+                ))
             _loading.value = false
         }
     }
 
+
+//    @RequiresApi(Build.VERSION_CODES.O)
+//    fun cargarTareas(context: Context)  {
+//        viewModelScope.launch {
+//            _loading.value = true
+//            val userId = getUserIdSeguro(context) ?: return@launch
+//
+//            val tareasCrudas = tareaUseCases.getTareas(userId)
+//
+//            val tareasOrdenadas = tareasCrudas.sortedWith(compareBy(
+//                { it.fecha.toLocalDateOrNull() ?: LocalDate.MAX },
+//                { it.hora.toLocalTimeOrNull() ?: LocalTime.MAX }
+//            ))
+//
+//            _tareas.value = tareasOrdenadas
+//            _loading.value = false
+//        }
+//    }
+
     /**
      * Establece una tarea como seleccionada (para editar).
      */
-    fun seleccionarTarea(id: String) {
 
-        if (id == "tareas" || id.isBlank()) {
-            Log.e("AgendaViewModel", "⚠️ ID inválido al seleccionar tarea: $id")
-            return
-        }
+    fun seleccionarTarea(id: String) {
+        if (id.isBlank()) return
         viewModelScope.launch {
-            tareaActual = tareaUseCases.getTarea(id)
+            tareaActual = tareaUseCases.getTarea(id, userId)
             Log.d("AgendaViewModel", "✅ tarea cargada: ${tareaActual?.titulo}")
         }
-
     }
+
+//    fun seleccionarTarea(id: String) {
+//
+//        if (id == "tareas" || id.isBlank()) {
+//            Log.e("AgendaViewModel", "⚠️ ID inválido al seleccionar tarea: $id")
+//            return
+//        }
+//        viewModelScope.launch {
+//            tareaActual = userId?.let { tareaUseCases.getTarea(id,it) }
+//            Log.d("AgendaViewModel", "✅ tarea cargada: ${tareaActual?.titulo}")
+//        }
+//
+//    }
+
+
+
     @RequiresApi(Build.VERSION_CODES.O)
-    fun guardarTarea(context: Context, tarea: Tarea) {
+    fun guardarTarea(tarea: Tarea) {
         viewModelScope.launch {
-
-          // val userId = FirebaseAuth.getInstance().currentUser?.uid
-
-            // obtenemos el id del usuario autenticado
-            val userId = getUserIdSeguro(context)
-
-            if (userId == null) {
-                Log.e("AgendaViewModel", "❌ Usuario no autenticado en este dispositivo.")
-                return@launch
-            }
-            val tareaConUsuario = tarea.copy(userId = userId)
-            tareaUseCases.addTarea(tareaConUsuario)
-
-            if (tareaConUsuario.activarAlarma) {
-                alarmUtils.programarAlarma(tareaConUsuario)
-            }
-            cargarTareas(context)
+            val t = tarea.copy(userId = userId)
+            tareaUseCases.addTarea(t, userId)
+            if (t.activarAlarma) alarmUtils.programarAlarma(t)
+            cargarTareas()
         }
-
     }
+
+
+//    @RequiresApi(Build.VERSION_CODES.O)
+//    fun guardarTarea(context: Context, tarea: Tarea) {
+//        viewModelScope.launch {
+//
+//
+//            // obtenemos el id del usuario autenticado
+//            val userId = getUserIdSeguro(context)
+//
+//            if (userId == null) {
+//                Log.e("AgendaViewModel", "❌ Usuario no autenticado en este dispositivo.")
+//                return@launch
+//            }
+//            val tareaConUsuario = tarea.copy(userId = userId)
+//            tareaUseCases.addTarea(tareaConUsuario, userId)
+//
+//            if (tareaConUsuario.activarAlarma) {
+//                alarmUtils.programarAlarma(tareaConUsuario)
+//            }
+//            cargarTareas(context)
+//        }
+//
+//    }
 
     fun limpiarTareaActual() {
         tareaActual = null
     }
 
+
+
     @RequiresApi(Build.VERSION_CODES.O)
-    fun eliminarTareaPorId(context: Context, id: String) {
+    fun eliminarTareaPorId(id: String) {
         viewModelScope.launch {
-            tareaUseCases.deleteTarea(id)
-            cargarTareas(context)
+            tareaUseCases.deleteTarea(id, userId)
+            cargarTareas()
         }
     }
+
+//    @RequiresApi(Build.VERSION_CODES.O)
+//    fun eliminarTareaPorId(context: Context, id: String) {
+//        viewModelScope.launch {
+//            tareaUseCases.deleteTarea(id, getUserIdSeguro(context) ?: return@launch)
+//            cargarTareas(context)
+//        }
+//    }
     fun actualizarFecha(nuevaFecha: String) {
         tareaActual = tareaActual?.copy(fecha = nuevaFecha)
 

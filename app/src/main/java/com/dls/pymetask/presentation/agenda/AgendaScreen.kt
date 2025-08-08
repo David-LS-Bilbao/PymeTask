@@ -57,8 +57,6 @@ fun AgendaScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
 
 
-
-
     var showDialog by remember { mutableStateOf(false) }
     if (showDialog) AlarmOptionsDialog(
         initialToneUri = PreferencesHelper.getToneUri(context),
@@ -74,7 +72,7 @@ fun AgendaScreen(
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                viewModel.cargarTareas(context)
+                viewModel.cargarTareas()
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)

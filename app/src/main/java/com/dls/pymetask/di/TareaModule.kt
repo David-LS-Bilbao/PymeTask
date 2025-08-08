@@ -27,12 +27,12 @@ object TareaModule {
     fun provideTareaRepository(
         @ApplicationContext context: Context
     ): TareaRepository {
-        return TareaRepositoryImpl(FirebaseFirestore.getInstance(),context)
+        return TareaRepositoryImpl(FirebaseFirestore.getInstance())
     }
 
     @Provides
     @Singleton
-    fun provideTareaUseCases(repository: TareaRepository): TareaUseCases{
+    fun provideTareaUseCases(repository: TareaRepository): TareaUseCases {
 
         return TareaUseCases(
            getTareas = GetTareas(repository),

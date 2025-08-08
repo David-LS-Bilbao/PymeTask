@@ -114,7 +114,7 @@ fun DashboardScreen(
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
                 Log.d("DashboardScreen", "OnResume: recargando tareas")
-                agendaViewModel.cargarTareas(context)
+                agendaViewModel.cargarTareas()
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
