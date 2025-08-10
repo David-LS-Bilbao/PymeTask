@@ -11,6 +11,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Save
@@ -36,13 +37,16 @@ fun TareaFormScreen(
     navController: NavController,
     viewModel: AgendaViewModel = hiltViewModel()
 ) {
+    // Contexto para dialogs y toasts
     val context = LocalContext.current
+    // Estados expuestos por el ViewModel
     val isLoading by viewModel.loading.collectAsState()
     val tareaActual by rememberUpdatedState(newValue = viewModel.tareaActual)
-
+    // Formateador y calendario base
     val calendar = Calendar.getInstance()
     val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale("es", "ES"))
 
+    // Estados locales del formulario
     var titulo by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
     var descripcionLarga by remember { mutableStateOf("") }
@@ -51,6 +55,11 @@ fun TareaFormScreen(
     var completado by remember { mutableStateOf(false) }
     var activarAlarma by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
+
+    // Carga inicial de la tarea o limpieza
+    LaunchedEffect(taskId) {
+        if (taskId != null) viewModel.seleccionarTarea(taskId) else viewModel.limpiarTareaActual()
+    }
 
     val datePicker = DatePickerDialog(
         context,
@@ -63,7 +72,6 @@ fun TareaFormScreen(
         calendar.get(Calendar.MONTH),
         calendar.get(Calendar.DAY_OF_MONTH)
     )
-
     val timePicker = TimePickerDialog(
         context,
         { _, h, min ->
@@ -75,11 +83,7 @@ fun TareaFormScreen(
         true
     )
 
-    LaunchedEffect(taskId) {
-        if (taskId != null) viewModel.seleccionarTarea(taskId)
-        else viewModel.limpiarTareaActual()
-    }
-
+    // Copiar datos de la tarea seleccionada al formulario
     LaunchedEffect(tareaActual) {
         tareaActual?.let { t ->
             titulo = t.titulo
@@ -92,6 +96,7 @@ fun TareaFormScreen(
         }
     }
 
+    // Acción común de guardar y salir
     BackHandler {
         saveAndExit(
             context, navController, viewModel,
@@ -114,7 +119,7 @@ fun TareaFormScreen(
                             )
                         }
                     ) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
                 },
                 actions = {
@@ -142,9 +147,7 @@ fun TareaFormScreen(
                     .fillMaxSize()
                     .padding(padding),
                 contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
+            ) { CircularProgressIndicator() }
         } else {
             Column(
                 modifier = Modifier
@@ -153,6 +156,7 @@ fun TareaFormScreen(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                // Titulo
                 OutlinedTextField(
                     value = titulo,
                     onValueChange = { titulo = it },
@@ -160,32 +164,97 @@ fun TareaFormScreen(
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
+                // Descripción
                 OutlinedTextField(
                     value = descripcion,
                     onValueChange = { descripcion = it },
                     label = { Text("Resumen breve") },
                     modifier = Modifier.fillMaxWidth()
                 )
-                OutlinedTextField(
-                    value = fecha,
-                    onValueChange = {
 
-                    },
-                    label = { Text("Fecha") },
-                    readOnly = true,
+                // Fecha y hora
+
+
+                // Fecha: usamos un contenedor clickable y deshabilitamos el TextField
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { datePicker.show() }
-                )
-                OutlinedTextField(
-                    value = hora,
-                    onValueChange = {},
-                    label = { Text("Hora") },
-                    readOnly = true,
+                        .clickable {
+                            val now = Calendar.getInstance()
+                            // Si ya hay fecha, inicializamos el picker con ella
+                            val init = runCatching { LocalDate.parse(fecha, dateFormatter) }.getOrNull()
+                            val year = init?.year ?: now.get(Calendar.YEAR)
+                            val month = (init?.monthValue ?: (now.get(Calendar.MONTH) + 1)) - 1
+                            val day = init?.dayOfMonth ?: now.get(Calendar.DAY_OF_MONTH)
+                            DatePickerDialog(context, { _, y, m, d ->
+                                val selected = LocalDate.of(y, m + 1, d)
+                                val newDate = selected.format(dateFormatter)
+                                fecha = newDate
+                                viewModel.actualizarFecha(newDate)
+                            }, year, month, day).show()
+                        }
+                ) {
+                    OutlinedTextField(
+                        value = fecha,
+                        onValueChange = {},
+                        label = { Text("Fecha") },
+                        readOnly = true,
+                        enabled = false,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                // Hora: mismo patrón
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { timePicker.show() }
-                )
+                        .clickable {
+                            val nowH = calendar
+                            val (initH, initM) = hora.split(":").let {
+                                val h = it.getOrNull(0)?.toIntOrNull() ?: nowH.get(Calendar.HOUR_OF_DAY)
+                                val m = it.getOrNull(1)?.toIntOrNull() ?: nowH.get(Calendar.MINUTE)
+                                h to m
+                            }
+                            TimePickerDialog(context, { _, h, min ->
+                                val newTime = String.format("%02d:%02d", h, min)
+                                hora = newTime
+                                viewModel.actualizarHora(newTime)
+                            }, initH, initM, true).show()
+                        }
+                ) {
+                    OutlinedTextField(
+                        value = hora,
+                        onValueChange = {},
+                        label = { Text("Hora") },
+                        readOnly = true,
+                        enabled = false,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+
+
+
+//                OutlinedTextField(
+//                    value = fecha,
+//                    onValueChange = {
+//
+//                    },
+//                    label = { Text("Fecha") },
+//                    readOnly = true,
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .clickable { datePicker.show() }
+//                )
+//                OutlinedTextField(
+//                    value = hora,
+//                    onValueChange = {},
+//                    label = { Text("Hora") },
+//                    readOnly = true,
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .clickable { timePicker.show() }
+//                )
+                // Descripción larga
                 OutlinedTextField(
                     value = descripcionLarga,
                     onValueChange = { descripcionLarga = it },
