@@ -202,7 +202,8 @@ fun DashboardScreen(
         },
         // barra de navegación inferior con iconos
         bottomBar = {
-            NavigationBar {
+            NavigationBar(modifier = Modifier,
+                containerColor = MaterialTheme.colorScheme.background) {
                 NavigationBarItem(
                     selected = currentRoute == "dashboard",
                     modifier = Modifier.height(56.dp),// altura estándar
@@ -254,9 +255,10 @@ fun DashboardScreen(
                 color =  MaterialTheme.colorScheme.onBackground
             )
             // Card de saludo
-            Card(
+            Card(modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.fillMaxWidth(),
+                // click en el card lleva a agenda
+                onClick = { navController.navigate("agenda") },
                 elevation = CardDefaults.cardElevation(4.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
             ) {

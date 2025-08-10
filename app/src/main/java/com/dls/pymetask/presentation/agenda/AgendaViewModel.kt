@@ -38,16 +38,9 @@ class AgendaViewModel @Inject constructor(
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading
 
-
     // obtenemos el userId UNA sola vez
     private val userId: String = getUserIdSeguro(context)
         ?: throw IllegalStateException("Usuario no autenticado")
-
-
-    /**
-     * Carga todas las tareas del usuario autenticado
-     * ordenadas por fecha y hora.
-     */
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun cargarTareas() {
@@ -62,8 +55,6 @@ class AgendaViewModel @Inject constructor(
             _loading.value = false
         }
     }
-
-
     /**
      * Establece una tarea como seleccionada (para editar).
      */
@@ -76,31 +67,72 @@ class AgendaViewModel @Inject constructor(
         }
     }
 
-
     @RequiresApi(Build.VERSION_CODES.O)
     fun guardarTarea(tarea: Tarea) {
         viewModelScope.launch {
-            val t = tarea.copy(userId = userId)
-            tareaUseCases.addTarea(t, userId)
-            if (t.activarAlarma) alarmUtils.programarAlarma(t)
+            // Siempre guardamos con el userId
+            val base = tarea.copy(userId = userId)
+
+            // Si el usuario marca la tarea como completada, forzamos activarAlarma = false
+            // y cancelamos cualquier alarma previa asociada a esa tarea.
+            val efectiva = if (base.completado) {
+                // Desactivar alarma al completar
+                alarmUtils.cancelarAlarma(base.id)
+                base.copy(activarAlarma = false)
+            } else {
+                base
+            }
+
+            // Persistimos en Firestore
+            tareaUseCases.addTarea(efectiva, userId)
+
+            // Gestionar la alarma en función del estado final:
+            if (efectiva.activarAlarma) {
+                // Programación idempotente (usa setExact y tu lógica de lead time si la tienes)
+                alarmUtils.programarAlarma(efectiva)
+            } else {
+                // Aseguramos que no quede ninguna alarma huérfana
+                alarmUtils.cancelarAlarma(efectiva.id)
+            }
+
             cargarTareas()
         }
     }
 
-    fun limpiarTareaActual() {
-        tareaActual = null
-    }
-
-
-
     @RequiresApi(Build.VERSION_CODES.O)
     fun eliminarTareaPorId(id: String) {
         viewModelScope.launch {
+            // Primero cancelar alarma asociada (si había)
+            alarmUtils.cancelarAlarma(id)
+            // Luego borrar en Firestore
             tareaUseCases.deleteTarea(id, userId)
             cargarTareas()
         }
     }
 
+
+
+
+//    @RequiresApi(Build.VERSION_CODES.O)
+//    fun guardarTarea(tarea: Tarea) {
+//        viewModelScope.launch {
+//            val t = tarea.copy(userId = userId)
+//            tareaUseCases.addTarea(t, userId)
+//            if (t.activarAlarma) alarmUtils.programarAlarma(t)
+//            cargarTareas()
+//        }
+//    }
+    fun limpiarTareaActual() {
+        tareaActual = null
+    }
+
+//    @RequiresApi(Build.VERSION_CODES.O)
+//    fun eliminarTareaPorId(id: String) {
+//        viewModelScope.launch {
+//            tareaUseCases.deleteTarea(id, userId)
+//            cargarTareas()
+//        }
+//    }
 
     fun actualizarFecha(nuevaFecha: String) {
         tareaActual = tareaActual?.copy(fecha = nuevaFecha)
@@ -110,9 +142,6 @@ class AgendaViewModel @Inject constructor(
         tareaActual = tareaActual?.copy(hora = nuevaHora)
     }
 }
-
-
-
 
 @RequiresApi(Build.VERSION_CODES.O)
 fun String.toLocalDateOrNull(): LocalDate? =
