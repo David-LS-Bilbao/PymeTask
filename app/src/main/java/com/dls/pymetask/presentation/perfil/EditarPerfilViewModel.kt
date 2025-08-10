@@ -1,12 +1,15 @@
 package com.dls.pymetask.presentation.perfil
 
+import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dls.pymetask.utils.getUserIdSeguro
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -14,12 +17,14 @@ import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
-class EditarPerfilViewModel @Inject constructor() : ViewModel() {
+class EditarPerfilViewModel @Inject constructor(
+    @ApplicationContext private val context: Context
+
+) : ViewModel() {
 
     private val auth = FirebaseAuth.getInstance()
     private val firestore = FirebaseFirestore.getInstance()
     private val storage = FirebaseStorage.getInstance()
-
     private val _perfil = MutableStateFlow(PerfilUsuario())
     val perfil: StateFlow<PerfilUsuario> get() = _perfil
 
@@ -28,7 +33,8 @@ class EditarPerfilViewModel @Inject constructor() : ViewModel() {
     }
 
     fun cargarDatosPerfil() {
-        val uid = auth.currentUser?.uid ?: return
+      //  val uid = auth.currentUser?.uid ?: return
+        val uid = getUserIdSeguro(context) ?: return
 
         firestore.collection("usuarios").document(uid).get()
             .addOnSuccessListener { doc ->

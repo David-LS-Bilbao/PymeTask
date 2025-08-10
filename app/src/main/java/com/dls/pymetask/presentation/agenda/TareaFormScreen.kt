@@ -28,7 +28,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-@SuppressLint("NewApi")
+@SuppressLint("NewApi", "DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TareaFormScreen(
@@ -168,7 +168,9 @@ fun TareaFormScreen(
                 )
                 OutlinedTextField(
                     value = fecha,
-                    onValueChange = {},
+                    onValueChange = {
+
+                    },
                     label = { Text("Fecha") },
                     readOnly = true,
                     modifier = Modifier

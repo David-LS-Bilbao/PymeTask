@@ -64,24 +64,6 @@ class AgendaViewModel @Inject constructor(
     }
 
 
-//    @RequiresApi(Build.VERSION_CODES.O)
-//    fun cargarTareas(context: Context)  {
-//        viewModelScope.launch {
-//            _loading.value = true
-//            val userId = getUserIdSeguro(context) ?: return@launch
-//
-//            val tareasCrudas = tareaUseCases.getTareas(userId)
-//
-//            val tareasOrdenadas = tareasCrudas.sortedWith(compareBy(
-//                { it.fecha.toLocalDateOrNull() ?: LocalDate.MAX },
-//                { it.hora.toLocalTimeOrNull() ?: LocalTime.MAX }
-//            ))
-//
-//            _tareas.value = tareasOrdenadas
-//            _loading.value = false
-//        }
-//    }
-
     /**
      * Establece una tarea como seleccionada (para editar).
      */

@@ -1,8 +1,10 @@
 package com.dls.pymetask.main
 
 import android.os.Build
+
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -12,6 +14,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.dls.pymetask.presentation.ajustes.ThemeViewModel
@@ -45,7 +48,10 @@ fun PymeTaskAppRoot(
 
     // 🟢 APLICA el tema aquí:
     PymeTaskTheme(themeMode = themeMode) {
-        Scaffold { innerPadding ->
+        Scaffold (
+            contentWindowInsets = WindowInsets(0.dp) // evita padding extra por insets
+
+        ){ innerPadding ->
             Box(
                 modifier = Modifier
                     .fillMaxSize()

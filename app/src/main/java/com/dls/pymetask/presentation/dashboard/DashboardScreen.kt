@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -62,6 +63,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.dls.pymetask.presentation.agenda.AgendaViewModel
 import com.dls.pymetask.presentation.auth.login.LoginViewModel
 import com.dls.pymetask.presentation.navigation.Routes
+import com.dls.pymetask.presentation.perfil.EditarPerfilViewModel
+import com.dls.pymetask.presentation.perfil.PerfilUserViewModel
 import com.dls.pymetask.ui.theme.Poppins
 import com.dls.pymetask.ui.theme.Roboto
 import com.google.firebase.auth.FirebaseAuth
@@ -81,7 +84,8 @@ fun DashboardScreen(
     onCardClick: (String) -> Unit = {},
     viewModel: LoginViewModel = hiltViewModel(),
     navController: NavController,
-    agendaViewModel: AgendaViewModel = hiltViewModel()
+    agendaViewModel: AgendaViewModel = hiltViewModel(),
+    perfilViewModel: EditarPerfilViewModel = hiltViewModel()
 ) {
     val cards = listOf(
         DashboardCard("Movimientos", "Ver movimientos registrados", Icons.Default.Euro),
@@ -92,7 +96,6 @@ fun DashboardScreen(
     var showLogoutDialog by remember { mutableStateOf(false) }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-
 
 
 //desactivar modo landscape
@@ -138,17 +141,28 @@ fun DashboardScreen(
     val tareasHoy = tareas.filter { parseFechaOrNull(it.fecha) == hoy }
     val tareasManana = tareas.filter { parseFechaOrNull(it.fecha) == manana }
 
-
     val displayFormatter = DateTimeFormatter.ofPattern("dd 'de' MMMM 'de' yyyy", Locale("es","ES"))
-    //val fechaBonita = parseFechaOrNull(it.fecha)?.format(displayFormatter) ?: ""
-
 
     Log.d("DashboardScreen", "Tareas Hoy: ${tareasHoy.size}, Tareas Mañana: ${tareasManana.size}")
 
+
+
+    LaunchedEffect(Unit) {
+        agendaViewModel.cargarTareas()
+        perfilViewModel.cargarDatosPerfil() // por si venimos de Editar Perfil
+    }
+
+
+
     // Preparar saludo
     val hour = LocalTime.now().hour
-    val user = FirebaseAuth.getInstance().currentUser
-    val userName = user?.displayName ?: user?.email?.substringBefore('@') ?: "Usuario"
+
+    val perfil by perfilViewModel.perfil.collectAsState()
+    val userName = remember(perfil) {
+        perfil.nombre.takeIf { it.isNotBlank() }
+            ?: perfil.email.substringBefore('@').ifBlank { "Usuario" }
+    }
+
     val saludo = when {
         hour in 8..20 -> if (tareasHoy.isNotEmpty())
             "Buenos días $userName, hoy tienes ${tareasHoy.size} tareas"
@@ -162,13 +176,13 @@ fun DashboardScreen(
     }
 
     Scaffold(modifier = Modifier.fillMaxSize(),
-
-        // barra de navegación superior con íconos
         topBar = {
-            TopAppBar(
+            TopAppBar( // barra de navegación superior con íconos
                 title = { Text("PymeTask",
                     fontSize = 26.sp,
                     fontFamily = Poppins,
+                    maxLines = 1,
+                    modifier = Modifier.height(56.dp), // altura mínima estándar Material3 para dispositivo fisico
                     fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
                     IconButton(onClick = {
@@ -190,6 +204,7 @@ fun DashboardScreen(
             NavigationBar {
                 NavigationBarItem(
                     selected = currentRoute == "dashboard",
+                    modifier = Modifier.height(56.dp),// altura estándar
                     onClick = { navController.navigate("dashboard") },
                     icon = { Icon(Icons.Default.Home, contentDescription = "Inicio") }
                 )
