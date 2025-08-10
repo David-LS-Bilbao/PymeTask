@@ -230,30 +230,6 @@ fun TareaFormScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
-
-
-
-
-//                OutlinedTextField(
-//                    value = fecha,
-//                    onValueChange = {
-//
-//                    },
-//                    label = { Text("Fecha") },
-//                    readOnly = true,
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .clickable { datePicker.show() }
-//                )
-//                OutlinedTextField(
-//                    value = hora,
-//                    onValueChange = {},
-//                    label = { Text("Hora") },
-//                    readOnly = true,
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .clickable { timePicker.show() }
-//                )
                 // Descripción larga
                 OutlinedTextField(
                     value = descripcionLarga,

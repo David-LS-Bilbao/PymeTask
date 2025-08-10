@@ -37,9 +37,8 @@ fun TareaCard(
 ) {
     Card(
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (tarea.completado) Color(0xFFD0F0C0) else MaterialTheme.colorScheme.surface
-        ),
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(containerColor = if (tarea.completado) Color(0xFFD0F0C0) else MaterialTheme.colorScheme.surface),
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() }

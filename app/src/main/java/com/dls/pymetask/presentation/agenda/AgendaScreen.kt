@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -33,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -111,9 +114,14 @@ fun AgendaScreen(
         },
                 containerColor = MaterialTheme.colorScheme.background,)
 
+
+
+
         { padding ->
 
-             Column(modifier = Modifier.padding(padding)) {
+             Column(modifier = Modifier.padding(padding),
+
+                 ) {
 
                  when{
                      isLoading -> {
@@ -122,7 +130,8 @@ fun AgendaScreen(
                          }
                      }
                      tareas.isEmpty() -> {
-                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                         Box(modifier = Modifier.fillMaxSize(),
+                             contentAlignment = Alignment.Center) {
                              Text("No hay tareas aún.")
                              Log.d("AgendaScreen", "No hay tareas aún.")
                          }

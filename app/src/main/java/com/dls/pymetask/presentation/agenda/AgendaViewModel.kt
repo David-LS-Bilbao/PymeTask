@@ -76,20 +76,6 @@ class AgendaViewModel @Inject constructor(
         }
     }
 
-//    fun seleccionarTarea(id: String) {
-//
-//        if (id == "tareas" || id.isBlank()) {
-//            Log.e("AgendaViewModel", "⚠️ ID inválido al seleccionar tarea: $id")
-//            return
-//        }
-//        viewModelScope.launch {
-//            tareaActual = userId?.let { tareaUseCases.getTarea(id,it) }
-//            Log.d("AgendaViewModel", "✅ tarea cargada: ${tareaActual?.titulo}")
-//        }
-//
-//    }
-
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun guardarTarea(tarea: Tarea) {
@@ -100,30 +86,6 @@ class AgendaViewModel @Inject constructor(
             cargarTareas()
         }
     }
-
-
-//    @RequiresApi(Build.VERSION_CODES.O)
-//    fun guardarTarea(context: Context, tarea: Tarea) {
-//        viewModelScope.launch {
-//
-//
-//            // obtenemos el id del usuario autenticado
-//            val userId = getUserIdSeguro(context)
-//
-//            if (userId == null) {
-//                Log.e("AgendaViewModel", "❌ Usuario no autenticado en este dispositivo.")
-//                return@launch
-//            }
-//            val tareaConUsuario = tarea.copy(userId = userId)
-//            tareaUseCases.addTarea(tareaConUsuario, userId)
-//
-//            if (tareaConUsuario.activarAlarma) {
-//                alarmUtils.programarAlarma(tareaConUsuario)
-//            }
-//            cargarTareas(context)
-//        }
-//
-//    }
 
     fun limpiarTareaActual() {
         tareaActual = null
@@ -139,13 +101,7 @@ class AgendaViewModel @Inject constructor(
         }
     }
 
-//    @RequiresApi(Build.VERSION_CODES.O)
-//    fun eliminarTareaPorId(context: Context, id: String) {
-//        viewModelScope.launch {
-//            tareaUseCases.deleteTarea(id, getUserIdSeguro(context) ?: return@launch)
-//            cargarTareas(context)
-//        }
-//    }
+
     fun actualizarFecha(nuevaFecha: String) {
         tareaActual = tareaActual?.copy(fecha = nuevaFecha)
 
