@@ -72,7 +72,6 @@ fun ArchivoCardExtendido(
 
 
     Card(
-        shape = RoundedCornerShape(4.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
@@ -83,9 +82,10 @@ fun ArchivoCardExtendido(
                     cargando = false
                 }
             },
-        elevation = CardDefaults.cardElevation(2.dp),
-        colors = CardDefaults.cardColors(containerColor = colorResource(R.color.blueCard) )
-    ) {
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(containerColor = colorResource( R.color.blueCard))
+   ) {
         Row(
             modifier = Modifier.padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween

@@ -91,26 +91,20 @@ fun ContenidoCarpetaScreen(
             Toast.makeText(context, mensaje, Toast.LENGTH_SHORT).show()
         }
     }
-
-
     LaunchedEffect(Unit) {
         viewModel.cargarArchivosDeCarpeta(carpetaId)
     }
-
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri ->
             uri?.let {
                 val nombre = uri.lastPathSegment?.substringAfterLast("/")
                     ?: "archivo_${System.currentTimeMillis()}"
-
                 viewModel.subirArchivo(context, uri, nombre, carpetaId) {
-
                 }
             }
         }
     )
-
 
     Scaffold(
         topBar = {
@@ -160,7 +154,6 @@ fun ContenidoCarpetaScreen(
 
                 }
             )
-
         },
         floatingActionButton = {
             Box(
@@ -211,7 +204,6 @@ fun ContenidoCarpetaScreen(
                 }
             }
         }
-
     ) { padding ->
 
         Box(
@@ -255,11 +247,13 @@ fun ContenidoCarpetaScreen(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(horizontal = 16.dp)
+                            .padding(horizontal = 16.dp),
+
                     ) {
                         items(archivos) { archivo ->
                             ArchivoCardExtendido(
                                 archivo = archivo,
+
                                 onRenombrar = {
                                     selectedArchivo = archivo
                                     nuevoNombre = archivo.nombre
@@ -293,13 +287,6 @@ fun ContenidoCarpetaScreen(
                             }
 
 
-//                    TextButton(onClick = {
-//                        val intent = Intent(Intent.ACTION_VIEW, selectedArchivo?.url?.toUri())
-//                        context.startActivity(intent)
-//                        mostrarMenu = false
-//                    }) {
-//                        Text("Abrir archivo")
-//                    }
 
                             TextButton(onClick = {
                                 val intent = Intent(Intent.ACTION_SEND).apply {
@@ -394,40 +381,6 @@ fun ContenidoCarpetaScreen(
                     }
                 )
             }
-
-
-//    if (mostrarDialogoRenombrar && selectedArchivo != null) {
-//        AlertDialog(
-//            onDismissRequest = { mostrarDialogoRenombrar = false },
-//            title = { Text("Renombrar archivo") },
-//            text = {
-//                OutlinedTextField(
-//                    value = nuevoNombre,
-//                    onValueChange = { nuevoNombre = it },
-//                    label = { Text("Nuevo nombre") }
-//                )
-//            },
-//            confirmButton = {
-//                TextButton(onClick = {
-//                    if (nuevoNombre.isNotBlank()) {
-//                        val nombreFinal = nuevoNombre.trim().take(50)
-//                        viewModel.renombrarArchivo(selectedArchivo!!.id, nombreFinal, carpetaId)
-//                        mostrarDialogoRenombrar = false
-//                    }
-//                }) {
-//                    Text("Renombrar")
-//                }
-//            },
-//            dismissButton = {
-//                TextButton(onClick = {
-//                    mostrarDialogoRenombrar = false
-//                }) {
-//                    Text("Cancelar")
-//                }
-//            }
-//        )
-//    }
-
 
             if (mostrarDialogoEliminar) {
                 AlertDialog(
