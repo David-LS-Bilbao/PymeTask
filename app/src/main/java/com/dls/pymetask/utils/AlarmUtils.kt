@@ -81,6 +81,12 @@ class AlarmUtils @Inject constructor(
     fun programarAlarma(tarea: Tarea) {
         if (tarea.fecha.isBlank() || tarea.hora.isBlank()) return
 
+        val intent = Intent(context, AlarmReceiver::class.java).apply {
+            putExtra("taskId", tarea.id)
+            putExtra("taskTitle", tarea.titulo)
+        }
+
+
         try {
             // 1) Parseo de fecha/hora
             val fFecha = DateTimeFormatter.ofPattern("yyyy-MM-dd")

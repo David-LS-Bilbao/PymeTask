@@ -21,6 +21,8 @@ class AlarmReceiver : BroadcastReceiver() {
 
         NotificationHelper.playAlarmSound(context, toneUriString)        // 🔊 una sola vez
 
+        AlarmUiState.startBlink(taskId)
+
         // ⇣ Pasamos taskId a la notificación para abrir Agenda y desactivar esa alarma
         NotificationHelper.showAlarmNotification(
             context = context,

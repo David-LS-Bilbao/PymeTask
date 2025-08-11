@@ -61,16 +61,19 @@ fun AgendaScreen(
 
     // Estado local que controla qué tarea debe parpadear ahora mismo.
     // Se inicializa con el id que llega del intent (si hay).
-    var blinkingTaskId by rememberSaveable { mutableStateOf(taskIdEnSonido) }
+    //var blinkingTaskId by rememberSaveable { mutableStateOf(taskIdEnSonido) }
+
+    val blinkingTaskId by AlarmUiState.currentRingingTaskId.collectAsState()
+
 
     // Detener sonido + cerrar notificación + desactivar en BD + cortar parpadeo
-    LaunchedEffect(taskIdEnSonido) {
-        taskIdEnSonido?.let { id ->
-            NotificationHelper.stopAlarmSound()
-            NotificationHelper.cancelActiveAlarmNotification(context)
-            viewModel.desactivarAlarmaEnBD(id) // ya la tienes en el VM
-        }
-    }
+//    LaunchedEffect(taskIdEnSonido) {
+//        taskIdEnSonido?.let { id ->
+//            NotificationHelper.stopAlarmSound()
+//            NotificationHelper.cancelActiveAlarmNotification(context)
+//            viewModel.desactivarAlarmaEnBD(id) // ya la tienes en el VM
+//        }
+//    }
 
 
     var showDialog by remember { mutableStateOf(false) }
@@ -163,14 +166,19 @@ fun AgendaScreen(
                                  TareaCard(tarea = tarea,
                                      isBlinking = blinkingTaskId == tarea.id)
                                  { id ->
-                                     // 1) Desactivar en BD y cancelar alarma del sistema por seguridad
+                                     // 1) Parar sonido + cerrar notificación
+                                     NotificationHelper.stopAlarmSound()
+                                     NotificationHelper.cancelActiveAlarmNotification(context)
+
+                                     // 2) Cortar parpadeo global
+                                     AlarmUiState.stopBlink()
+
+                                     // 3) (Opcional) desactivar alarma en BD y cancelar PendingIntent
                                      viewModel.desactivarAlarmaEnBD(id)
-                                     // 2) Cortar parpadeo
-                                     blinkingTaskId = null
-                                     // 3) Abrir el form
+
+                                     // 4) Abrir edición
                                      viewModel.seleccionarTarea(id)
-                                     navController.navigate("tarea_form?taskId=${tarea.id}")
-                                     Log.d("AgendaScreen", "Tarea seleccionada: ${tarea.id}")
+                                     navController.navigate("tarea_form?taskId=$id")
                                  }
                              }
                          }
