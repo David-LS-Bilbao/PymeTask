@@ -25,23 +25,36 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.dls.pymetask.domain.model.Tarea
 import com.dls.pymetask.ui.theme.Poppins
+import com.dls.pymetask.utils.NotificationHelper
 import com.dls.pymetask.utils.formatAsDayMonth
 
 @Composable
 fun TareaCard(
     tarea: Tarea,
-    onClick: () -> Unit,
+   // onClick: () -> Unit,
+    onOpenTask: (String) -> Unit, // lambda para navegar (ej: "tarea_form?taskId=$id")
 ) {
+    val context = LocalContext.current
+
     Card(
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(containerColor = if (tarea.completado) Color(0xFFD0F0C0) else MaterialTheme.colorScheme.surface),
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() }
+            .clickable {
+                //onClick()
+                // 1) Parar el tono en reproducción (si lo hubiera)
+                NotificationHelper.stopAlarmSound()
+                // 2) Cerrar la notificación activa (id=1 en tu helper)
+                NotificationHelper.cancelActiveAlarmNotification(context)
+                // 3) Navegar al detalle/edición de la tarea
+                onOpenTask(tarea.id)
+                 }
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
 

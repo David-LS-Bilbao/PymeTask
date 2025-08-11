@@ -44,11 +44,7 @@ fun ArchivosScreen(
     val estaCargando by viewModel.cargando.collectAsState()
 
 
-
-
-
     //desactivar modo landscape
-
     val activity = context as? Activity
     LaunchedEffect(Unit) {
         activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
@@ -63,8 +59,6 @@ fun ArchivosScreen(
 
 
 
-
-
     // Mostrar mensajes (Toast) desde ViewModel
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { mensaje ->
@@ -72,21 +66,18 @@ fun ArchivosScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.cargarArchivos()
-    }
+    // cargar archivos
+    LaunchedEffect(Unit) { viewModel.cargarArchivos() }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
+        topBar = { TopAppBar(title = {
                     Text(
                         "Archivos",
                         fontSize = 22.sp,
                         fontFamily = Poppins
                     )
                 },
-                navigationIcon = {
+                navigationIcon = {// boton de volver
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }

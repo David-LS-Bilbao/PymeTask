@@ -1,6 +1,7 @@
 package com.dls.pymetask.presentation.agenda
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -66,7 +67,7 @@ fun AgendaScreen(
         }
     )
 
-
+    // RECARGAR TAREAS CUANDO SE CAMBIA DE PANTALLA =============================================================================
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
@@ -78,12 +79,12 @@ fun AgendaScreen(
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
+
     // DISEÑO DE PANTALLA========================================================================
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Agenda", fontFamily = Poppins, fontWeight = FontWeight.SemiBold) },
-                   navigationIcon = {
+    Scaffold(topBar = { TopAppBar(
+                title = { Text("Agenda",
+                fontFamily = Poppins, fontWeight = FontWeight.SemiBold) },
+                navigationIcon = {
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                 }
@@ -103,14 +104,10 @@ fun AgendaScreen(
                         imageVector = Icons.Outlined.NotificationsOff,
                         contentDescription = "Detener alarma"
                     )
-                }
+                }// MENU DE OPCIONES DE ALARMA
                     IconButton(onClick = {
-                        // MENU DE OPCIONES DE ALARMA
                         showDialog = true
-
-                    }) {
-                        Icon(Icons.Default.Menu, contentDescription = "Opciones Alarma")
-                    }
+                    }) { Icon(Icons.Default.Menu, contentDescription = "Opciones Alarma") }
                 }
             )
         },
@@ -120,36 +117,32 @@ fun AgendaScreen(
             MyFab.Default(
                 onClick = { navController.navigate("tarea_form") }
             )
-        },
-                containerColor = MaterialTheme.colorScheme.background)
+        }, containerColor = MaterialTheme.colorScheme.background)
 
         { padding ->
-
-             Column(modifier = Modifier.padding(padding),
-
-                 ) {
-
+             Column(modifier = Modifier.padding(padding)) {
                  when{
                      isLoading -> {
                          Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                              CircularProgressIndicator()
                          }
                      }
-                     tareas.isEmpty() -> {
+                     tareas.isEmpty() -> { // si no hay tareas  muestra un mensaje
                          Box(modifier = Modifier.fillMaxSize(),
                              contentAlignment = Alignment.Center) {
                              Text("No hay tareas aún.")
                              Log.d("AgendaScreen", "No hay tareas aún.")
                          }
                      }
-                     else -> {
+                     else -> { // si hay tareas muestra las tareas
                          LazyColumn(
                            verticalArrangement = Arrangement.spacedBy(8.dp),
                              modifier = Modifier.padding(8.dp)
                          ) {
-
                              // Ordenar las tareas por fecha y hora para mostrarlas en el orden correcto
                              val tareasOrdenadas = tareas.sortedWith(compareBy({ it.fecha }, { it.hora }))
+
+                             // Mostrar cada tarea en la lista
                              items(tareasOrdenadas, key = { it.id }) { tarea ->
                                  TareaCard(tarea = tarea) {
                                      viewModel.seleccionarTarea(tarea.id)
@@ -157,7 +150,6 @@ fun AgendaScreen(
                                      Log.d("AgendaScreen", "Tarea seleccionada: ${tarea.id}")
                                  }
                              }
-
                          }
                      }
                  }

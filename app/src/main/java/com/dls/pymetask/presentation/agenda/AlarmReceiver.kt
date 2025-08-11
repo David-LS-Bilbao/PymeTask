@@ -16,14 +16,18 @@ class AlarmReceiver : BroadcastReceiver() {
         val title = intent.getStringExtra("titulo") ?: "Tarea pendiente" // clave correcta
         val toneUriString = intent.getStringExtra("alarmToneUri")        // puede ser null
 
+        val taskId = intent.getStringExtra("taskId")
+
+
         NotificationHelper.playAlarmSound(context, toneUriString)        // 🔊 una sola vez
 
+        // ⇣ Pasamos taskId a la notificación para abrir Agenda y desactivar esa alarma
         NotificationHelper.showAlarmNotification(
             context = context,
             title   = title,
-            message = "Es hora de completar: $title"
+            message = "Es hora de completar: $title",
+            taskId  = taskId
         )
-        Log.d("AlarmReceiver", "🔔 Notificada y sonando: $title")
     }
 }
 
