@@ -15,7 +15,6 @@ class GetTareas(private val repo: TareaRepository) {
     suspend operator fun invoke(userId: String) = repo.getTareas(userId)
 }
 class GetTarea(private val repo: TareaRepository) {
-    /** Ahora recibe userId para filtrar en el repositorio */
 
     suspend operator fun invoke(id: String, userId: String) = repo.getTareaById(id,userId)
 }

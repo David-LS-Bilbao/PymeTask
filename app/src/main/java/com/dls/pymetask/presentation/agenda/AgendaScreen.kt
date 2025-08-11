@@ -24,10 +24,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,12 +50,27 @@ import com.dls.pymetask.utils.NotificationHelper
 @Composable
 fun AgendaScreen(
     navController: NavController,
-    viewModel: AgendaViewModel = hiltViewModel()
+    viewModel: AgendaViewModel = hiltViewModel(),
+    taskIdEnSonido: String? = null // <- id recibido desde MainActivity al abrir desde la notificación
+
 ) {
     val context = LocalContext.current
     val tareas by viewModel.tareas.collectAsState()
     val isLoading by viewModel.loading.collectAsState()
     val lifecycleOwner = LocalLifecycleOwner.current
+
+    // Estado local que controla qué tarea debe parpadear ahora mismo.
+    // Se inicializa con el id que llega del intent (si hay).
+    var blinkingTaskId by rememberSaveable { mutableStateOf(taskIdEnSonido) }
+
+    // Detener sonido + cerrar notificación + desactivar en BD + cortar parpadeo
+    LaunchedEffect(taskIdEnSonido) {
+        taskIdEnSonido?.let { id ->
+            NotificationHelper.stopAlarmSound()
+            NotificationHelper.cancelActiveAlarmNotification(context)
+            viewModel.desactivarAlarmaEnBD(id) // ya la tienes en el VM
+        }
+    }
 
 
     var showDialog by remember { mutableStateOf(false) }
@@ -111,7 +128,6 @@ fun AgendaScreen(
                 }
             )
         },
-
         // MyFAB
         floatingActionButton = {
             MyFab.Default(
@@ -144,8 +160,15 @@ fun AgendaScreen(
 
                              // Mostrar cada tarea en la lista
                              items(tareasOrdenadas, key = { it.id }) { tarea ->
-                                 TareaCard(tarea = tarea) {
-                                     viewModel.seleccionarTarea(tarea.id)
+                                 TareaCard(tarea = tarea,
+                                     isBlinking = blinkingTaskId == tarea.id)
+                                 { id ->
+                                     // 1) Desactivar en BD y cancelar alarma del sistema por seguridad
+                                     viewModel.desactivarAlarmaEnBD(id)
+                                     // 2) Cortar parpadeo
+                                     blinkingTaskId = null
+                                     // 3) Abrir el form
+                                     viewModel.seleccionarTarea(id)
                                      navController.navigate("tarea_form?taskId=${tarea.id}")
                                      Log.d("AgendaScreen", "Tarea seleccionada: ${tarea.id}")
                                  }

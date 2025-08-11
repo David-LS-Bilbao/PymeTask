@@ -16,21 +16,13 @@ import androidx.core.app.NotificationManagerCompat
 import com.dls.pymetask.R
 import com.dls.pymetask.main.MainActivity
 
-/**
- * NOTA IMPORTANTE SOBRE EL DOBLE SONIDO:
- * - Si alguna vez se creó un CHANNEL con sonido, Android mantiene esa config aunque cambies el código.
- * - Solución: usar un NUEVO channelId sin sonido y, opcionalmente, borrar el viejo.
- */
-
-// ➜ NUEVO canal silencioso para evitar "doble sonido"
 private const val CHANNEL_ID_SILENT = "tarea_recordatorio_silent_v2"
-
 // ➜ Canales antiguos que pudieron crearse con sonido (ajusta si usaste otros)
 private val OLD_CHANNEL_IDS = arrayOf("tarea_recordatorio")
-
 object NotificationHelper {
-    private var ringtone: Ringtone? = null
 
+    private var currentAlarmTaskId: String? = null
+    private var ringtone: Ringtone? = null
     /**
      * Borra canales antiguos (si existen) y crea el canal NUEVO sin sonido.
      * Llama a esto al inicio de la app (Application.onCreate) o antes de notificar.
@@ -58,7 +50,6 @@ object NotificationHelper {
             nm.createNotificationChannel(channel)
         }
     }
-
     /**
      * Reproduce el tono seleccionado (o el de alarma por defecto si null).
      * Usamos Ringtone (simple y fiable para alarmas) en vez de MediaPlayer.
@@ -88,12 +79,10 @@ object NotificationHelper {
             ringtone
         }
     }
-
     /** Detiene el sonido si está activo y libera referencia. */
     fun stopAlarmSound() {
         try { ringtone?.stop() } finally { ringtone = null }
     }
-
     /**
      * Notificación SILENCIOSA (sin setSound ni DEFAULT_ALL).
      * El sonido ya lo reproduce playAlarmSound().
@@ -104,8 +93,6 @@ object NotificationHelper {
         taskId: String?,
         message: String) {
         ensureSilentChannel(context) // asegurar canal silencioso creado
-
-
 
         // Al tocar la notificación, abrimos Agenda
         val openIntent = Intent(context, MainActivity::class.java).apply {
@@ -131,40 +118,12 @@ object NotificationHelper {
 
         (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
             .notify(1, notif)
-
-
-
-
-//        val stopIntent = Intent(context, MainActivity::class.java).apply {
-//            action = "com.dls.pymetask.STOP_ALARM"
-//            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-//        }
-//        val pi = PendingIntent.getActivity(
-//            context, 0, stopIntent,
-//            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-//        )
-//
-//        val notif = NotificationCompat.Builder(context, CHANNEL_ID_SILENT)
-//            .setSmallIcon(R.drawable.ic_alarm)
-//            .setContentTitle(title)
-//            .setContentText(message)
-//            .setPriority(NotificationCompat.PRIORITY_HIGH)
-//            .setOnlyAlertOnce(true)     // evita re-alertas si actualizas
-//            .setSilent(true)            // 🔕 extra: pide notificación silenciosa
-//            // NO setSound, NO defaults con sonido:
-//            // .setDefaults(NotificationCompat.DEFAULT_ALL) ← ¡NO!
-//            .setContentIntent(pi)
-//            .setAutoCancel(true)
-//            .build()
-//
-//        (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
-//            .notify(1, notif)
     }
-
     fun cancelActiveAlarmNotification(context: Context) {
         // Si usas siempre el mismo ID (1), con esto basta.
         NotificationManagerCompat.from(context).cancel(1)
     }
+
 }
 
 

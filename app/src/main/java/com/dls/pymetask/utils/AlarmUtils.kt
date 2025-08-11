@@ -26,7 +26,6 @@ import kotlin.math.max
 class AlarmUtils @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
-
     /** PendingIntent único por tarea (requestCode = hash del id) → evita duplicados. */
     private fun buildPendingIntent(taskId: String, title: String, toneUri: String?): PendingIntent {
         val intent = Intent(context, AlarmReceiver::class.java).apply {
@@ -41,7 +40,6 @@ class AlarmUtils @Inject constructor(
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
     }
-
     /** ¿Existe una alarma activa para esta tarea? (NO crea si no existe). */
     fun existeAlarma(taskId: String): Boolean {
         val intent = Intent(context, AlarmReceiver::class.java)
@@ -51,7 +49,6 @@ class AlarmUtils @Inject constructor(
         )
         return pi != null
     }
-
     /** Cancela la alarma de una tarea si existe. */
     fun cancelarAlarma(taskId: String) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -66,14 +63,12 @@ class AlarmUtils @Inject constructor(
             Log.d("AlarmUtils", "🗑️ Alarma cancelada para $taskId")
         }
     }
-
     /** Reprograma de forma idempotente (cancela + programa). */
     @RequiresApi(Build.VERSION_CODES.O)
     fun reprogramarAlarma(tarea: Tarea) {
         cancelarAlarma(tarea.id)
         programarAlarma(tarea)
     }
-
     /**
      * Programa una alarma exacta:
      * - Parsea fecha/hora ("yyyy-MM-dd", "HH:mm")
@@ -123,7 +118,6 @@ class AlarmUtils @Inject constructor(
                 context.startActivity(settingsIntent)
                 return
             }
-
             am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, whenMillis, pi)
             Log.d("AlarmUtils", "✅ Alarma ${tarea.id} @ $zdt (lead=$lead)")
         } catch (e: Exception) {
