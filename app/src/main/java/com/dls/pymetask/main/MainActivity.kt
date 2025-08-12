@@ -4,6 +4,7 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import com.dls.pymetask.utils.AlarmUtils
 import com.dls.pymetask.utils.NotificationHelper
@@ -18,6 +19,7 @@ class MainActivity : ComponentActivity() { @Inject lateinit var alarmUtils: Alar
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        enableEdgeToEdge()
         NotificationHelper.ensureSilentChannel(this)
         handleIntent(intent)
         setContent {

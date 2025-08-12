@@ -26,7 +26,6 @@ class NotaViewModel @Inject constructor(
 
     private val _isLoading = mutableStateOf(false)
     val isLoading: State<Boolean> = _isLoading
-
     fun cargarNotas() {
         viewModelScope.launch {
             _isLoading.value = true
@@ -34,8 +33,6 @@ class NotaViewModel @Inject constructor(
             _isLoading.value = false
         }
     }
-
-
 
     fun seleccionarNota(id: String) {
         viewModelScope.launch {

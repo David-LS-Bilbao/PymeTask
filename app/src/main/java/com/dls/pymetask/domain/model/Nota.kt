@@ -9,6 +9,6 @@ data class Nota(
     val colorHex: String = "#FFF9C4",
     val contactoId: String? = null, // opcional, para asociar nota con contacto
     val posicion: Int =0,//marca la posicion de la nota
-    val userId: String = ""
+  //  val userId: String = ""
 
 )

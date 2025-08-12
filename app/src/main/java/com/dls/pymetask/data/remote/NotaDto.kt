@@ -12,10 +12,11 @@ data class NotaDto(
     val colorHex: String = "#FFF9C4", // ✅ AÑADIDO AQUÍ
     val contactoId: String? = null,
     val posicion: Int =0,
-    val userId: String = ""
+   // val userId: String = ""
 
 ) {
-    fun toDomain() = Nota(id, titulo, contenido, fecha, colorHex, contactoId, posicion, userId)
+    fun toDomain() = Nota(id, titulo, contenido, fecha, colorHex, contactoId, posicion,)
+        //userId)
 
     companion object {
         fun fromDomain(nota: Nota) = NotaDto(
@@ -26,7 +27,7 @@ data class NotaDto(
             colorHex = nota.colorHex, // ✅ AÑADIDO AQUÍ
             contactoId = nota.contactoId,
             posicion = nota.posicion,
-            userId = nota.userId
+           // userId = nota.userId
         )
     }
 }
