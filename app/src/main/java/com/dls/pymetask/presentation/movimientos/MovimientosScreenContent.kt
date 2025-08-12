@@ -18,10 +18,12 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.dls.pymetask.domain.model.Movimiento
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -32,8 +34,15 @@ data class MovimientoUi(
     val id: String,
     val titulo: String,
     val fechaTexto: String,   // fecha ya formateada para UI
-    val importe: Double       // positivo si ingreso, negativo si gasto
+    val importe: Double,       // positivo si ingreso, negativo si gasto
+    val fechaMillis: Long     // <-- NUEVO: para filtros por mes
+
 )
+
+// ===== Enum para el tipo de filtro =====
+private enum class FiltroTipo { TODOS, INGRESOS, GASTOS }
+
+
 
 // ------------------------------------------------------------
 // WRAPPER: conecta VM -> ordena por fecha -> mapea a UI -> Content
@@ -45,6 +54,13 @@ fun MovimientosScreen(
     navController: NavController,
     viewModel: MovimientosViewModel = hiltViewModel()
 ) {
+    // 👇 Convierte StateFlow -> State para poder usar `by`
+    val movimientos by viewModel.movimientos.collectAsStateWithLifecycle()
+    val selectedMonth by viewModel.selectedMonth.collectAsStateWithLifecycle()
+    val selectedYear  by viewModel.selectedYear.collectAsStateWithLifecycle()
+    val tipoSeleccionado by viewModel.tipoSeleccionado.collectAsStateWithLifecycle()
+
+
     // 1) Recogemos el estado del VM (StateFlow<List<Movimiento>>)
     val movimientosDomain by viewModel.movimientos.collectAsState()
 
@@ -79,6 +95,22 @@ fun MovimientosScreenContent(
     onAddClick: () -> Unit = {},
     onItemClick: (MovimientoUi) -> Unit = {}
 ) {
+    // --- Estado de filtros ---
+    var filtroTipo by remember { mutableStateOf(FiltroTipo.TODOS) }
+
+    // Mes/Año seleccionado (por defecto: mes actual)
+    val calNow = remember {
+        Calendar.getInstance().apply { timeInMillis = System.currentTimeMillis() }
+    }
+    var filtroYear by remember { mutableStateOf(calNow.get(Calendar.YEAR)) }
+    var filtroMonth by remember { mutableStateOf(calNow.get(Calendar.MONTH)) } // 0..11
+
+    // --- Aplica filtros ---
+    val movimientosFiltrados = remember(movimientos, filtroTipo, filtroYear, filtroMonth) {
+        filtrarMovimientos(movimientos, filtroTipo, filtroYear, filtroMonth)
+    }
+
+
     // Totales calculados sobre la lista actual
     val (ingresos, gastos, saldo) = remember(movimientos) { calcularTotales(movimientos) }
 
@@ -223,7 +255,8 @@ private fun Movimiento.toUi(): MovimientoUi {
         id = this.id,
         titulo = this.titulo,
         fechaTexto = fechaFormateada,
-        importe = importeUi
+        importe = importeUi,
+        fechaMillis = this.fecha
     )
 }
 
@@ -240,4 +273,105 @@ private fun Double.toCurrency(withSign: Boolean = false): String {
     val nf = NumberFormat.getCurrencyInstance(Locale("es", "ES"))
     val base = nf.format(kotlin.math.abs(this))
     return if (!withSign) nf.format(this) else if (this >= 0) "+$base" else "-$base"
+}
+
+
+// ===== Barra de filtros (tipo + mes/año) =====
+@Composable
+private fun FiltrosBar(
+    filtroTipo: FiltroTipo,
+    onTipoChange: (FiltroTipo) -> Unit,
+    year: Int,
+    monthZeroBased: Int,
+    onPrevMonth: () -> Unit,
+    onNextMonth: () -> Unit
+) {
+    val mesNombre = remember(year, monthZeroBased) {
+        // "agosto 2025"
+        val cal = Calendar.getInstance().apply {
+            set(Calendar.YEAR, year); set(Calendar.MONTH, monthZeroBased)
+        }
+        SimpleDateFormat("LLLL yyyy", Locale("es", "ES")).format(cal.time)
+            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale("es", "ES")) else it.toString() }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+    ) {
+        // Filtro por tipo
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FilterChip(
+                selected = filtroTipo == FiltroTipo.TODOS,
+                onClick = { onTipoChange(FiltroTipo.TODOS) },
+                label = { Text("Todos") }
+            )
+            FilterChip(
+                selected = filtroTipo == FiltroTipo.INGRESOS,
+                onClick = { onTipoChange(FiltroTipo.INGRESOS) },
+                label = { Text("Ingresos") }
+            )
+            FilterChip(
+                selected = filtroTipo == FiltroTipo.GASTOS,
+                onClick = { onTipoChange(FiltroTipo.GASTOS) },
+                label = { Text("Gastos") }
+            )
+        }
+
+        Spacer(Modifier.height(8.dp))
+
+        // Selector mes/año simple (← Mes →)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TextButton(onClick = onPrevMonth) { Text("←") }
+            Text(mesNombre, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+            TextButton(onClick = onNextMonth) { Text("→") }
+        }
+    }
+}
+
+// ===== Lógica de filtro =====
+private fun filtrarMovimientos(
+    movimientos: List<MovimientoUi>,
+    filtroTipo: FiltroTipo,
+    year: Int,
+    monthZeroBased: Int
+): List<MovimientoUi> {
+    // 1) Filtra por mes/año usando fechaMillis (rápido y robusto)
+    val inicioMes = Calendar.getInstance().apply {
+        set(Calendar.YEAR, year)
+        set(Calendar.MONTH, monthZeroBased)
+        set(Calendar.DAY_OF_MONTH, 1)
+        set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
+    }.timeInMillis
+
+    val finMes = Calendar.getInstance().apply {
+        set(Calendar.YEAR, year)
+        set(Calendar.MONTH, monthZeroBased)
+        set(Calendar.DAY_OF_MONTH, 1)
+        set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
+        add(Calendar.MONTH, 1)
+        add(Calendar.MILLISECOND, -1)
+    }.timeInMillis
+
+    val porMes = movimientos.filter { it.fechaMillis in inicioMes..finMes }
+
+    // 2) Filtra por tipo
+    val porTipo = when (filtroTipo) {
+        FiltroTipo.TODOS -> porMes
+        FiltroTipo.INGRESOS -> porMes.filter { it.importe >= 0 }
+        FiltroTipo.GASTOS -> porMes.filter { it.importe < 0 }
+    }
+
+    // 3) (Ya vienen ordenados desde el wrapper; si quieres asegurar, reordena por fechaMillis desc)
+    return porTipo.sortedWith(
+        compareByDescending<MovimientoUi> { it.fechaMillis }
+            .thenByDescending { it.id }
+    )
 }

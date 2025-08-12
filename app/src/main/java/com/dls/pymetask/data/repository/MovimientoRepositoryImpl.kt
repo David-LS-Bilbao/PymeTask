@@ -7,6 +7,7 @@ import com.dls.pymetask.domain.model.Movimiento
 import com.dls.pymetask.domain.repository.MovimientoRepository
 import com.dls.pymetask.utils.Constants
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -24,6 +25,8 @@ class MovimientoRepositoryImpl(
     }
     override fun getMovimientos(): Flow<List<Movimiento>> = callbackFlow {
         val collection = userCollection()
+            ?.orderBy("fecha", Query.Direction.DESCENDING)
+
         if (collection == null) {
             trySend(emptyList())
             close()
