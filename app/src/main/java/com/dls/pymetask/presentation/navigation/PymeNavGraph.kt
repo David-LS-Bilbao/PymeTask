@@ -80,10 +80,10 @@ fun PymeNavGraph(
             )
         }
 
-
-        composable(route = Routes.MOVIMIENTOS) {
-            MovimientosScreen(navController)
-        }
+//
+//        composable(route = Routes.MOVIMIENTOS) {
+//            MovimientosScreen(navController)
+//        }
 
 
 
@@ -91,7 +91,7 @@ fun PymeNavGraph(
 
         composable("movimientos") {
             MovimientosScreen(
-                navController = navController,
+                navController = navController
             )
         }
 
@@ -101,15 +101,22 @@ fun PymeNavGraph(
             )
         }
         // editar movimiento nuevo
-        composable(
-            route = "editar_movimiento/{id}",
-            arguments = listOf(navArgument("id") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val id = backStackEntry.arguments?.getString("id")
-            id?.let {
-                EditarMovimientoScreen(navController = navController, movimientoId = it)
-            }
+//        composable(
+//            route = "editar_movimiento/{id}",
+//           // arguments = listOf(navArgument("id") { type = NavType.StringType })
+//        ) { backStackEntry ->
+//            val id = backStackEntry.arguments?.getString("id")
+//            id?.let {
+//                EditarMovimientoScreen(navController = navController, movimientoId = it)
+//            }
+//        }
+
+        composable(route = "editar_movimiento/{id}") { backStackEntry ->
+            val id = backStackEntry.arguments?.getString("id") ?: return@composable
+            EditarMovimientoScreen(navController = navController, movimientoId = id)
         }
+
+
         composable("estadisticas") {
             EstadisticasScreen(navController = navController)
         }

@@ -1,7 +1,6 @@
 package com.dls.pymetask.presentation.agenda
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,12 +23,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,30 +47,12 @@ import com.dls.pymetask.utils.NotificationHelper
 @Composable
 fun AgendaScreen(
     navController: NavController,
-    viewModel: AgendaViewModel = hiltViewModel(),
-    taskIdEnSonido: String? = null // <- id recibido desde MainActivity al abrir desde la notificación
-
+    viewModel: AgendaViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val tareas by viewModel.tareas.collectAsState()
     val isLoading by viewModel.loading.collectAsState()
     val lifecycleOwner = LocalLifecycleOwner.current
-
-    // Estado local que controla qué tarea debe parpadear ahora mismo.
-    // Se inicializa con el id que llega del intent (si hay).
-    //var blinkingTaskId by rememberSaveable { mutableStateOf(taskIdEnSonido) }
-
-    val blinkingTaskId by AlarmUiState.currentRingingTaskId.collectAsState()
-
-
-    // Detener sonido + cerrar notificación + desactivar en BD + cortar parpadeo
-//    LaunchedEffect(taskIdEnSonido) {
-//        taskIdEnSonido?.let { id ->
-//            NotificationHelper.stopAlarmSound()
-//            NotificationHelper.cancelActiveAlarmNotification(context)
-//            viewModel.desactivarAlarmaEnBD(id) // ya la tienes en el VM
-//        }
-//    }
 
 
     var showDialog by remember { mutableStateOf(false) }
@@ -87,7 +66,7 @@ fun AgendaScreen(
         }
     )
 
-    // RECARGAR TAREAS CUANDO SE CAMBIA DE PANTALLA =============================================================================
+
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
@@ -99,12 +78,12 @@ fun AgendaScreen(
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
-
     // DISEÑO DE PANTALLA========================================================================
-    Scaffold(topBar = { TopAppBar(
-                title = { Text("Agenda",
-                fontFamily = Poppins, fontWeight = FontWeight.SemiBold) },
-                navigationIcon = {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Agenda", fontFamily = Poppins, fontWeight = FontWeight.SemiBold) },
+                   navigationIcon = {
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                 }
@@ -124,63 +103,61 @@ fun AgendaScreen(
                         imageVector = Icons.Outlined.NotificationsOff,
                         contentDescription = "Detener alarma"
                     )
-                }// MENU DE OPCIONES DE ALARMA
+                }
                     IconButton(onClick = {
+                        // MENU DE OPCIONES DE ALARMA
                         showDialog = true
-                    }) { Icon(Icons.Default.Menu, contentDescription = "Opciones Alarma") }
+
+                    }) {
+                        Icon(Icons.Default.Menu, contentDescription = "Opciones Alarma")
+                    }
                 }
             )
         },
+
         // MyFAB
         floatingActionButton = {
             MyFab.Default(
                 onClick = { navController.navigate("tarea_form") }
             )
-        }, containerColor = MaterialTheme.colorScheme.background)
+        },
+                containerColor = MaterialTheme.colorScheme.background)
 
         { padding ->
-             Column(modifier = Modifier.padding(padding)) {
+
+             Column(modifier = Modifier.padding(padding),
+
+                 ) {
+
                  when{
                      isLoading -> {
                          Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                              CircularProgressIndicator()
                          }
                      }
-                     tareas.isEmpty() -> { // si no hay tareas  muestra un mensaje
+                     tareas.isEmpty() -> {
                          Box(modifier = Modifier.fillMaxSize(),
                              contentAlignment = Alignment.Center) {
                              Text("No hay tareas aún.")
                              Log.d("AgendaScreen", "No hay tareas aún.")
                          }
                      }
-                     else -> { // si hay tareas muestra las tareas
+                     else -> {
                          LazyColumn(
                            verticalArrangement = Arrangement.spacedBy(8.dp),
                              modifier = Modifier.padding(8.dp)
                          ) {
+
                              // Ordenar las tareas por fecha y hora para mostrarlas en el orden correcto
                              val tareasOrdenadas = tareas.sortedWith(compareBy({ it.fecha }, { it.hora }))
-
-                             // Mostrar cada tarea en la lista
                              items(tareasOrdenadas, key = { it.id }) { tarea ->
-                                 TareaCard(tarea = tarea,
-                                     isBlinking = blinkingTaskId == tarea.id)
-                                 { id ->
-                                     // 1) Parar sonido + cerrar notificación
-                                     NotificationHelper.stopAlarmSound()
-                                     NotificationHelper.cancelActiveAlarmNotification(context)
-
-                                     // 2) Cortar parpadeo global
-                                     AlarmUiState.stopBlink()
-
-                                     // 3) (Opcional) desactivar alarma en BD y cancelar PendingIntent
-                                     viewModel.desactivarAlarmaEnBD(id)
-
-                                     // 4) Abrir edición
-                                     viewModel.seleccionarTarea(id)
-                                     navController.navigate("tarea_form?taskId=$id")
+                                 TareaCard(tarea = tarea, isBlinking = true) {
+                                     viewModel.seleccionarTarea(tarea.id)
+                                     navController.navigate("tarea_form?taskId=${tarea.id}")
+                                     Log.d("AgendaScreen", "Tarea seleccionada: ${tarea.id}")
                                  }
                              }
+
                          }
                      }
                  }

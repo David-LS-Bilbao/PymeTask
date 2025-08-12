@@ -29,8 +29,6 @@ class AgendaViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
-    val uid = getUserIdSeguro(context).toString()
-
     private val _tareas = MutableStateFlow<List<Tarea>>(emptyList())
     val tareas: StateFlow<List<Tarea>> = _tareas
 
@@ -57,6 +55,10 @@ class AgendaViewModel @Inject constructor(
             _loading.value = false
         }
     }
+    /**
+     * Establece una tarea como seleccionada (para editar).
+     */
+
     fun seleccionarTarea(id: String) {
         if (id.isBlank()) return
         viewModelScope.launch {
@@ -64,6 +66,7 @@ class AgendaViewModel @Inject constructor(
             Log.d("AgendaViewModel", "✅ tarea cargada: ${tareaActual?.titulo}")
         }
     }
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun guardarTarea(tarea: Tarea) {
         viewModelScope.launch {
@@ -95,6 +98,7 @@ class AgendaViewModel @Inject constructor(
             cargarTareas()
         }
     }
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun eliminarTareaPorId(id: String) {
         viewModelScope.launch {
@@ -105,9 +109,31 @@ class AgendaViewModel @Inject constructor(
             cargarTareas()
         }
     }
+
+
+
+
+//    @RequiresApi(Build.VERSION_CODES.O)
+//    fun guardarTarea(tarea: Tarea) {
+//        viewModelScope.launch {
+//            val t = tarea.copy(userId = userId)
+//            tareaUseCases.addTarea(t, userId)
+//            if (t.activarAlarma) alarmUtils.programarAlarma(t)
+//            cargarTareas()
+//        }
+//    }
     fun limpiarTareaActual() {
         tareaActual = null
     }
+
+//    @RequiresApi(Build.VERSION_CODES.O)
+//    fun eliminarTareaPorId(id: String) {
+//        viewModelScope.launch {
+//            tareaUseCases.deleteTarea(id, userId)
+//            cargarTareas()
+//        }
+//    }
+
     fun actualizarFecha(nuevaFecha: String) {
         tareaActual = tareaActual?.copy(fecha = nuevaFecha)
 
@@ -115,37 +141,8 @@ class AgendaViewModel @Inject constructor(
     fun actualizarHora(nuevaHora: String) {
         tareaActual = tareaActual?.copy(hora = nuevaHora)
     }
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun desactivarAlarmaEnBD(taskId: String) = viewModelScope.launch {
-        try {
-            // 1) Obtener la tarea correcta usando (id, userId)
-            val tarea = tareaUseCases.getTarea(taskId, userId)
-
-            //val tarea = tareaUseCases.getTarea(taskId, uid)
-            if (tarea == null) {
-                Log.w("AgendaVM", "Tarea no encontrada: $taskId")
-                return@launch
-            }
-
-            // 2) Desactivar la alarma en el modelo de dominio
-            val actualizada = tarea.copy(activarAlarma = false)
-
-            // 3) Persistir los cambios
-            // Usa updateTarea si tu repo diferencia add/update.
-            // Si tu repo hace upsert en addTarea, puedes usar addTarea(actualizada, userId).
-            tareaUseCases.updateTarea(actualizada, userId)
-
-            // 4) Cancelar la alarma del sistema (PendingIntent) por seguridad
-            alarmUtils.cancelarAlarma(taskId)
-
-            // 5) Refrescar la lista en UI
-            cargarTareas()
-        } catch (e: Exception) {
-            Log.e("AgendaVM", "Error desactivando alarma de $taskId", e)
-        }
-    }
-
 }
+
 @RequiresApi(Build.VERSION_CODES.O)
 fun String.toLocalDateOrNull(): LocalDate? =
     try {
@@ -153,6 +150,7 @@ fun String.toLocalDateOrNull(): LocalDate? =
     } catch (e: Exception) {
         null
     }
+
 @RequiresApi(Build.VERSION_CODES.O)
 fun String.toLocalTimeOrNull(): LocalTime? =
     try {

@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.dls.pymetask.data.mappers.toUi
+import com.dls.pymetask.presentation.navigation.Routes
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -55,7 +56,7 @@ data class MovimientoUi(
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MovimientosScreenContent(
-    navController: NavController,
+
     viewModel: MovimientosViewModel = hiltViewModel(),
     movimientos: List<MovimientoUi>,
     onAddClick: () -> Unit = {},           // callback para FAB "Añadir"
@@ -87,7 +88,6 @@ fun MovimientosScreenContent(
                     saldo = saldo
                 )
             }
-
             // -- 3) Lista de movimientos
             items(
                 items = movimientos,
@@ -99,7 +99,6 @@ fun MovimientosScreenContent(
                     // onDeleteClick lo dejamos preparado para la siguiente iteración
                 )
             }
-
             // -- 4) Estado vacío (si no hay datos)
             if (movimientos.isEmpty()) {
                 item {
@@ -125,9 +124,9 @@ fun MovimientosScreen(
         movimientosDomain.map { it.toUi() }
     }
 
+
     // 3) Navegación: usa tus rutas existentes
     MovimientosScreenContent(
-        navController = navController,
         movimientos = movimientosUi,
         onAddClick = { navController.navigate("crear_movimiento") },
         onItemClick = { ui -> navController.navigate("editar_movimiento/${ui.id}") }
