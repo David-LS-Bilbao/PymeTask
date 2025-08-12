@@ -79,6 +79,16 @@ fun PymeNavGraph(
                 }
             )
         }
+
+
+        composable(route = Routes.MOVIMIENTOS) {
+            MovimientosScreen(navController)
+        }
+
+
+
+
+
         composable("movimientos") {
             MovimientosScreen(
                 navController = navController,

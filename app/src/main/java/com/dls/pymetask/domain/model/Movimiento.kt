@@ -9,7 +9,6 @@ data class Movimiento(
     val subtitulo: String = "",
     val cantidad: Double = 0.0,
     val ingreso: Boolean = true,
-    //val fecha: Long = Timestamp.now(),
-    val fecha: Long = System.currentTimeMillis(), // Agrega esta línea
+    val fecha: Long = System.currentTimeMillis(),
     val userId: String = ""
 )
