@@ -10,6 +10,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Stairs
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -54,16 +57,14 @@ fun MovimientosScreen(
     navController: NavController,
     viewModel: MovimientosViewModel = hiltViewModel()
 ) {
-    // 👇 Convierte StateFlow -> State para poder usar `by`
-    val movimientos by viewModel.movimientos.collectAsStateWithLifecycle()
-    val selectedMonth by viewModel.selectedMonth.collectAsStateWithLifecycle()
-    val selectedYear  by viewModel.selectedYear.collectAsStateWithLifecycle()
-    val tipoSeleccionado by viewModel.tipoSeleccionado.collectAsStateWithLifecycle()
 
+    val hoy = remember { Calendar.getInstance() }
+    val year = hoy.get(Calendar.YEAR)
+    val month0 = hoy.get(Calendar.MONTH)
 
-    val hoy = remember { java.util.Calendar.getInstance() }
-    val year = hoy.get(java.util.Calendar.YEAR)
-    val month0 = hoy.get(java.util.Calendar.MONTH)
+    // 👇 Estos dos son compose state del VM (mutableStateOf), se pueden leer directamente
+    val syncing = viewModel.syncing
+    val lastMsg = viewModel.lastSyncResult
 
 
     // 1) Recogemos el estado del VM (StateFlow<List<Movimiento>>)
@@ -76,36 +77,23 @@ fun MovimientosScreen(
                 .thenByDescending { it.id } // desempate estable
         )
     }
-
     // 3) Mapeamos a UI (fecha -> "dd/MM/yyyy", signo del importe)
-    val movimientosUi = remember(ordenados) {
-        ordenados.map { it.toUi() }
-    }
-
+    val movimientosUi = remember(ordenados) { ordenados.map { it.toUi() } }
     // 4) Delegamos navegación por callbacks (el content no conoce NavController)
     MovimientosScreenContent(
+        navController = navController,
         movimientos = movimientosUi,
         onAddClick = { navController.navigate("crear_movimiento") },
         onItemClick = { ui -> navController.navigate("editar_movimiento/${ui.id}") },
-        // NUEVO:
-        onSyncBanco = {
-            // TODO: sustituye "demo-account" por la ID real del proveedor
-            viewModel.syncBancoMes(accountId = "demo-account", year = year, month0 = month0)
-        }
+        onSyncBanco = { viewModel.syncBancoMes(accountId = "demo-account", year = year, month0 = month0) }
     )
-
 // (Opcional) Snackbar de resultado:
-    val last = viewModel.lastSyncResult
-    val syncing = viewModel.syncing
     if (syncing) {
-        // Puedes mostrar un indicador
-        // CircularProgressIndicator(modifier = Modifier.align(Alignment.BottomCenter))
+        Box(
+            modifier = Modifier.fillMaxSize(), // O el tamaño que necesites para el área de alineación
+            contentAlignment = Alignment.BottomCenter // Alinea el contenido del Box
+        ) { CircularProgressIndicator() }
     }
-    // Si quieres Snackbar, colócalo dentro de Scaffold de tu screen
-
-
-
-
 }
 
 // ------------------------------------------------------------
@@ -114,10 +102,13 @@ fun MovimientosScreen(
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MovimientosScreenContent(
+    navController: NavController,
     movimientos: List<MovimientoUi>,
     onAddClick: () -> Unit = {},
     onItemClick: (MovimientoUi) -> Unit = {},
-    onSyncBanco: () -> Unit
+    onSyncBanco: () -> Unit ={},
+    syncing: Boolean = false,                // 👈 NUEVO
+    lastSyncMessage: String? = null          // 👈 NUEVO
 ) {
     // --- Estado de filtros ---
     var filtroTipo by remember { mutableStateOf(FiltroTipo.TODOS) }
@@ -126,17 +117,24 @@ fun MovimientosScreenContent(
     val calNow = remember {
         Calendar.getInstance().apply { timeInMillis = System.currentTimeMillis() }
     }
-    var filtroYear by remember { mutableStateOf(calNow.get(Calendar.YEAR)) }
-    var filtroMonth by remember { mutableStateOf(calNow.get(Calendar.MONTH)) } // 0..11
+    var filtroYear by remember { mutableIntStateOf(calNow.get(Calendar.YEAR)) }
+    var filtroMonth by remember { mutableIntStateOf(calNow.get(Calendar.MONTH)) } // 0..11
 
     // --- Aplica filtros ---
     val movimientosFiltrados = remember(movimientos, filtroTipo, filtroYear, filtroMonth) {
         filtrarMovimientos(movimientos, filtroTipo, filtroYear, filtroMonth)
     }
-
-
     // Totales calculados sobre la lista actual
     val (ingresos, gastos, saldo) = remember(movimientos) { calcularTotales(movimientos) }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(lastSyncMessage) {
+        if (lastSyncMessage != null) {
+            snackbarHostState.showSnackbar(lastSyncMessage)
+        }
+    }
+
 
     Scaffold(
         floatingActionButton = {
@@ -153,7 +151,14 @@ fun MovimientosScreenContent(
         ) {
             // Header fijo arriba
             stickyHeader {
-                SaldoStickyHeader(ingresos = ingresos, gastos = gastos, saldo = saldo, onSyncBanco = onSyncBanco)
+                SaldoStickyHeader(
+                    navController = navController,
+                    ingresos = ingresos,
+                    gastos = gastos,
+                    saldo = saldo,
+                    onSyncBanco = onSyncBanco,
+                    syncing = syncing
+                )
             }
 
             if (movimientos.isEmpty()) {
@@ -172,44 +177,16 @@ fun MovimientosScreenContent(
             }
         }
     }
+
 }
+
+
+
 
 // ------------------------------------------------------------
 // COMPONENTES DE UI
 // ------------------------------------------------------------
-@Composable
-private fun SaldoStickyHeader(
-    ingresos: Double,
-    gastos: Double,
-    saldo: Double
-) {
-    Surface(
-        tonalElevation = 2.dp,
-        shadowElevation = 4.dp,
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(2.dp)
-            .background(MaterialTheme.colorScheme.surface)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .navigationBarsPadding(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Text("Resumen", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                ResumenChip(title = "Ingresos", amount = ingresos, positive = true)
-                ResumenChip(title = "Gastos", amount = gastos, positive = false)
-                ResumenChip(title = "Saldo", amount = saldo, positive = saldo >= 0)
-            }
-        }
-    }
-}
+
 
 @Composable
 private fun ResumenChip(title: String, amount: Double, positive: Boolean) {
@@ -217,8 +194,8 @@ private fun ResumenChip(title: String, amount: Double, positive: Boolean) {
     val fg = if (positive) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onErrorContainer
     Surface(color = bg, contentColor = fg, shape = MaterialTheme.shapes.medium, tonalElevation = 2.dp) {
         Column(Modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
-            Text(title, style = MaterialTheme.typography.labelMedium)
-            Text(amount.toCurrency(), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(title, style = MaterialTheme.typography.labelLarge)
+            Text(amount.toCurrency(), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -403,11 +380,12 @@ private fun filtrarMovimientos(
 
 @Composable
 private fun SaldoStickyHeader(
+    navController: NavController,
     ingresos: Double,
     gastos: Double,
     saldo: Double,
-    // NUEVO: callback para sincronizar
-    onSyncBanco: () -> Unit = {}
+    onSyncBanco: () -> Unit = {},
+    syncing: Boolean = false
 ) {
     Surface(tonalElevation = 2.dp, shadowElevation = 4.dp) {
         Column(
@@ -417,13 +395,23 @@ private fun SaldoStickyHeader(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
+                // boton atras
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(Icons.Default.ArrowBackIosNew, contentDescription = "volver al menu")
+                }
                 Text("Resumen", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                 Spacer(Modifier.weight(1f))
-                OutlinedButton(onClick = onSyncBanco) {
-                    Text("Sincronizar banco")
+                OutlinedButton(onClick = onSyncBanco, enabled = !syncing) {   // 👈 deshabilita si está sincronizando
+                    Text(if (syncing) "Sincronizando..." else "Sincronizar banco")
+                }
+                Spacer(Modifier.width(24.dp))
+                // boton para ir a estadisticas
+                OutlinedButton(onClick = { navController.navigate("estadisticas") }) {
+                    Icon(Icons.Default.BarChart, contentDescription = "ir a estadisticas")
                 }
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            if (syncing) { LinearProgressIndicator(Modifier.fillMaxWidth()) }  // 👈 barra de progreso
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 ResumenChip("Ingresos", ingresos, true)
                 ResumenChip("Gastos", gastos, false)
                 ResumenChip("Saldo", saldo, saldo >= 0)
