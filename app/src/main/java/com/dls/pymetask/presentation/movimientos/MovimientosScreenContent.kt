@@ -153,7 +153,7 @@ fun MovimientosScreenContent(
         ) {
             // Header fijo arriba
             stickyHeader {
-                SaldoStickyHeader(ingresos = ingresos, gastos = gastos, saldo = saldo)
+                SaldoStickyHeader(ingresos = ingresos, gastos = gastos, saldo = saldo, onSyncBanco = onSyncBanco)
             }
 
             if (movimientos.isEmpty()) {
@@ -431,4 +431,6 @@ private fun SaldoStickyHeader(
         }
     }
 }
+
+
 
