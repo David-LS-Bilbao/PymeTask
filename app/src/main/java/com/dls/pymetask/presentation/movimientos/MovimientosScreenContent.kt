@@ -61,6 +61,11 @@ fun MovimientosScreen(
     val tipoSeleccionado by viewModel.tipoSeleccionado.collectAsStateWithLifecycle()
 
 
+    val hoy = remember { java.util.Calendar.getInstance() }
+    val year = hoy.get(java.util.Calendar.YEAR)
+    val month0 = hoy.get(java.util.Calendar.MONTH)
+
+
     // 1) Recogemos el estado del VM (StateFlow<List<Movimiento>>)
     val movimientosDomain by viewModel.movimientos.collectAsState()
 
@@ -81,8 +86,26 @@ fun MovimientosScreen(
     MovimientosScreenContent(
         movimientos = movimientosUi,
         onAddClick = { navController.navigate("crear_movimiento") },
-        onItemClick = { ui -> navController.navigate("editar_movimiento/${ui.id}") }
+        onItemClick = { ui -> navController.navigate("editar_movimiento/${ui.id}") },
+        // NUEVO:
+        onSyncBanco = {
+            // TODO: sustituye "demo-account" por la ID real del proveedor
+            viewModel.syncBancoMes(accountId = "demo-account", year = year, month0 = month0)
+        }
     )
+
+// (Opcional) Snackbar de resultado:
+    val last = viewModel.lastSyncResult
+    val syncing = viewModel.syncing
+    if (syncing) {
+        // Puedes mostrar un indicador
+        // CircularProgressIndicator(modifier = Modifier.align(Alignment.BottomCenter))
+    }
+    // Si quieres Snackbar, colócalo dentro de Scaffold de tu screen
+
+
+
+
 }
 
 // ------------------------------------------------------------
@@ -93,7 +116,8 @@ fun MovimientosScreen(
 fun MovimientosScreenContent(
     movimientos: List<MovimientoUi>,
     onAddClick: () -> Unit = {},
-    onItemClick: (MovimientoUi) -> Unit = {}
+    onItemClick: (MovimientoUi) -> Unit = {},
+    onSyncBanco: () -> Unit
 ) {
     // --- Estado de filtros ---
     var filtroTipo by remember { mutableStateOf(FiltroTipo.TODOS) }
@@ -374,4 +398,37 @@ private fun filtrarMovimientos(
         compareByDescending<MovimientoUi> { it.fechaMillis }
             .thenByDescending { it.id }
     )
+
 }
+
+@Composable
+private fun SaldoStickyHeader(
+    ingresos: Double,
+    gastos: Double,
+    saldo: Double,
+    // NUEVO: callback para sincronizar
+    onSyncBanco: () -> Unit = {}
+) {
+    Surface(tonalElevation = 2.dp, shadowElevation = 4.dp) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Resumen", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Spacer(Modifier.weight(1f))
+                OutlinedButton(onClick = onSyncBanco) {
+                    Text("Sincronizar banco")
+                }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                ResumenChip("Ingresos", ingresos, true)
+                ResumenChip("Gastos", gastos, false)
+                ResumenChip("Saldo", saldo, saldo >= 0)
+            }
+        }
+    }
+}
+

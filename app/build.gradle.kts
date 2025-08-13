@@ -1,4 +1,4 @@
-@file:Suppress("DEPRECATION")
+
 
 plugins {
     alias(libs.plugins.android.application)
@@ -22,6 +22,9 @@ android {
         versionCode = 1
         versionName = "1.0"
 
+        buildConfigField("String", "BANK_BASE_URL", "\"https://api.mockbank.local/\"")
+
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -44,6 +47,8 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true      // <- ACTÍVALO
+
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.3"
@@ -107,7 +112,9 @@ dependencies {
 
     implementation(libs.androidx.datastore.preferences)
 
-
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.gson)
+    implementation(libs.okhttp.logging)
 
 
 
