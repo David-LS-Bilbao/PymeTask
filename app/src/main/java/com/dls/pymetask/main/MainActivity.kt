@@ -6,13 +6,19 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
+import com.dls.pymetask.data.remote.bank.auth.OAuthManager
+import com.dls.pymetask.presentation.navigation.PymeNavGraph
 import com.dls.pymetask.utils.AlarmUtils
 import com.dls.pymetask.utils.NotificationHelper
 import dagger.hilt.android.AndroidEntryPoint
 import jakarta.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() { @Inject lateinit var alarmUtils: AlarmUtils   // para cancelar PendingIntent
+class MainActivity : ComponentActivity() {
+    @Inject lateinit var alarmUtils: AlarmUtils
+    @Inject lateinit var oauthManager: OAuthManager   // <-- inyección Hilt
+
+    // para cancelar PendingIntent
     private var taskIdParaDesactivar: String? = null
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -24,7 +30,11 @@ class MainActivity : ComponentActivity() { @Inject lateinit var alarmUtils: Alar
         handleIntent(intent)
         setContent {
             // Pasamos el taskId a la raíz para que Agenda lo consuma
-            PymeTaskAppRoot(taskIdInicial = taskIdParaDesactivar)
+            PymeTaskAppRoot(
+                oauthManager = oauthManager,
+                taskIdInicial = taskIdParaDesactivar
+            )
+
         }
     }
     /**

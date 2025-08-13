@@ -1,3 +1,4 @@
+@file:Suppress("DEPRECATION")
 
 
 plugins {
@@ -22,7 +23,13 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        buildConfigField("String", "BANK_BASE_URL", "\"https://api.mockbank.local/\"")
+
+        buildConfigField("String", "BANK_BASE_URL", "\"https://api.truelayer.com/\"")           // Data API
+        buildConfigField("String", "OAUTH_BASE_URL", "\"https://auth.truelayer.com/\"")         // OAuth host (authorize & token)
+        buildConfigField("String", "OAUTH_CLIENT_ID", "\"TU_CLIENT_ID\"")
+        buildConfigField("String", "OAUTH_CLIENT_SECRET", "\"TU_CLIENT_SECRET\"")               // si el proveedor lo requiere
+        buildConfigField("String", "OAUTH_REDIRECT_URI", "\"pymetask://auth/callback\"")        // debe coincidir con el manifest
+        buildConfigField("String", "OAUTH_SCOPES", "\"accounts balance transactions offline_access\"")
 
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -115,6 +122,11 @@ dependencies {
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.gson)
     implementation(libs.okhttp.logging)
+
+
+    implementation(libs.security.crypto)
+    implementation(libs.androidx.browser)
+
 
 
 

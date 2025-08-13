@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
+import com.dls.pymetask.data.remote.bank.auth.OAuthManager
 import com.dls.pymetask.presentation.ajustes.ThemeViewModel
 import com.dls.pymetask.presentation.navigation.PymeNavGraph
 import com.dls.pymetask.ui.theme.PymeTaskTheme
@@ -24,6 +25,8 @@ import com.dls.pymetask.ui.theme.PymeTaskTheme
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PymeTaskAppRoot(
+    oauthManager: OAuthManager,                        // ✅ NUEVO parámetro
+
     mainViewModel: MainViewModel = hiltViewModel(),
     themeViewModel: ThemeViewModel = hiltViewModel(),
     taskIdInicial: String? = null
@@ -60,8 +63,8 @@ fun PymeTaskAppRoot(
                 if (isUserLoggedIn != null) {
                     PymeNavGraph(
                         navController = navController,
-                        startDestination = if (isUserLoggedIn == true) "dashboard" else "login"
-                    )
+                        oauthManager = oauthManager,
+                        startDestination = if (isUserLoggedIn == true) "dashboard" else "login")
                 }
             }
         }

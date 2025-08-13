@@ -27,6 +27,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imeNestedScroll
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
@@ -37,7 +39,9 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Redo
 import androidx.compose.material.icons.automirrored.filled.Send
@@ -75,6 +79,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
@@ -106,6 +112,13 @@ fun NotaFormScreen(
     val imeBottomPx = WindowInsets.ime.getBottom(density) // alto actual del teclado en px
     val gapPx = with(density) { 8.dp.roundToPx() }        // margen visible sobre el teclado
 
+    // ... dentro de NotaFormScreen
+    val scrollState = rememberScrollState()
+    val focusRequester = remember { FocusRequester() }                  // NUEVO
+    rememberCoroutineScope()
+
+// altura aprox del overlay para no tapar el campo
+    val overlayHeight = 56.dp
 
     val notaActual = viewModel.notaActual
     // Datos de la nota
@@ -199,6 +212,16 @@ fun NotaFormScreen(
             color = backgroundColor
         )
     }
+
+
+    LaunchedEffect(isKeyboardOpen, contenido) {
+        if (isKeyboardOpen) {
+            // Pequeña espera para que el IME estabilice su tamaño
+            delay(50)
+            contenidoBringRequester.bringIntoView()
+        }
+    }
+
 
     Box(Modifier.fillMaxSize()) {
         Scaffold(
@@ -305,6 +328,9 @@ fun NotaFormScreen(
             },
 
         ) { inner ->
+
+
+            // nueva:
             Column(
                 modifier = Modifier
                     .padding(
@@ -312,53 +338,16 @@ fun NotaFormScreen(
                         end = inner.calculateEndPadding(LocalLayoutDirection.current),
                         top = inner.calculateTopPadding()
                     )
-                  //  .padding(4.dp) // Aumenta el padding de la columna
                     .fillMaxSize()
                     .background(backgroundColor)
+                    .verticalScroll(scrollState)   // 👈 ahora puede desplazarse
+                    .imeNestedScroll()             // 👈 deja que el IME pida scroll
+                    .imePadding()                  // 👈 empuja el contenido sobre el teclado
+                    .padding(bottom = overlayHeight) // 👈 hueco para el overlay inferior
             ) {
-                // boton color
-                if (mostrarSelectorColor) {
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text("Color de fondo", style = MaterialTheme.typography.labelSmall)
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        coloresDisponibles.forEach { (_, hex) ->
-                            val color = Color(hex.toColorInt())
-                            Surface(
-                                shape = CircleShape,
-                                color = color,
-                                modifier = Modifier
-                                    .size(36.dp)
-                                    .clickable { backgroundColor = color }
-                                    .border(
-                                        width = 2.dp,
-                                        color = if (color == backgroundColor) Color.Black else Color.Transparent,
-                                        shape = CircleShape
-                                    )
-                            ) {}
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.height(6.dp))
-                // titulo
-                OutlinedTextField(
-                    value = titulo,
-                    onValueChange = {
-                        if (titulo != it) {
-                            tituloUndoStack.add(it)
-                            tituloRedoStack.clear()
-                            titulo = it
-                        }
-                    },
-                    label = { Text("Título") },
-                    singleLine = true,
-                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
-                    modifier = Modifier.fillMaxWidth()
-                )
+                // ... (tu selector de color y el OutlinedTextField de título igual)
                 Spacer(modifier = Modifier.height(12.dp))
-                // Cuadro texto para contenido
+
                 OutlinedTextField(
                     value = contenido,
                     onValueChange = {
@@ -372,13 +361,14 @@ fun NotaFormScreen(
                     textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f)// mantiene altura flexible; el TextField ya hace scroll interno
-                        .bringIntoViewRequester(contenidoBringRequester)   // 👈 preparado
-                        .onFocusEvent { focus ->
-                            if (focus.isFocused) {
-                                // Pequeño retardo para esperar la animación del teclado y luego traer a vista
+                        .weight(1f, fill = false)                // 👈 evita forzar toda la altura; deja espacio real de scroll
+                        .bringIntoViewRequester(contenidoBringRequester)
+                        .focusRequester(focusRequester)
+                        .onFocusEvent { f ->
+                            if (f.isFocused) {
                                 scope.launch {
-                                    delay(200)
+                                    // espera breve a la animación del IME y trae a vista
+                                    delay(150)
                                     contenidoBringRequester.bringIntoView()
                                 }
                             }
@@ -386,6 +376,97 @@ fun NotaFormScreen(
                     maxLines = Int.MAX_VALUE
                 )
             }
+
+
+
+
+
+
+
+
+
+
+//            Column(
+//                modifier = Modifier
+//                    .padding(
+//                        start = inner.calculateStartPadding(LocalLayoutDirection.current),
+//                        end = inner.calculateEndPadding(LocalLayoutDirection.current),
+//                        top = inner.calculateTopPadding()
+//                    )
+//                  //  .padding(4.dp) // Aumenta el padding de la columna
+//                    .fillMaxSize()
+//                    .background(backgroundColor)
+//            ) {
+//                // boton color
+//                if (mostrarSelectorColor) {
+//                    Spacer(modifier = Modifier.height(12.dp))
+//                    Text("Color de fondo", style = MaterialTheme.typography.labelSmall)
+//                    Row(
+//                        modifier = Modifier.fillMaxWidth(),
+//                        horizontalArrangement = Arrangement.SpaceEvenly
+//                    ) {
+//                        coloresDisponibles.forEach { (_, hex) ->
+//                            val color = Color(hex.toColorInt())
+//                            Surface(
+//                                shape = CircleShape,
+//                                color = color,
+//                                modifier = Modifier
+//                                    .size(36.dp)
+//                                    .clickable { backgroundColor = color }
+//                                    .border(
+//                                        width = 2.dp,
+//                                        color = if (color == backgroundColor) Color.Black else Color.Transparent,
+//                                        shape = CircleShape
+//                                    )
+//                            ) {}
+//                        }
+//                    }
+//                }
+//                Spacer(modifier = Modifier.height(6.dp))
+//                // titulo
+//                OutlinedTextField(
+//                    value = titulo,
+//                    onValueChange = {
+//                        if (titulo != it) {
+//                            tituloUndoStack.add(it)
+//                            tituloRedoStack.clear()
+//                            titulo = it
+//                        }
+//                    },
+//                    label = { Text("Título") },
+//                    singleLine = true,
+//                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
+//                    modifier = Modifier.fillMaxWidth()
+//                )
+//                Spacer(modifier = Modifier.height(12.dp))
+//                // Cuadro texto para contenido
+//                OutlinedTextField(
+//                    value = contenido,
+//                    onValueChange = {
+//                        if (contenido != it) {
+//                            contenidoUndoStack.add(it)
+//                            contenidoRedoStack.clear()
+//                            contenido = it
+//                        }
+//                    },
+//                    label = { Text("Contenido", color = Color.Black) },
+//                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .weight(1f)// mantiene altura flexible; el TextField ya hace scroll interno
+//                        .bringIntoViewRequester(contenidoBringRequester)   // 👈 preparado
+//                        .onFocusEvent { focus ->
+//                            if (focus.isFocused) {
+//                                // Pequeño retardo para esperar la animación del teclado y luego traer a vista
+//                                scope.launch {
+//                                    delay(200)
+//                                    contenidoBringRequester.bringIntoView()
+//                                }
+//                            }
+//                        },
+//                    maxLines = Int.MAX_VALUE
+//                )
+//            }
             // Diálogo de confirmación para borrar
             if (mostrarConfirmacionBorrado) {
                 AlertDialog(
