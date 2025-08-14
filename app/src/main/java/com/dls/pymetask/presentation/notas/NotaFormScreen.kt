@@ -360,7 +360,7 @@ fun NotaFormScreen(
                     label = { Text("Contenido", color = Color.Black) },
                     textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxSize()
                         .weight(1f, fill = false)                // 👈 evita forzar toda la altura; deja espacio real de scroll
                         .bringIntoViewRequester(contenidoBringRequester)
                         .focusRequester(focusRequester)
