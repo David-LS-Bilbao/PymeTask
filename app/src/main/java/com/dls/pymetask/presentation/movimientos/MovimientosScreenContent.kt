@@ -9,9 +9,11 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIosNew
@@ -392,9 +394,17 @@ private fun SaldoStickyHeader(
     Surface(tonalElevation = 2.dp, shadowElevation = 4.dp) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+
+
+
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                // scroll horizontal
+                modifier = Modifier.horizontalScroll(rememberScrollState())
+                ) {
                 // botón atrás
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(Icons.Default.ArrowBackIosNew, contentDescription = "volver al menú")
@@ -415,7 +425,8 @@ private fun SaldoStickyHeader(
                 }
             }
             if (syncing) { LinearProgressIndicator(Modifier.fillMaxWidth()) }
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp),
+                modifier = Modifier.horizontalScroll(rememberScrollState())) {
                 ResumenChip("Ingresos", ingresos, true)
                 ResumenChip("Gastos", gastos, false)
                 ResumenChip("Saldo", saldo, saldo >= 0)
