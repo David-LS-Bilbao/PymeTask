@@ -30,16 +30,33 @@ class OAuthManager(
     }
 
     /** Construye la URI de autorización. Ajusta parámetros a tu proveedor si difieren. */
+
+
     private fun buildAuthorizeUri(): Uri {
         val base = BuildConfig.OAUTH_BASE_URL.trimEnd('/')
-        return "$base/authorize".toUri().buildUpon()
+        val uri = "$base/authorize".toUri().buildUpon()
             .appendQueryParameter("response_type", "code")
             .appendQueryParameter("client_id", BuildConfig.OAUTH_CLIENT_ID)
             .appendQueryParameter("redirect_uri", BuildConfig.OAUTH_REDIRECT_URI)
             .appendQueryParameter("scope", BuildConfig.OAUTH_SCOPES)
-            // .appendQueryParameter("state", "anti_csrf_token") // opcional, recomendado
             .build()
+        android.util.Log.d("OAuth", "Auth URL: $uri") // 👈 log de depuración
+        return uri
     }
+
+
+
+
+//    private fun buildAuthorizeUri(): Uri {
+//        val base = BuildConfig.OAUTH_BASE_URL.trimEnd('/')
+//        return "$base/authorize".toUri().buildUpon()
+//            .appendQueryParameter("response_type", "code")
+//            .appendQueryParameter("client_id", BuildConfig.OAUTH_CLIENT_ID)
+//            .appendQueryParameter("redirect_uri", BuildConfig.OAUTH_REDIRECT_URI)
+//            .appendQueryParameter("scope", BuildConfig.OAUTH_SCOPES)
+//            // .appendQueryParameter("state", "anti_csrf_token") // opcional, recomendado
+//            .build()
+//    }
 
     /**
      * Maneja el redirect: extrae 'code', intercambia por tokens y los guarda.

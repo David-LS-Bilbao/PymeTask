@@ -59,7 +59,9 @@
                 <data
                     android:scheme="pymetask"
                     android:host="auth"
-                    android:path="/callback" />
+                    android:enableOnBackInvokedCallback="true"
+                    android:path="/callback"
+                    tools:targetApi="33" />
             </intent-filter>
         </activity>
 

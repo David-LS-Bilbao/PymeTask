@@ -34,16 +34,13 @@ fun AjustesScreen(
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showFontSizeDialog by remember { mutableStateOf(false) }
     var showInfoDialog by remember { mutableStateOf(false) }
-
     val opcionesTema = listOf(
         ThemeMode.LIGHT to "Claro",
         ThemeMode.DARK to "Oscuro",
         ThemeMode.SYSTEM to "Por sistema"
     )
-
     val idiomas = listOf("Español", "Inglés", "Francés")
     val tamaniosFuente = listOf("Pequeño", "Mediano", "Grande")
-
     var idiomaSeleccionado by remember { mutableStateOf(idiomas.first()) }
     var fuenteSeleccionada by remember { mutableStateOf(tamaniosFuente[1]) }
 
@@ -57,19 +54,15 @@ fun AjustesScreen(
                 }
             }
         )
-
         Spacer(Modifier.height(16.dp))
-
 
         ListItem(
             headlineContent = { Text("Tema de la aplicación") },
             supportingContent = { Text(opcionesTema.firstOrNull { it.first == theme }?.second ?: "") },
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { showThemeDialog = true } // CAMBIADO AQUÍ
+                .clickable { showThemeDialog = true }
         )
-
-
 
         ListItem(
             headlineContent = { Text("Idioma") },
@@ -130,10 +123,30 @@ fun AjustesScreen(
                     Toast.makeText(context, "Preferencias de archivo restablecidas", Toast.LENGTH_SHORT).show()
                 }
         )
+
+
+        // Dentro de Column(...) junto al resto de ListItem, añade este bloque:
+
+        ListItem(
+            headlineContent = { Text("Bancos (conectar/desconectar)") },
+            supportingContent = { Text("Gestiona la conexión con tu banco") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    // 👉 Navega a la pantalla específica de bancos
+                    navController.navigate("ajustes_bancos")
+                }
+        )
+
+
+
+
         HorizontalDivider(modifier = Modifier.fillMaxWidth()) // Ajustado para que ocupe el ancho
+
+
     }
 
-    // Diálogos
+    // Diálogos ------------------------------------------------------------------------------------
 
     if (showThemeDialog) {
         OpcionesDialog(

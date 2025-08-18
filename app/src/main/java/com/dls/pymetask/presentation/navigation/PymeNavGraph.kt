@@ -36,6 +36,7 @@ import com.dls.pymetask.presentation.notas.NotaFormScreen
 import com.dls.pymetask.presentation.notas.NotasScreen
 import com.dls.pymetask.presentation.perfil.EditarPerfilScreen
 import com.dls.pymetask.presentation.perfil.PerfilUserScreen
+import com.dls.pymetask.presentation.settings.BancosSettingsScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -76,31 +77,25 @@ fun PymeNavGraph(
                         "Archivos" -> navController.navigate("archivos")
                         "Agenda" -> navController.navigate("agenda")
                         "Notas" -> navController.navigate("notas")
-
                     }
                 }
             )
         }
-
         composable("movimientos") {
             MovimientosScreen(
                 navController = navController,
                 oauthManager = oauthManager
             )
         }
-
         composable("crear_movimiento") {
             CrearMovimientoScreen(
                 navController = navController
             )
         }
-
         composable(route = "editar_movimiento/{id}") { backStackEntry ->
             val id = backStackEntry.arguments?.getString("id") ?: return@composable
             EditarMovimientoScreen(navController = navController, movimientoId = id)
         }
-
-
         composable("estadisticas") {
             EstadisticasScreen(navController = navController)
         }
@@ -122,13 +117,9 @@ fun PymeNavGraph(
         composable("perfil_user") {
             PerfilUserScreen(navController = navController)
         }
-
         composable("editar_perfil") {
             EditarPerfilScreen(onBack = { navController.popBackStack() })
         }
-
-
-
         composable(
             route = "editar_contacto/{id}",
             arguments = listOf(navArgument("id") { type = NavType.StringType })
@@ -138,6 +129,7 @@ fun PymeNavGraph(
                 EditarContactoScreen(navController = navController, contactoId = it)
             }
         }
+
         // contactos----------------------------------------------------------------------------------
         composable("crear_contacto") {
             CrearContactoScreen(navController = navController)
@@ -151,51 +143,46 @@ fun PymeNavGraph(
             }
         }
 
-
         // Notas -----------------------------------------------------------------------------------
         composable("nota_form") {
             NotaFormScreen(navController = navController)
         }
-
         composable(
             route = "nota_form?notaId={notaId}",
             arguments = listOf(navArgument("notaId") {
                 nullable = true
                 defaultValue = null
             })
-        ) { backStackEntry ->
-            NotaFormScreen(
+        ) { backStackEntry -> NotaFormScreen(
                 navController = navController,
                 notaId = backStackEntry.arguments?.getString("notaId")
-            )
-        }
+            ) }
 
         // tarea -----------------------------------------------------------------------------------
         composable("tarea_form") {
             TareaFormScreen(navController = navController)
         }
-
         composable(
             route = "tarea_form?taskId={taskId}",
             arguments = listOf(navArgument("taskId") {
                 nullable = true
                 defaultValue = null
             })
-        ) {backStackEntry ->
-            TareaFormScreen(
+        ) {backStackEntry -> TareaFormScreen(
                 navController = navController,
-                taskId = backStackEntry.arguments?.getString("taskId"))
-
-        }
-
-
-
+                taskId = backStackEntry.arguments?.getString("taskId")) }
 
         // archivos --------------------------------------------------------------------------------
         composable("contenido_carpeta/{carpetaId}") { backStackEntry ->
             val carpetaId = backStackEntry.arguments?.getString("carpetaId") ?: ""
             ContenidoCarpetaScreen(carpetaId = carpetaId, navController = navController)
         }
-    }
+
+        composable("ajustes_bancos") {
+            BancosSettingsScreen(oauthManager = oauthManager)
+        }
+
+
+    }// NavHost--------------------------------------------------------------------------------------
 }
 
