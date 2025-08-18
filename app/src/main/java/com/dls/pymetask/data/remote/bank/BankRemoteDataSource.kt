@@ -9,6 +9,8 @@ interface BankRemoteDataSource {
         fromMillis: Long,
         toMillis: Long
     ): List<BankTransactionDto>
+
+    suspend fun getAccounts(): List<AccountDto>
 }
 
 class BankRemoteDataSourceImpl(
@@ -23,4 +25,7 @@ class BankRemoteDataSourceImpl(
         // Llama a la API y devuelve la lista (maneja errores arriba en el repo)
         return api.getTransactions(accountId, fromMillis, toMillis).transactions
     }
+
+    override suspend fun getAccounts(): List<AccountDto> = api.getAccounts().results
+
 }

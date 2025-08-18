@@ -94,7 +94,7 @@ fun MovimientosScreen(
         movimientos = movimientosUi,
         onAddClick = { navController.navigate("crear_movimiento") },
         onItemClick = { ui -> navController.navigate("editar_movimiento/${ui.id}") },
-        onSyncBanco = { viewModel.syncBancoMes(accountId = "demo-account", year = year, month0 = month0) },
+        onSyncBanco = { viewModel.syncBancoMes( year = year, month0 = month0) },
         onConectarBanco = {
             val act = activity ?: return@MovimientosScreenContent
             oauthManager?.startAuth(act) // <-- aquí sí llamamos a startAuth de forma segura

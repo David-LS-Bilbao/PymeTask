@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.math.max
 import androidx.core.net.toUri
+import java.util.UUID
 
 /**
  * OAuthManager:
@@ -31,30 +32,53 @@ class OAuthManager(
 
     /** Construye la URI de autorización. Ajusta parámetros a tu proveedor si difieren. */
 
-
     private fun buildAuthorizeUri(): Uri {
-        val base = BuildConfig.OAUTH_BASE_URL.trimEnd('/') // "https://auth.truelayer.com"
-        // ⚠️ NO añadimos "/authorize"
-        val builder = base.toUri().buildUpon()
-            .appendQueryParameter("response_type", "code")
-            .appendQueryParameter("client_id", BuildConfig.OAUTH_CLIENT_ID)
-            .appendQueryParameter("redirect_uri", BuildConfig.OAUTH_REDIRECT_URI)
-            .appendQueryParameter("scope", BuildConfig.OAUTH_SCOPES)
-        // .appendQueryParameter("state", YOUR_RANDOM_STATE) // recomendado
 
-        // 💡 Para probar con Mock Bank (sandbox):
-        // - muestra solo el banco simulado y salta selección
-        builder.appendQueryParameter("providers", "uk-cs-mock")
-        builder.appendQueryParameter("provider_id", "uk-cs-mock")
+            // 👇 Debe ser sandbox si tu client_id es sandbox-...
+            val base = BuildConfig.OAUTH_BASE_URL.trimEnd('/') // "https://auth.truelayer-sandbox.com"
+            val state = UUID.randomUUID().toString() // recomendado por seguridad (CSRF)
 
-        // 🔁 Si más adelante pasamos a producción ES:
-        // - quita las 2 líneas de arriba y usa, por ejemplo:
-        // builder.appendQueryParameter("country_id", "ES") // salta selección de país
-        // (sin 'providers' mostrará los bancos soportados para ES)
+            // TrueLayer acepta el authorize en la raíz del host con query params.
+            // No añadas un path, basta con el host y los parámetros.
+            val builder = base.toUri().buildUpon()
+                .appendQueryParameter("response_type", "code")
+                .appendQueryParameter("client_id", BuildConfig.OAUTH_CLIENT_ID)
+                .appendQueryParameter("redirect_uri", BuildConfig.OAUTH_REDIRECT_URI)
+                .appendQueryParameter("scope", BuildConfig.OAUTH_SCOPES)
+                .appendQueryParameter("response_mode", "form_post") // recomendado para móviles
+                .appendQueryParameter("state", state)
 
-        val uri = builder.build()
-        android.util.Log.d("OAuth", "Auth URL: $uri")
-        return uri
+            // 🔧 Para primeras pruebas, NO fuerces provider_id; deja que el flujo muestre el mock/bancos soportados.
+            // builder.appendQueryParameter("providers", "uk-cs-mock")
+            // builder.appendQueryParameter("provider_id", "uk-cs-mock")
+
+            val uri = builder.build()
+            android.util.Log.d("OAuth", "Auth URL: $uri")
+            return uri
+
+
+//        val base = BuildConfig.OAUTH_BASE_URL.trimEnd('/') // "https://auth.truelayer.com"
+//        // ⚠️ NO añadimos "/authorize"
+//        val builder = base.toUri().buildUpon()
+//            .appendQueryParameter("response_type", "code")
+//            .appendQueryParameter("client_id", BuildConfig.OAUTH_CLIENT_ID)
+//            .appendQueryParameter("redirect_uri", BuildConfig.OAUTH_REDIRECT_URI)
+//            .appendQueryParameter("scope", BuildConfig.OAUTH_SCOPES)
+//        // .appendQueryParameter("state", YOUR_RANDOM_STATE) // recomendado
+//
+//        // 💡 Para probar con Mock Bank (sandbox):
+//        // - muestra solo el banco simulado y salta selección
+//        builder.appendQueryParameter("providers", "uk-cs-mock")
+//        builder.appendQueryParameter("provider_id", "uk-cs-mock")
+//
+//        // 🔁 Si más adelante pasamos a producción ES:
+//        // - quita las 2 líneas de arriba y usa, por ejemplo:
+//        // builder.appendQueryParameter("country_id", "ES") // salta selección de país
+//        // (sin 'providers' mostrará los bancos soportados para ES)
+//
+//        val uri = builder.build()
+//        android.util.Log.d("OAuth", "Auth URL: $uri")
+//        return uri
     }
 
     /**

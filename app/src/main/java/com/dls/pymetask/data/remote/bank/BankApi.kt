@@ -1,5 +1,6 @@
 package com.dls.pymetask.data.remote.bank
 
+import com.google.gson.annotations.SerializedName
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -20,6 +21,11 @@ interface BankApi {
         @Query("from") fromMillis: Long,
         @Query("to") toMillis: Long
     ): TransactionsResponse
+
+    // TrueLayer Data API – listado de cuentas del usuario
+    @GET("data/v1/accounts")
+    suspend fun getAccounts(): AccountsResponse
+
 }
 
 /** Respuesta JSON simple */
@@ -35,4 +41,14 @@ data class BankTransactionDto(
     val amount: Double,        // positivo = ingreso, negativo = gasto
     val currency: String,
     val description: String?   // concepto / merchant
+)
+
+
+
+// Respuesta mínima para la UI
+data class AccountsResponse(val results: List<AccountDto>)
+data class AccountDto(
+    @SerializedName("account_id") val accountId: String,
+    @SerializedName("display_name") val displayName: String?,
+    val currency: String?
 )
