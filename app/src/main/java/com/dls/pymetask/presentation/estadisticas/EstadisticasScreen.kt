@@ -72,7 +72,7 @@ import com.dls.pymetask.domain.model.Movimiento
 import com.dls.pymetask.presentation.movimientos.MovimientosViewModel
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
-import java.time.Instant
+import java.time.Instant.ofEpochMilli
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
@@ -274,7 +274,7 @@ fun EstadisticasScreen(
         DateRangePickerDialog(
             onDismiss = { showRangePicker = false },
             onConfirm = { start, end ->
-                statsVm.setCustomRange(start.toEpochMillisAtStart() to end.toEpochMillisAtStart())
+                statsVm.setCustomRange(start.toEpochMillisAtStart() to end.toEpochMillisAtEnd())
                 showRangePicker = false
             }
         )
@@ -696,10 +696,10 @@ private fun DateRangePickerDialog(
             TextButton(
                 enabled = state.selectedStartDateMillis != null && state.selectedEndDateMillis != null,
                 onClick = {
-                    onConfirm(
-                        state.selectedStartDateMillis!!.toLocalDate(),
-                        state.selectedEndDateMillis!!.toLocalDate()
-                    )
+                    // ⬇️ usa la extensión con PARÉNTESIS
+                    val start = state.selectedStartDateMillis!!.toLocalDate()
+                    val end = state.selectedEndDateMillis!!.toLocalDate()
+                    onConfirm(start, end)
                 }
             ) { Text("Aplicar") }
         },
@@ -720,11 +720,24 @@ private fun DateRangePickerDialog(
 }
 
 /* ======================== Utils fecha UI ======================== */
+@RequiresApi(Build.VERSION_CODES.O)
+private fun Long.toLocalDate(): LocalDate =
+    ofEpochMilli(this)             // ← FQN: java.time.Instant
+        .atZone(ZoneId.systemDefault())
+        .toLocalDate()
 
 @RequiresApi(Build.VERSION_CODES.O)
 private fun LocalDate.toEpochMillisAtStart(): Long =
-    atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+    atStartOfDay(ZoneId.systemDefault())
+        .toInstant()
+        .toEpochMilli()
+
 @RequiresApi(Build.VERSION_CODES.O)
-private fun Long.toLocalDate(): LocalDate =
-    Instant.ofEpochMilli(this).atZone(ZoneId.systemDefault()).toLocalDate()
+private fun LocalDate.toEpochMillisAtEnd(): Long =
+    plusDays(1)
+        .atStartOfDay(ZoneId.systemDefault())
+        .toInstant()
+        .toEpochMilli() - 1
+
+
 
