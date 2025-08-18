@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dls.pymetask.data.local.AccountPrefs
 import com.dls.pymetask.domain.model.Movimiento
 import com.dls.pymetask.domain.repository.BankRepository
 import com.dls.pymetask.domain.repository.MovimientoRepository
@@ -22,7 +23,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MovimientosViewModel @Inject constructor(
     private val repository: MovimientoRepository,
-    private val bankRepository: BankRepository // <-- inyecta
+    private val bankRepository: BankRepository, // <-- inyecta
+    private val prefs: AccountPrefs
 
 
 ) : ViewModel() {
@@ -49,12 +51,18 @@ class MovimientosViewModel @Inject constructor(
     var lastSyncResult by mutableStateOf<String?>(null)
         private set
 
+
+    val selectedAccountId = prefs.selectedAccountId()
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
+
     /**
      * Sincroniza un MES concreto de una cuenta bancaria:
      * - accountId viene del proveedor (temporalmente, introduce un hardcode para probar).
      * - year/month0 definen el rango
      */
-    fun syncBancoMes(accountId: String, year: Int, month0: Int) {
+    fun syncBancoMes( year: Int, month0: Int) {
+        val accountId = selectedAccountId.value ?: return
         viewModelScope.launch {
             syncing = true
             lastSyncResult = null

@@ -1,6 +1,7 @@
 package com.dls.pymetask.data.repository
 
 import android.content.Context
+import com.dls.pymetask.data.remote.bank.AccountDto
 import com.dls.pymetask.data.remote.bank.BankRemoteDataSource
 import com.dls.pymetask.domain.model.Movimiento
 import com.dls.pymetask.domain.repository.BankRepository
@@ -24,6 +25,9 @@ class BankRepositoryImpl(
     private val movimientoRepo: MovimientoRepository,
     private val appContext: Context
 ) : BankRepository {
+
+    override suspend fun fetchAccounts(): List<AccountDto> = remote.getAccounts()
+
 
     override suspend fun syncAccount(
         accountId: String,

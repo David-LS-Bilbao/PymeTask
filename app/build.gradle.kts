@@ -1,4 +1,5 @@
-@file:Suppress("DEPRECATION")
+val TL_SANDBOX_CLIENT_SECRET: String = (project.findProperty("TL_SANDBOX_CLIENT_SECRET") as String?) ?: ""
+
 
 
 plugins {
@@ -23,30 +24,65 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-
-        buildConfigField("String", "BANK_BASE_URL", "\"https://api.truelayer.com/\"")           // Data API
-        buildConfigField("String", "OAUTH_BASE_URL", "\"https://auth.truelayer.com/\"")         // OAuth host (authorize & token)
-        buildConfigField("String", "OAUTH_CLIENT_ID", "\"TU_CLIENT_ID\"")
-        buildConfigField("String", "OAUTH_CLIENT_SECRET", "\"TU_CLIENT_SECRET\"")               // si el proveedor lo requiere
-        buildConfigField("String", "OAUTH_REDIRECT_URI", "\"pymetask://auth/callback\"")        // debe coincidir con el manifest
+        // ✅ SANDBOX (API y Auth)
+        buildConfigField("String", "BANK_BASE_URL", "\"https://api.truelayer-sandbox.com/\"") // Data API sandbox
+        buildConfigField("String", "OAUTH_BASE_URL", "\"https://auth.truelayer-sandbox.com/\"") // Auth sandbox
+        buildConfigField("String", "OAUTH_CLIENT_ID", "\"sandbox-pymetask-b17d46\"")
+        buildConfigField("String", "OAUTH_CLIENT_SECRET", "\"${'$'}{TL_SANDBOX_CLIENT_SECRET}\"") // ← lo leeremos desde gradle.properties
+        buildConfigField("String", "OAUTH_REDIRECT_URI", "\"pymetask://auth/callback\"")
         buildConfigField("String", "OAUTH_SCOPES", "\"accounts balance transactions offline_access\"")
 
+//        buildConfigField("String", "BANK_BASE_URL", "\"https://api.truelayer.com/\"")           // Data API
+//        buildConfigField("String", "OAUTH_BASE_URL", "\"https://auth.truelayer.com/\"")         // OAuth host (authorize & token)
+//        buildConfigField("String", "OAUTH_CLIENT_ID", "\"sandbox-pymetask-b17d46\"")
+//        buildConfigField("String", "OAUTH_CLIENT_SECRET", "\"19fa3e88-a8c4-45b9-b38b-7514be839b59\"")               // si el proveedor lo requiere
+//        buildConfigField("String", "OAUTH_REDIRECT_URI", "\"pymetask://auth/callback\"")        // debe coincidir con el manifest
+//        buildConfigField("String", "OAUTH_SCOPES", "\"accounts balance transactions offline_access\"")
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+      // testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
+
+        debug {
+            buildConfigField("String", "OAUTH_BASE_URL", "\"https://auth.truelayer-sandbox.com\"")
+            buildConfigField("String", "OAUTH_CLIENT_ID", "\"sandbox-pymetask-b17d46\"") // <- copia exacto de Console
+            buildConfigField("String", "OAUTH_REDIRECT_URI", "\"pymetask://auth/callback\"")
+            // Scopes mínimos para listar cuentas y transacciones; añade balance/offline_access si quieres refresh
+            buildConfigField("String", "OAUTH_SCOPES", "\"accounts transactions balance offline_access\"")
+            // (Opcional) Si tu OAuthApi necesita base explícita para token:
+            buildConfigField("String", "OAUTH_TOKEN_URL", "\"https://auth.truelayer-sandbox.com/connect/token\"")
+        }
+
+
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+
+            // Cuando pases a producción:
+            // OAUTH_BASE_URL = "https://auth.truelayer.com"
+            // OAUTH_CLIENT_ID = "live-xxxx"
+            // OAUTH_REDIRECT_URI igual que en Console Live
+            // OAUTH_TOKEN_URL = "https://auth.truelayer.com/connect/token"
+
         }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
+    }
+
+
+
+    packaging {
+        resources {
+            pickFirsts.add("META-INF/LICENSE-MIT")
+        }
     }
     kotlinOptions {
         jvmTarget = "11"
@@ -127,7 +163,9 @@ dependencies {
     implementation(libs.security.crypto)
     implementation(libs.androidx.browser)
 
-
+    implementation(libs.ui)
+    // habilita desugaring para soportar Java 8 en minSdk 24
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 
 
 }
