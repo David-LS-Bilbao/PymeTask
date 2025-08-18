@@ -17,12 +17,14 @@
         android:name=".PymeTaskApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
+        android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.PymeTask" >
+        android:theme="@style/Theme.PymeTask"
+        tools:targetApi="33">
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -59,21 +61,10 @@
                 <data
                     android:scheme="pymetask"
                     android:host="auth"
-                    android:enableOnBackInvokedCallback="true"
                     android:path="/callback"
                     tools:targetApi="33" />
             </intent-filter>
         </activity>
-
-
     </application>
-
-
-
-
-
-
-
-
 
 </manifest>

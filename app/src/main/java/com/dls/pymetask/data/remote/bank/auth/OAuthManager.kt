@@ -33,30 +33,29 @@ class OAuthManager(
 
 
     private fun buildAuthorizeUri(): Uri {
-        val base = BuildConfig.OAUTH_BASE_URL.trimEnd('/')
-        val uri = "$base/authorize".toUri().buildUpon()
+        val base = BuildConfig.OAUTH_BASE_URL.trimEnd('/') // "https://auth.truelayer.com"
+        // ⚠️ NO añadimos "/authorize"
+        val builder = base.toUri().buildUpon()
             .appendQueryParameter("response_type", "code")
             .appendQueryParameter("client_id", BuildConfig.OAUTH_CLIENT_ID)
             .appendQueryParameter("redirect_uri", BuildConfig.OAUTH_REDIRECT_URI)
             .appendQueryParameter("scope", BuildConfig.OAUTH_SCOPES)
-            .build()
-        android.util.Log.d("OAuth", "Auth URL: $uri") // 👈 log de depuración
+        // .appendQueryParameter("state", YOUR_RANDOM_STATE) // recomendado
+
+        // 💡 Para probar con Mock Bank (sandbox):
+        // - muestra solo el banco simulado y salta selección
+        builder.appendQueryParameter("providers", "uk-cs-mock")
+        builder.appendQueryParameter("provider_id", "uk-cs-mock")
+
+        // 🔁 Si más adelante pasamos a producción ES:
+        // - quita las 2 líneas de arriba y usa, por ejemplo:
+        // builder.appendQueryParameter("country_id", "ES") // salta selección de país
+        // (sin 'providers' mostrará los bancos soportados para ES)
+
+        val uri = builder.build()
+        android.util.Log.d("OAuth", "Auth URL: $uri")
         return uri
     }
-
-
-
-
-//    private fun buildAuthorizeUri(): Uri {
-//        val base = BuildConfig.OAUTH_BASE_URL.trimEnd('/')
-//        return "$base/authorize".toUri().buildUpon()
-//            .appendQueryParameter("response_type", "code")
-//            .appendQueryParameter("client_id", BuildConfig.OAUTH_CLIENT_ID)
-//            .appendQueryParameter("redirect_uri", BuildConfig.OAUTH_REDIRECT_URI)
-//            .appendQueryParameter("scope", BuildConfig.OAUTH_SCOPES)
-//            // .appendQueryParameter("state", "anti_csrf_token") // opcional, recomendado
-//            .build()
-//    }
 
     /**
      * Maneja el redirect: extrae 'code', intercambia por tokens y los guarda.
