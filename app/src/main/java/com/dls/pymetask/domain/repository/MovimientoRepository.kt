@@ -12,4 +12,9 @@ interface MovimientoRepository {
     suspend fun insertMovimiento(mov: Movimiento)// inserta un movimiento en la base de datos
     suspend fun deleteMovimiento(id: String)// elimina un movimiento de la base de datos
 
+    // NUEVOS MÉTODOS PARA PAGINACIÓN POR MESES
+    suspend fun getMovimientosBetween(userId: String, fromMillis: Long, toMillis: Long): List<Movimiento>
+    suspend fun getEarliestMovimientoMillis(userId: String): Long?
+
+
 }
