@@ -114,7 +114,6 @@ fun MovimientosScreen(
         onSyncBanco = { viewModel.syncBancoMes(year = year, month0 = month0) },
         onConectarBanco = { activity?.let { oauthManager?.startAuth(it) } },
         onImportCsv = { picker.launch(arrayOf("text/*", "text/csv", "application/vnd.ms-excel")) },
-        onGenerarDemo = { viewModel.generateDemo(context, count = 25) },
         syncing = syncing,
         lastSyncMessage = lastMsg,
                 // 👇 NUEVO: secciones mensuales y control de paginación
@@ -145,7 +144,6 @@ fun MovimientosScreenContent(
     syncing: Boolean = false,
     lastSyncMessage: String? = null,
     onImportCsv: () -> Unit = {},            // NUEVO
-    onGenerarDemo: () -> Unit = {},          // NUEVO
     meses: List<MovimientosViewModel.MesSection> = emptyList(),
     noHayMas: Boolean = false,
     onMostrarMas: () -> Unit = {}
@@ -194,8 +192,7 @@ fun MovimientosScreenContent(
                     onConectarBanco = onConectarBanco,          // <-- PASAMOS el callback
                     onSyncBanco = onSyncBanco,
                     syncing = syncing,
-                    onImportCsv = onImportCsv,
-                    onGenerarDemo = onGenerarDemo
+                    onImportCsv = onImportCsv
                 )
             }
 
@@ -463,22 +460,22 @@ private fun SaldoStickyHeader(
                 Spacer(Modifier.width(8.dp))
 
                 // boton generar demo
-                OutlinedButton(onClick = onGenerarDemo) { Text("Generar demo") }
-                Spacer(Modifier.width(8.dp))
+//                OutlinedButton(onClick = onGenerarDemo) { Text("Generar demo") }
+//                Spacer(Modifier.width(8.dp))
 
 
                 // botón conectar banco (llama al callback; aquí NO sabemos nada de OAuthManager)
-                OutlinedButton(onClick = onConectarBanco) { Text("Conectar banco") }
-                Spacer(Modifier.width(8.dp))
+//                OutlinedButton(onClick = onConectarBanco) { Text("Conectar banco") }
+//                Spacer(Modifier.width(8.dp))
 
                 // boton seleccionar fecha movimientos
 //                OutlinedButton(onClick = { /*TODO*/ }) { Text("Seleccionar fecha") }
 
 
                 // botón sincronizar (deshabilitado si está sincronizando)
-                OutlinedButton(onClick = onSyncBanco, enabled = !syncing) {
-                    Text(if (syncing) "Sincronizando..." else "Sincronizar banco")
-                }
+//                OutlinedButton(onClick = onSyncBanco, enabled = !syncing) {
+//                    Text(if (syncing) "Sincronizando..." else "Sincronizar banco")
+//                }
                 Spacer(Modifier.width(24.dp))
                 // botón para ir a estadísticas
                 OutlinedButton(onClick = { navController.navigate("estadisticas") }) {

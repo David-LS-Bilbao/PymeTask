@@ -8,6 +8,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -28,6 +30,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.CompareArrows
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DatePickerDefaults
@@ -56,6 +59,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
@@ -77,6 +81,8 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
 import java.util.Locale
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -95,9 +101,20 @@ fun EstadisticasScreen(
     // UI local
     var showRangePicker by remember { mutableStateOf(false) }
 
+    var selectedCategory by remember { mutableStateOf<String?>(null) }
+
+
     // formatos
     val currency = remember { NumberFormat.getCurrencyInstance(Locale("es", "ES")) }
     val sdfFecha = remember { SimpleDateFormat("dd/MM/yyyy", Locale("es", "ES")) }
+
+    val listaParaLista = remember(ui.listaA, ui.filtro, selectedCategory) {
+        val base = ui.listaA.filtrarPorTipo(ui.filtro)
+        selectedCategory?.let { label ->
+            base.filter { !it.ingreso && movimientoCategoryLabel(it) == label }
+        } ?: base
+    }
+
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -198,13 +215,36 @@ fun EstadisticasScreen(
 
             // ---------- Filtro por tipo (modo Mes) ----------
             if (ui.modo == Modo.MES) {
+
+                // EstadisticasScreen.kt — dentro del LazyColumn, en modo Mes
+
                 item {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        TypeChip("Todo", ui.filtro == FiltroTipo.TODO) { statsVm.setFiltro(FiltroTipo.TODO) }
-                        TypeChip("Ingresos", ui.filtro == FiltroTipo.INGRESO) { statsVm.setFiltro(FiltroTipo.INGRESO) }
-                        TypeChip("Gastos", ui.filtro == FiltroTipo.GASTO) { statsVm.setFiltro(FiltroTipo.GASTO) }
-                    }
+                    val allSlices = remember(ui.listaA) { buildExpenseSlicesAll(ui.listaA) } // <-- TODAS
+                    CategoryBreakdownCard(
+                        title = "Gastos por categorías — ${ui.tituloMesA}",
+                        allSlices = allSlices,
+                        selectedLabel = selectedCategory,
+                        onSelect = { label -> selectedCategory = if (selectedCategory == label) null else label },
+                        maxVisible = 8 // ← sube a 8 (o lo que quieras)
+                    )
                 }
+//                item {
+//                    val slices = remember(ui.listaA) { buildExpenseSlices(ui.listaA, maxSlices = 6) }
+//                    CategoryBreakdownCard(
+//                        title = "Gastos por categorías — ${ui.tituloMesA}",
+//                        slices = slices,
+//                        selectedLabel = selectedCategory,
+//                        onSelect = { label -> selectedCategory = if (selectedCategory == label) null else label }
+//                    )
+//                }
+
+//                item {
+//                    val slices = remember(ui.listaA) { buildExpenseSlices(ui.listaA, maxSlices = 6) }
+//                    CategoryBreakdownCard(
+//                        title = "Gastos por categorías — ${ui.tituloMesA}",
+//                        slices = slices
+//                    )
+//                }
             }
 
             // ---------- Gráficos ----------
@@ -218,6 +258,14 @@ fun EstadisticasScreen(
                             height = 180.dp
                         )
                     }
+                    if (selectedCategory != null) {
+                        Spacer(Modifier.height(4.dp))
+                        AssistChip(
+                            onClick = { selectedCategory = null },
+                            label = { Text("Filtro: $selectedCategory  ✕") }
+                        )
+                    }
+
                 }
                 item {
                     Tarjeta("Saldo acumulado — ${ui.tituloMesA}") {
@@ -253,7 +301,7 @@ fun EstadisticasScreen(
             }
 
             // ---------- Lista ----------
-            if (ui.modo == Modo.MES && ui.listaFiltradaA.isNotEmpty()) {
+            if (ui.modo == Modo.MES && listaParaLista.isNotEmpty()) {
                 val tituloLista = when (ui.periodo) {
                     Periodo.MES -> "Movimientos de ${ui.tituloMesA}"
                     Periodo.HOY -> "Movimientos de hoy"
@@ -261,11 +309,12 @@ fun EstadisticasScreen(
                     Periodo.PERSONALIZADO -> "Movimientos (rango personalizado)"
                 }
                 item { Text(tituloLista, style = MaterialTheme.typography.titleMedium) }
-                items(ui.listaFiltradaA.sortedByDescending { it.fecha }, key = { it.id }) { mov ->
+                items(listaParaLista.sortedByDescending { it.fecha }, key = { it.id }) { mov ->
                     MovimientoRow(mov, sdfFecha, currency)
                     HorizontalDivider()
                 }
             }
+
         }
     }
 
@@ -738,6 +787,415 @@ private fun LocalDate.toEpochMillisAtEnd(): Long =
         .atStartOfDay(ZoneId.systemDefault())
         .toInstant()
         .toEpochMilli() - 1
+
+// ---------- Modelo y agregación de "categorías light" ----------
+private data class CategorySlice(val label: String, val value: Double)
+
+private fun buildExpenseSlices(
+    movimientos: List<Movimiento>,
+    maxSlices: Int = 6
+): List<CategorySlice> {
+    if (movimientos.isEmpty()) return emptyList()
+
+    // Solo GASTOS; sumamos cantidades positivas (tu dominio ya guarda positivas)
+    val byLabel: Map<String, Double> = movimientos
+        .asSequence()
+        .filter { !it.ingreso }
+        .groupBy { m ->
+            val base = (m.subtitulo.ifBlank { m.titulo }).ifBlank { "Otros" }.trim()
+            base.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+        }
+        .mapValues { (_, list) -> list.sumOf { it.cantidad } }
+
+    if (byLabel.isEmpty()) return emptyList()
+
+    // Top N y "Otros"
+    val sorted = byLabel.entries.sortedByDescending { it.value }
+    val takeN = (maxSlices - 1).coerceAtLeast(1)
+    val top = sorted.take(takeN).map { CategorySlice(it.key, it.value) }
+    val rest = sorted.drop(takeN).sumOf { it.value }
+    return if (rest > 0.0) top + CategorySlice("Otros", rest) else top
+}
+
+// Paleta simple y estable (reutiliza si hay más slices)
+//private val donutPalette = listOf(
+//    Color(0xFF3B82F6), // azul
+//    Color(0xFF22C55E), // verde
+//    Color(0xFFF59E0B), // ámbar
+//    Color(0xFFEF4444), // rojo
+//    Color(0xFF8B5CF6), // violeta
+//    Color(0xFF06B6D4)  // cian
+//)
+
+
+@Composable
+private fun CategoryBreakdownCard(
+    title: String,
+    allSlices: List<CategorySlice>,         // <- pásame TODAS (sin agrupar)
+    selectedLabel: String?,
+    onSelect: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    maxVisible: Int = 8,                   // <- Top N por defecto
+    height: Dp = 180.dp,
+    ringThickness: Dp = 22.dp
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    // Decide qué mostrar en donut/leyenda
+    val display = remember(allSlices, expanded, maxVisible) {
+        if (expanded) allSlices else collapseSlices(allSlices, maxVisible)
+    }
+
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(2.dp),
+        shape = MaterialTheme.shapes.large
+    ) {
+        Column(Modifier.fillMaxWidth().padding(16.dp)) {
+            Row(
+                Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(title, style = MaterialTheme.typography.titleMedium)
+                // Toggle expand/compact
+                TextButton(onClick = { expanded = !expanded }) {
+                    Text(if (expanded) "Ver top $maxVisible" else "Ver todas")
+                }
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            if (display.isEmpty() || display.sumOf { it.value } <= 0.0) {
+                TextoVacio("Sin gastos en este periodo")
+                return@Column
+            }
+
+            Row(
+                Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                DonutChart(
+                    slices = display.mapIndexed { i, s -> s.value to donutPalette[i % donutPalette.size] },
+                    modifier = Modifier.size(height),
+                    thickness = ringThickness
+                )
+                Spacer(Modifier.width(16.dp))
+                LegendList(
+                    slices = display,
+                    selectedLabel = selectedLabel,
+                    onSelect = onSelect,
+                    // Para que quepan más de 3 sin recortar:
+                    modifier = Modifier
+                        .weight(1f)
+                        .heightIn(max = height) // altura ~ al donut
+                        .verticalScroll(rememberScrollState())
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun LegendList(
+    slices: List<CategorySlice>,
+    selectedLabel: String?,
+    onSelect: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val total = slices.sumOf { it.value }
+    val currency = remember { java.text.NumberFormat.getCurrencyInstance(java.util.Locale("es", "ES")) }
+
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        slices.forEachIndexed { i, s ->
+            val pct = if (total == 0.0) 0 else ((s.value / total) * 100).toInt()
+            val isSel = s.label == selectedLabel
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(
+                        if (isSel) MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)
+                        else Color.Transparent
+                    )
+                    .clickable { onSelect(s.label) }
+                    .padding(horizontal = 8.dp, vertical = 6.dp)
+            ) {
+                Box(
+                    Modifier
+                        .size(10.dp)
+                        .background(donutPalette[i % donutPalette.size], CircleShape)
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    s.label,
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        fontWeight = if (isSel) FontWeight.SemiBold else FontWeight.Normal
+                    ),
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    "${currency.format(s.value)}  ·  $pct%",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DonutChart(
+    slices: List<Pair<Double, Color>>,
+    modifier: Modifier = Modifier,
+    thickness: Dp = 20.dp
+) {
+    val total = slices.sumOf { it.first }.takeIf { it > 0 } ?: return
+    Canvas(modifier) {
+        val diameter = size.minDimension
+        val strokeWidth = thickness.toPx()
+        val radius = diameter / 2f
+        val rect = androidx.compose.ui.geometry.Rect(
+            center = Offset(size.width / 2f, size.height / 2f),
+            radius = radius - strokeWidth / 2f
+        )
+        var start = -90f
+        slices.forEach { (value, color) ->
+            val sweep = (value / total).toFloat() * 360f
+            if (sweep > 0f) {
+                drawArc(
+                    color = color,
+                    startAngle = start,
+                    sweepAngle = sweep,
+                    useCenter = false,
+                    topLeft = rect.topLeft,
+                    size = rect.size,
+                    style = androidx.compose.ui.graphics.drawscope.Stroke(width = strokeWidth)
+                )
+                start += sweep
+            }
+        }
+    }
+}
+
+
+
+
+
+//
+//@Composable
+//private fun CategoryBreakdownCard(
+//    title: String,
+//    slices: List<CategorySlice>,
+//    selectedLabel: String?,
+//    onSelect: (String) -> Unit,
+//    modifier: Modifier = Modifier,
+//    height: Dp = 180.dp,
+//    ringThickness: Dp = 22.dp
+//) {
+//    Card(
+//        modifier = modifier,
+//        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+//        elevation = CardDefaults.cardElevation(2.dp),
+//        shape = MaterialTheme.shapes.large
+//    ) {
+//        Column(Modifier.fillMaxWidth().padding(16.dp)) {
+//            Text(title, style = MaterialTheme.typography.titleMedium)
+//            Spacer(Modifier.height(12.dp))
+//
+//            if (slices.isEmpty() || slices.sumOf { it.value } <= 0.0) {
+//                TextoVacio("Sin gastos en este periodo")
+//                return@Column
+//            }
+//
+//            Row(
+//                Modifier.fillMaxWidth(),
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                DonutChart(
+//                    slices = slices.mapIndexed { i, s -> s.value to donutPalette[i % donutPalette.size] },
+//                    modifier = Modifier.size(height),
+//                    thickness = ringThickness
+//                )
+//                Spacer(Modifier.width(16.dp))
+//                LegendList(
+//                    slices = slices,
+//                    selectedLabel = selectedLabel,
+//                    onSelect = onSelect
+//                )
+//            }
+//        }
+//    }
+//}
+//
+//@Composable
+//private fun LegendList(
+//    slices: List<CategorySlice>,
+//    selectedLabel: String?,
+//    onSelect: (String) -> Unit
+//) {
+//    val total = slices.sumOf { it.value }
+//    val currency = remember { NumberFormat.getCurrencyInstance(Locale("es", "ES")) }
+//
+//    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+//        slices.forEachIndexed { i, s ->
+//            val pct = if (total == 0.0) 0 else ((s.value / total) * 100).toInt()
+//            val isSel = s.label == selectedLabel
+//            Row(
+//                verticalAlignment = Alignment.CenterVertically,
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .clip(RoundedCornerShape(12.dp))
+//                    .background(
+//                        if (isSel) MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)
+//                        else Color.Transparent
+//                    )
+//                    .padding(horizontal = 8.dp, vertical = 6.dp)
+//                    .then(Modifier.clickable { onSelect(s.label) })
+//            ) {
+//                Box(
+//                    Modifier
+//                        .size(10.dp)
+//                        .background(donutPalette[i % donutPalette.size], CircleShape)
+//                )
+//                Spacer(Modifier.width(8.dp))
+//                Text(
+//                    s.label,
+//                    style = MaterialTheme.typography.labelLarge.copy(
+//                        fontWeight = if (isSel) FontWeight.SemiBold else FontWeight.Normal
+//                    ),
+//                    modifier = Modifier.weight(1f)
+//                )
+//                Text(
+//                    "${currency.format(s.value)}  ·  $pct%",
+//                    style = MaterialTheme.typography.labelMedium,
+//                    color = MaterialTheme.colorScheme.onSurfaceVariant
+//                )
+//            }
+//        }
+//    }
+//}
+//
+//
+//@Composable
+//private fun DonutChart(
+//    slices: List<Pair<Double, Color>>,
+//    modifier: Modifier = Modifier,
+//    thickness: Dp = 20.dp
+//) {
+//    val total = slices.sumOf { it.first }.takeIf { it > 0 } ?: return
+//    Canvas(modifier) {
+//        val diameter = size.minDimension
+//        val strokeWidth = thickness.toPx()
+//        val radius = diameter / 2f
+//        val rect = androidx.compose.ui.geometry.Rect(
+//            center = Offset(size.width / 2f, size.height / 2f),
+//            radius = radius - strokeWidth / 2f
+//        )
+//        var start = -90f
+//        slices.forEach { (value, color) ->
+//            val sweep = (value / total).toFloat() * 360f
+//            drawArc(
+//                color = color,
+//                startAngle = start,
+//                sweepAngle = sweep,
+//                useCenter = false,
+//                topLeft = rect.topLeft,
+//                size = rect.size,
+//                style = androidx.compose.ui.graphics.drawscope.Stroke(width = strokeWidth)
+//            )
+//            start += sweep
+//        }
+//    }
+//}
+
+
+// DONNUT
+@Composable
+private fun LegendList(slices: List<CategorySlice>) {
+    val total = slices.sumOf { it.value }
+    val currency = remember { NumberFormat.getCurrencyInstance(Locale("es", "ES")) }
+
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        slices.forEachIndexed { i, s ->
+            val pct = if (total == 0.0) 0 else ((s.value / total) * 100).toInt()
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    Modifier
+                        .size(10.dp)
+                        .background(donutPalette[i % donutPalette.size], CircleShape)
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    s.label,
+                    style = MaterialTheme.typography.labelLarge,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    "${currency.format(s.value)}  ·  $pct%",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+private fun movimientoCategoryLabel(m: Movimiento): String {
+    val base = (m.subtitulo.ifBlank { m.titulo }).ifBlank { "Otros" }.trim()
+    return base.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+}
+
+
+
+
+// ---------- Modelo y agregación ----------
+//private data class CategorySlice(val label: String, val value: Double)
+
+/** Devuelve TODAS las categorías (sin agrupar "Otros"), ordenadas por importe desc. */
+private fun buildExpenseSlicesAll(
+    movimientos: List<com.dls.pymetask.domain.model.Movimiento>
+): List<CategorySlice> {
+    if (movimientos.isEmpty()) return emptyList()
+    val byLabel = movimientos
+        .asSequence()
+        .filter { !it.ingreso }
+        .groupBy { m ->
+            val base = (m.subtitulo.ifBlank { m.titulo }).ifBlank { "Otros" }.trim()
+            base.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+        }
+        .mapValues { (_, list) -> list.sumOf { it.cantidad } }
+        .filterValues { it > 0.0 }
+
+    return byLabel.entries
+        .sortedByDescending { it.value }
+        .map { CategorySlice(it.key, it.value) }
+}
+
+/** Colapsa a Top N + "Otros" */
+private fun collapseSlices(
+    all: List<CategorySlice>,
+    maxVisible: Int
+): List<CategorySlice> {
+    if (all.size <= maxVisible) return all
+    val top = all.take(maxVisible - 1)
+    val rest = all.drop(maxVisible - 1).sumOf { it.value }
+    return top + CategorySlice("Otros", rest)
+}
+
+// Paleta
+private val donutPalette = listOf(
+    androidx.compose.ui.graphics.Color(0xFF3B82F6),
+    androidx.compose.ui.graphics.Color(0xFF22C55E),
+    androidx.compose.ui.graphics.Color(0xFFF59E0B),
+    androidx.compose.ui.graphics.Color(0xFFEF4444),
+    androidx.compose.ui.graphics.Color(0xFF8B5CF6),
+    androidx.compose.ui.graphics.Color(0xFF06B6D4),
+    androidx.compose.ui.graphics.Color(0xFF10B981),
+    androidx.compose.ui.graphics.Color(0xFFE11D48),
+)
 
 
 
