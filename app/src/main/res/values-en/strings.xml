@@ -1,0 +1,210 @@
+<resources>
+    <string name="app_name">PymeTask</string>
+    <string name="back">Back</string>
+
+    <string name="settings_theme">App theme</string>
+
+
+    <string name="select_theme">Select theme</string>
+
+    <string name="select_language">Select language</string>
+    <string name="lang_es">Spanish</string>
+    <string name="lang_en">English</string>
+    <string name="lang_fr">French</string>
+    <string name="language_changed_to">Language changed to %1$s</string>
+
+    <string name="select_font_size">Select font size</string>
+
+
+    <string name="info_title">Information</string>
+    <string name="info_text">Version 1.0\nApp by David\n© 2025</string>
+    <string name="close">Close</string>
+
+    <string name="coming_soon_faq">FAQ coming soon</string>
+    <string name="coming_soon_instructions">Guide coming soon</string>
+
+
+    <string name="btn_save">Save</string>
+    <string name="btn_edit">Edit</string>
+    <string name="btn_delete">Delete</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_ok">OK</string>
+    <string name="btn_back">Back</string>
+    <string name="btn_share">Share</string>
+    <string name="btn_send">Send</string>
+    <string name="btn_add">Add</string>
+
+    <string name="empty_list">No items</string>
+    <string name="empty_search">No results</string>
+
+    <string name="dialog_confirm_title">Confirmation</string>
+    <string name="dialog_confirm_delete">Delete this item?</string>
+
+    <string name="error_required">Required field</string>
+    <string name="error_unknown">An unexpected error occurred</string>
+
+    <string name="label_title">Title</string>
+    <string name="label_description">Description</string>
+    <string name="label_phone">Phone</string>
+    <string name="label_email">Email</string>
+    <string name="label_date">Date</string>
+    <string name="label_time">Time</string>
+
+    <string name="msg_saved">Saved successfully</string>
+    <string name="msg_deleted">Deleted successfully</string>
+
+
+    <!-- Common -->
+    <string name="common_back">Back</string>
+    <string name="common_save">Save</string>
+    <string name="common_delete">Delete</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_ok">OK</string>
+    <string name="common_send">Send</string>
+    <string name="common_undo">Undo</string>
+    <string name="common_redo">Redo</string>
+    <string name="common_show_more">Show more</string>
+    <string name="common_empty_list">No items yet.</string>
+    <string name="common_home">Home</string>
+
+    <!-- AgendaScreen -->
+    <string name="agenda_title">Planner</string>
+    <string name="agenda_stop_alarm">Stop alarm</string>
+    <string name="agenda_alarm_options">Alarm options</string>
+    <string name="agenda_empty">No tasks yet.</string>
+    <string name="agenda_cd_task_status">Status</string>
+    <string name="agenda_cd_alarm_active">Alarm active</string>
+
+    <!-- TareaFormScreen -->
+    <string name="task_title_bar">Task</string>
+    <string name="task_field_title">Title</string>
+    <string name="task_field_summary">Short summary</string>
+    <string name="task_field_date">Date</string>
+    <string name="task_field_time">Time</string>
+    <string name="task_field_long_desc">Detailed description</string>
+    <string name="task_completed">Completed</string>
+    <string name="task_enable_alarm">Enable alarm</string>
+
+    <!-- Delete dialog -->
+    <string name="task_confirm_delete_title">Are you sure?</string>
+    <string name="task_confirm_delete_text">The task will be permanently deleted.</string>
+
+    <!-- Toasters / validation -->
+    <string name="task_toast_title_required">Title is required</string>
+    <string name="task_toast_date_required">Date is required</string>
+    <string name="task_toast_time_required">Time is required</string>
+    <string name="task_toast_deleted">Task deleted</string>
+    <string name="task_toast_saved">Task saved</string>
+
+
+    <!-- CrearMovimientoScreen -->
+    <string name="mov_new_title">New movement</string>
+    <string name="mov_field_title">Title</string>
+    <string name="mov_field_description">Description</string>
+    <string name="mov_field_amount">Amount (€)</string>
+    <string name="mov_type_income">Income</string>
+    <string name="mov_type_expense">Expense</string>
+
+    <!-- EditarMovimientoScreen -->
+    <string name="mov_edit_title">Edit movement</string>
+    <string name="mov_field_description_full">Description / Client / Supplier</string>
+    <string name="mov_updated_toast">Movement updated</string>
+
+    <!-- MovimientosScreenContent -->
+    <string name="mov_add">Add movement</string>
+    <string name="mov_no_more">No more movements</string>
+    <string name="mov_empty">No movements yet.</string>
+    <string name="mov_summary">Summary</string>
+    <string name="mov_cd_back_to_menu">back to menu</string>
+    <string name="mov_import_csv">Import CSV</string>
+    <string name="mov_go_to_stats">go to statistics</string>
+    <string name="mov_incomes">Incomes</string>
+    <string name="mov_expenses">Expenses</string>
+    <string name="mov_balance">Balance</string>
+
+    <!-- NotasScreen -->
+    <string name="notes_title">Notes</string>
+    <string name="notes_empty">No notes yet</string>
+
+    <!-- NotaFormScreen -->
+    <string name="note_field_title">Title</string>
+    <string name="note_field_content">Content</string>
+    <string name="note_confirm_delete_title">Confirm deletion</string>
+
+    <!-- AjustesScreen -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_app_theme">App theme</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_font_size">Font size</string>
+    <string name="settings_faq">Frequently Asked Questions (FAQ)</string>
+    <string name="settings_guide">User guide</string>
+    <string name="settings_app_info">App information</string>
+    <string name="settings_reset_prefs">Reset preferences</string>
+    <string name="settings_reset_done">File preferences reset</string>
+    <string name="settings_banks">Banks (connect/disconnect)</string>
+    <string name="settings_banks_desc">Manage your bank connection</string>
+
+    <string name="settings_select_theme">Select theme</string>
+    <string name="settings_select_language">Select language</string>
+    <string name="settings_select_font_size">Select font size</string>
+    <string name="settings_info_title">Information</string>
+    <string name="settings_info_text">Version 1.0\nApp by David</string>
+
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_system">System</string>
+    <string name="lang_spanish">Spanish</string>
+    <string name="lang_english">English</string>
+    <string name="lang_french">French</string>
+    <string name="font_small">Small</string>
+    <string name="font_medium">Medium</string>
+    <string name="font_large">Large</string>
+
+    <!-- Login -->
+    <string name="login_welcome_title">Welcome to PymeTask</string>
+    <string name="login_welcome_subtitle">Manage your business simply and professionally</string>
+    <string name="auth_email">Email</string>
+    <string name="auth_password">Password</string>
+    <string name="login_sign_in">Sign in</string>
+    <string name="login_sign_in_google">Sign in with Google</string>
+    <string name="login_no_account">No account? </string>
+    <string name="auth_register">Register</string>
+    <string name="auth_fill_all">Fill in all fields</string>
+
+    <!-- Register -->
+    <string name="register_title">Create account</string>
+    <string name="register_subtitle">Complete the fields to sign up</string>
+    <string name="auth_full_name">Full name</string>
+    <string name="auth_confirm_password">Confirm password</string>
+    <string name="register_have_account">Already have an account? </string>
+    <string name="auth_sign_in">Sign in</string>
+
+    <!-- Others -->
+    <string name="contacts_title">Contacts</string>
+    <string name="contacts_add">Add contact</string>
+    <string name="contacts_edit">Edit contact</string>
+    <string name="files_title">Files</string>
+    <string name="files_create_folder">Create folder</string>
+    <string name="profile_title">Profile</string>
+    <string name="profile_edit">Edit profile</string>
+    <string name="dashboard_title">Dashboard</string>
+    <string name="stats_title">Statistics</string>
+
+
+
+
+
+    <plurals name="count_tasks">
+        <item quantity="one">%1$d task</item>
+        <item quantity="other">%1$d tasks</item>
+    </plurals>
+    <plurals name="count_notes">
+        <item quantity="one">%1$d note</item>
+        <item quantity="other">%1$d notes</item>
+    </plurals>
+    <plurals name="count_contacts">
+        <item quantity="one">%1$d contact</item>
+        <item quantity="other">%1$d contacts</item>
+    </plurals>
+
+</resources>

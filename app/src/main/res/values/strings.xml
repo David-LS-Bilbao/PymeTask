@@ -1,4 +1,233 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">PymeTask</string>
     <string name="default_web_client_id">753887109649-v0smvs1f2hmga24fbhmauouo9iplq8l4.apps.googleusercontent.com</string>
+
+    <!-- Ajustes -->
+    Ajustes
+    <string name="back">Volver</string>
+
+    <string name="settings_theme">Tema de la aplicación</string>
+
+    <!-- Opciones tema -->
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Oscuro</string>
+    <string name="theme_system">Por sistema</string>
+    <string name="select_theme">Seleccionar tema</string>
+
+    <!-- Opciones idioma -->
+    <string name="select_language">Seleccionar idioma</string>
+    <string name="lang_es">Español</string>
+    <string name="lang_en">Inglés</string>
+    <string name="lang_fr">Francés</string>
+    <string name="language_changed_to">Idioma cambiado a %1$s</string>
+
+    <!-- Fuente -->
+    <string name="select_font_size">Seleccionar tamaño de fuente</string>
+    <string name="font_small">Pequeño</string>
+    <string name="font_medium">Mediano</string>
+    <string name="font_large">Grande</string>
+
+    <!-- Info -->
+    <string name="info_title">Información</string>
+    <string name="info_text">Versión 1.0\nAplicación creada por David\n© 2025</string>
+    <string name="close">Cerrar</string>
+
+    <!-- Estados/Toasts demo -->
+    <string name="coming_soon_faq">Próximamente FAQ</string>
+    <string name="coming_soon_instructions">Próximamente Instrucciones</string>
+
+    <!-- Acciones genéricas -->
+    <string name="btn_save">Guardar</string>
+    <string name="btn_edit">Editar</string>
+    <string name="btn_delete">Eliminar</string>
+    <string name="btn_cancel">Cancelar</string>
+    <string name="btn_ok">Aceptar</string>
+    <string name="btn_back">Volver</string>
+    <string name="btn_share">Compartir</string>
+    <string name="btn_send">Enviar</string>
+    <string name="btn_add">Añadir</string>
+
+    <!-- Estados vacíos -->
+    <string name="empty_list">No hay elementos</string>
+    <string name="empty_search">Sin resultados</string>
+
+    <!-- Diálogos comunes -->
+    <string name="dialog_confirm_title">Confirmación</string>
+    <string name="dialog_confirm_delete">¿Eliminar este elemento?</string>
+
+    <!-- Errores y validaciones -->
+    <string name="error_required">Campo obligatorio</string>
+    <string name="error_unknown">Ha ocurrido un error inesperado</string>
+
+    <!-- Campos comunes -->
+    <string name="label_title">Título</string>
+    <string name="label_description">Descripción</string>
+    <string name="label_phone">Teléfono</string>
+    <string name="label_email">Email</string>
+    <string name="label_date">Fecha</string>
+    <string name="label_time">Hora</string>
+
+    <!-- Mensajes -->
+    <string name="msg_saved">Guardado correctamente</string>
+    <string name="msg_deleted">Eliminado correctamente</string>
+
+
+
+
+    <!-- ===== Comunes ===== -->
+    <string name="common_back">Volver</string>
+    <string name="common_save">Guardar</string>
+    <string name="common_delete">Eliminar</string>
+    <string name="common_cancel">Cancelar</string>
+    <string name="common_ok">Aceptar</string>
+    <string name="common_send">Enviar</string>
+    <string name="common_undo">Deshacer</string>
+    <string name="common_redo">Rehacer</string>
+    <string name="common_show_more">Mostrar más</string>
+    <string name="common_empty_list">No hay elementos aún.</string>
+    <string name="common_home">Inicio</string>
+
+    <!-- ===== AgendaScreen ===== -->
+    <string name="agenda_title">Agenda</string>
+    <string name="agenda_stop_alarm">Detener alarma</string>
+    <string name="agenda_alarm_options">Opciones Alarma</string>
+    <string name="agenda_empty">No hay tareas aún.</string>
+    <!-- Agenda / TareaCard -->
+    <string name="agenda_cd_task_status">Estado</string>
+    <string name="agenda_cd_alarm_active">Alarma activa</string>
+
+    <!-- TareaFormScreen -->
+    <string name="task_title_bar">Tarea</string>
+    <string name="task_field_title">Título</string>
+    <string name="task_field_summary">Resumen breve</string>
+    <string name="task_field_date">Fecha</string>
+    <string name="task_field_time">Hora</string>
+    <string name="task_field_long_desc">Descripción detallada</string>
+    <string name="task_completed">Completada</string>
+    <string name="task_enable_alarm">Activar alarma</string>
+
+    <!-- Diálogo borrar -->
+    <string name="task_confirm_delete_title">¿Estás seguro?</string>
+    <string name="task_confirm_delete_text">Se eliminará la tarea permanentemente.</string>
+
+    <!-- Toasters / validaciones -->
+    <string name="task_toast_title_required">Título obligatorio</string>
+    <string name="task_toast_date_required">Fecha obligatoria</string>
+    <string name="task_toast_time_required">Hora obligatoria</string>
+    <string name="task_toast_deleted">Tarea eliminada</string>
+    <string name="task_toast_saved">Tarea guardada</string>
+
+
+
+
+
+    <!-- ===== CrearMovimientoScreen ===== -->
+    <string name="mov_new_title">Nuevo movimiento</string>
+    <string name="mov_field_title">Título</string>
+    <string name="mov_field_description">Descripción</string>
+    <string name="mov_field_amount">Cantidad (€)</string>
+    <string name="mov_type_income">Ingreso</string>
+    <string name="mov_type_expense">Gasto</string>
+
+    <!-- ===== EditarMovimientoScreen ===== -->
+    <string name="mov_edit_title">Editar movimiento</string>
+    <string name="mov_field_description_full">Descripción / Cliente / Proveedor</string>
+    <string name="mov_updated_toast">Movimiento actualizado</string>
+
+    <!-- ===== MovimientosScreenContent ===== -->
+    <string name="mov_add">Añadir movimiento</string>
+    <string name="mov_no_more">No hay más movimientos</string>
+    <string name="mov_empty">No hay movimientos aún.</string>
+    <string name="mov_summary">Resumen</string>
+    <string name="mov_cd_back_to_menu">volver al menú</string>
+    <string name="mov_import_csv">Importar CSV</string>
+    <string name="mov_go_to_stats">ir a estadísticas</string>
+    <string name="mov_incomes">Ingresos</string>
+    <string name="mov_expenses">Gastos</string>
+    <string name="mov_balance">Saldo</string>
+
+    <!-- ===== NotasScreen ===== -->
+    <string name="notes_title">Notas</string>
+    <string name="notes_empty">No hay notas aún</string>
+
+    <!-- ===== NotaFormScreen ===== -->
+    <string name="note_field_title">Título</string>
+    <string name="note_field_content">Contenido</string>
+    <string name="note_confirm_delete_title">Confirmar eliminación</string>
+
+    <!-- ===== AjustesScreen ===== -->
+    <string name="settings_title">Ajustes</string>
+    <string name="settings_app_theme">Tema de la aplicación</string>
+    <string name="settings_language">Idioma</string>
+    <string name="settings_font_size">Tamaño de fuente</string>
+    <string name="settings_faq">Preguntas frecuentes (FAQ)</string>
+    <string name="settings_guide">Instrucciones de uso</string>
+    <string name="settings_app_info">Información de la app</string>
+    <string name="settings_reset_prefs">Restablecer Preferencias</string>
+    <string name="settings_reset_done">Preferencias de archivo restablecidas</string>
+    <!-- (Opcional, si algún día reactivas bancos) -->
+    <string name="settings_banks">Bancos (conectar/desconectar)</string>
+    <string name="settings_banks_desc">Gestiona la conexión con tu banco</string>
+
+    <string name="settings_select_theme">Seleccionar tema</string>
+    <string name="settings_select_language">Seleccionar idioma</string>
+    <string name="settings_select_font_size">Seleccionar tamaño de fuente</string>
+    <string name="settings_info_title">Información</string>
+    <string name="settings_info_text">Versión 1.0\nAplicación creada por David</string>
+
+    <!-- Listas -->
+
+    <string name="lang_spanish">Español</string>
+    <string name="lang_english">Inglés</string>
+    <string name="lang_french">Francés</string>
+
+
+    <!-- ===== LoginScreen ===== -->
+    <string name="login_welcome_title">Bienvenido a PymeTask</string>
+    <string name="login_welcome_subtitle">Gestiona tu negocio de forma simple y profesional</string>
+    <string name="auth_email">Correo electrónico</string>
+    <string name="auth_password">Contraseña</string>
+    <string name="login_sign_in">Iniciar sesión</string>
+    <string name="login_sign_in_google">Iniciar sesión con Google</string>
+    <string name="login_no_account">¿No tienes cuenta? </string>
+    <string name="auth_register">Registrarse</string>
+    <string name="auth_fill_all">Rellena todos los campos</string>
+
+    <!-- ===== RegisterScreen ===== -->
+    <string name="register_title">Crear cuenta</string>
+    <string name="register_subtitle">Completa los campos para registrarte</string>
+    <string name="auth_full_name">Nombre completo</string>
+    <string name="auth_confirm_password">Confirmar contraseña</string>
+    <string name="register_have_account">¿Ya tienes cuenta? </string>
+    <string name="auth_sign_in">Iniciar sesión</string>
+
+    <!-- ===== Otros módulos (base) ===== -->
+    <string name="contacts_title">Contactos</string>
+    <string name="contacts_add">Añadir contacto</string>
+    <string name="contacts_edit">Editar contacto</string>
+    <string name="files_title">Archivos</string>
+    <string name="files_create_folder">Crear carpeta</string>
+    <string name="profile_title">Perfil</string>
+    <string name="profile_edit">Editar perfil</string>
+    <string name="dashboard_title">Dashboard</string>
+    <string name="stats_title">Estadísticas</string>
+
+
+
+
+    <!-- Plurals de ejemplo (tareas, notas, contactos) -->
+    <plurals name="count_tasks">
+        <item quantity="one">%1$d tarea</item>
+        <item quantity="other">%1$d tareas</item>
+    </plurals>
+    <plurals name="count_notes">
+        <item quantity="one">%1$d nota</item>
+        <item quantity="other">%1$d notas</item>
+    </plurals>
+    <plurals name="count_contacts">
+        <item quantity="one">%1$d contacto</item>
+        <item quantity="other">%1$d contactos</item>
+    </plurals>
+
+
 </resources>

@@ -32,12 +32,6 @@ android {
         buildConfigField("String", "OAUTH_REDIRECT_URI", "\"pymetask://auth/callback\"")
         buildConfigField("String", "OAUTH_SCOPES", "\"accounts balance transactions offline_access\"")
 
-//        buildConfigField("String", "BANK_BASE_URL", "\"https://api.truelayer.com/\"")           // Data API
-//        buildConfigField("String", "OAUTH_BASE_URL", "\"https://auth.truelayer.com/\"")         // OAuth host (authorize & token)
-//        buildConfigField("String", "OAUTH_CLIENT_ID", "\"sandbox-pymetask-b17d46\"")
-//        buildConfigField("String", "OAUTH_CLIENT_SECRET", "\"19fa3e88-a8c4-45b9-b38b-7514be839b59\"")               // si el proveedor lo requiere
-//        buildConfigField("String", "OAUTH_REDIRECT_URI", "\"pymetask://auth/callback\"")        // debe coincidir con el manifest
-//        buildConfigField("String", "OAUTH_SCOPES", "\"accounts balance transactions offline_access\"")
 
 
       // testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -46,13 +40,7 @@ android {
     buildTypes {
 
         debug {
-            buildConfigField("String", "OAUTH_BASE_URL", "\"https://auth.truelayer-sandbox.com\"")
-            buildConfigField("String", "OAUTH_CLIENT_ID", "\"sandbox-pymetask-b17d46\"") // <- copia exacto de Console
-            buildConfigField("String", "OAUTH_REDIRECT_URI", "\"pymetask://auth/callback\"")
-            // Scopes mínimos para listar cuentas y transacciones; añade balance/offline_access si quieres refresh
-            buildConfigField("String", "OAUTH_SCOPES", "\"accounts transactions balance offline_access\"")
-            // (Opcional) Si tu OAuthApi necesita base explícita para token:
-            buildConfigField("String", "OAUTH_TOKEN_URL", "\"https://auth.truelayer-sandbox.com/connect/token\"")
+
         }
 
 
@@ -62,12 +50,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-
-            // Cuando pases a producción:
-            // OAUTH_BASE_URL = "https://auth.truelayer.com"
-            // OAUTH_CLIENT_ID = "live-xxxx"
-            // OAUTH_REDIRECT_URI igual que en Console Live
-            // OAUTH_TOKEN_URL = "https://auth.truelayer.com/connect/token"
 
         }
     }
@@ -112,6 +94,7 @@ dependencies {
     implementation(libs.material3)
     implementation(libs.androidx.foundation.layout)
     implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.appcompat)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -159,6 +142,8 @@ dependencies {
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.gson)
     implementation(libs.okhttp.logging)
+
+
 
 
     implementation(libs.security.crypto)

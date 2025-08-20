@@ -1,0 +1,207 @@
+<resources>
+    <string name="app_name">PymeTask</string>
+
+    <string name="back">Retour</string>
+
+    <string name="settings_theme">Thème de l’application</string>
+
+    <string name="select_theme">Sélectionner le thème</string>
+
+    <string name="select_language">Sélectionner la langue</string>
+    <string name="lang_es">Espagnol</string>
+    <string name="lang_en">Anglais</string>
+    <string name="lang_fr">Français</string>
+    <string name="language_changed_to">Langue changée en %1$s</string>
+
+    <string name="select_font_size">Sélectionner la taille de police</string>
+
+
+    <string name="info_title">Informations</string>
+    <string name="info_text">Version 1.0\nApplication créée par David\n© 2025</string>
+    <string name="close">Fermer</string>
+
+    <string name="coming_soon_faq">FAQ bientôt disponible</string>
+    <string name="coming_soon_instructions">Guide bientôt disponible</string>
+
+    <string name="btn_save">Enregistrer</string>
+    <string name="btn_edit">Modifier</string>
+    <string name="btn_delete">Supprimer</string>
+    <string name="btn_cancel">Annuler</string>
+    <string name="btn_ok">OK</string>
+    <string name="btn_back">Retour</string>
+    <string name="btn_share">Partager</string>
+    <string name="btn_send">Envoyer</string>
+    <string name="btn_add">Ajouter</string>
+
+    <string name="empty_list">Aucun élément</string>
+    <string name="empty_search">Aucun résultat</string>
+
+    <string name="dialog_confirm_title">Confirmation</string>
+    <string name="dialog_confirm_delete">Supprimer cet élément ?</string>
+
+    <string name="error_required">Champ obligatoire</string>
+    <string name="error_unknown">Une erreur inattendue s’est produite</string>
+
+    <string name="label_title">Titre</string>
+    <string name="label_description">Description</string>
+    <string name="label_phone">Téléphone</string>
+    <string name="label_email">Email</string>
+    <string name="label_date">Date</string>
+    <string name="label_time">Heure</string>
+
+    <string name="msg_saved">Enregistré avec succès</string>
+    <string name="msg_deleted">Supprimé avec succès</string>
+
+
+    <!-- Commun -->
+    <string name="common_back">Retour</string>
+    <string name="common_save">Enregistrer</string>
+    <string name="common_delete">Supprimer</string>
+    <string name="common_cancel">Annuler</string>
+    <string name="common_ok">OK</string>
+    <string name="common_send">Envoyer</string>
+    <string name="common_undo">Annuler</string>
+    <string name="common_redo">Rétablir</string>
+    <string name="common_show_more">Afficher plus</string>
+    <string name="common_empty_list">Aucun élément pour l’instant.</string>
+    <string name="common_home">Accueil</string>
+
+    <!-- AgendaScreen -->
+    <string name="agenda_title">Tâches</string>
+    <string name="agenda_stop_alarm">Arrêter l’alarme</string>
+    <string name="agenda_alarm_options">Options de l’alarme</string>
+    <string name="agenda_empty">Aucune tâche pour l’instant.</string>
+    <string name="agenda_cd_task_status">Statut</string>
+    <string name="agenda_cd_alarm_active">Alarme active</string>
+
+    <!-- TareaFormScreen -->
+    <string name="task_title_bar">Tâche</string>
+    <string name="task_field_title">Titre</string>
+    <string name="task_field_summary">Résumé bref</string>
+    <string name="task_field_date">Date</string>
+    <string name="task_field_time">Heure</string>
+    <string name="task_field_long_desc">Description détaillée</string>
+    <string name="task_completed">Terminée</string>
+    <string name="task_enable_alarm">Activer l’alarme</string>
+
+    <!-- Boîte de dialogue suppression -->
+    <string name="task_confirm_delete_title">Êtes-vous sûr ?</string>
+    <string name="task_confirm_delete_text">La tâche sera supprimée définitivement.</string>
+
+    <!-- Toasters / validation -->
+    <string name="task_toast_title_required">Le titre est obligatoire</string>
+    <string name="task_toast_date_required">La date est obligatoire</string>
+    <string name="task_toast_time_required">L’heure est obligatoire</string>
+    <string name="task_toast_deleted">Tâche supprimée</string>
+    <string name="task_toast_saved">Tâche enregistrée</string>
+
+
+    <!-- CrearMovimientoScreen -->
+    <string name="mov_new_title">Nouveau mouvement</string>
+    <string name="mov_field_title">Titre</string>
+    <string name="mov_field_description">Description</string>
+    <string name="mov_field_amount">Montant (€)</string>
+    <string name="mov_type_income">Revenu</string>
+    <string name="mov_type_expense">Dépense</string>
+
+    <!-- EditarMovimientoScreen -->
+    <string name="mov_edit_title">Modifier le mouvement</string>
+    <string name="mov_field_description_full">Description / Client / Fournisseur</string>
+    <string name="mov_updated_toast">Mouvement mis à jour</string>
+
+    <!-- MovimientosScreenContent -->
+    <string name="mov_add">Ajouter un mouvement</string>
+    <string name="mov_no_more">Plus de mouvements</string>
+    <string name="mov_empty">Aucun mouvement pour l’instant.</string>
+    <string name="mov_summary">Résumé</string>
+    <string name="mov_cd_back_to_menu">retour au menu</string>
+    <string name="mov_import_csv">Importer CSV</string>
+    <string name="mov_go_to_stats">aller aux statistiques</string>
+    <string name="mov_incomes">Revenus</string>
+    <string name="mov_expenses">Dépenses</string>
+    <string name="mov_balance">Solde</string>
+
+    <!-- NotasScreen -->
+    <string name="notes_title">Notes</string>
+    <string name="notes_empty">Aucune note pour l’instant</string>
+
+    <!-- NotaFormScreen -->
+    <string name="note_field_title">Titre</string>
+    <string name="note_field_content">Contenu</string>
+    <string name="note_confirm_delete_title">Confirmer la suppression</string>
+
+    <!-- AjustesScreen -->
+    <string name="settings_title">Paramètres</string>
+    <string name="settings_app_theme">Thème de l’application</string>
+    <string name="settings_language">Langue</string>
+    <string name="settings_font_size">Taille de police</string>
+    <string name="settings_faq">Foire aux questions (FAQ)</string>
+    <string name="settings_guide">Guide d’utilisation</string>
+    <string name="settings_app_info">Informations sur l’application</string>
+    <string name="settings_reset_prefs">Réinitialiser les préférences</string>
+    <string name="settings_reset_done">Préférences de fichier réinitialisées</string>
+    <string name="settings_banks">Banques (connexion/déconnexion)</string>
+    <string name="settings_banks_desc">Gérer la connexion bancaire</string>
+
+    <string name="settings_select_theme">Sélectionner le thème</string>
+    <string name="settings_select_language">Sélectionner la langue</string>
+    <string name="settings_select_font_size">Sélectionner la taille de police</string>
+    <string name="settings_info_title">Informations</string>
+    <string name="settings_info_text">Version 1.0\nApplication créée par David</string>
+
+    <string name="theme_light">Clair</string>
+    <string name="theme_dark">Sombre</string>
+    <string name="theme_system">Système</string>
+    <string name="lang_spanish">Espagnol</string>
+    <string name="lang_english">Anglais</string>
+    <string name="lang_french">Français</string>
+    <string name="font_small">Petite</string>
+    <string name="font_medium">Moyenne</string>
+    <string name="font_large">Grande</string>
+
+    <!-- Connexion / Inscription -->
+    <string name="login_welcome_title">Bienvenue sur PymeTask</string>
+    <string name="login_welcome_subtitle">Gérez votre activité simplement et professionnellement</string>
+    <string name="auth_email">Email</string>
+    <string name="auth_password">Mot de passe</string>
+    <string name="login_sign_in">Se connecter</string>
+    <string name="login_sign_in_google">Se connecter avec Google</string>
+    <string name="login_no_account">Pas de compte ? </string>
+    <string name="auth_register">S’inscrire</string>
+    <string name="auth_fill_all">Remplissez tous les champs</string>
+
+    <string name="register_title">Créer un compte</string>
+    <string name="register_subtitle">Complétez les champs pour vous inscrire</string>
+    <string name="auth_full_name">Nom complet</string>
+    <string name="auth_confirm_password">Confirmer le mot de passe</string>
+    <string name="register_have_account">Vous avez déjà un compte ? </string>
+    <string name="auth_sign_in">Se connecter</string>
+
+    <!-- Autres -->
+    <string name="contacts_title">Contacts</string>
+    <string name="contacts_add">Ajouter un contact</string>
+    <string name="contacts_edit">Modifier le contact</string>
+    <string name="files_title">Fichiers</string>
+    <string name="files_create_folder">Créer un dossier</string>
+    <string name="profile_title">Profil</string>
+    <string name="profile_edit">Modifier le profil</string>
+    <string name="dashboard_title">Tableau de bord</string>
+    <string name="stats_title">Statistiques</string>
+
+
+
+
+    <plurals name="count_tasks">
+        <item quantity="one">%1$d tâche</item>
+        <item quantity="other">%1$d tâches</item>
+    </plurals>
+    <plurals name="count_notes">
+        <item quantity="one">%1$d note</item>
+        <item quantity="other">%1$d notes</item>
+    </plurals>
+    <plurals name="count_contacts">
+        <item quantity="one">%1$d contact</item>
+        <item quantity="other">%1$d contacts</item>
+    </plurals>
+
+</resources>

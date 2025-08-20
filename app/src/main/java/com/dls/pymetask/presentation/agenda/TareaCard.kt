@@ -1,3 +1,4 @@
+
 package com.dls.pymetask.presentation.agenda
 
 import androidx.compose.animation.core.LinearEasing
@@ -35,22 +36,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource // <-- i18n en Compose
 import androidx.compose.ui.unit.dp
+import com.dls.pymetask.R
 import com.dls.pymetask.domain.model.Tarea
 import com.dls.pymetask.ui.theme.Poppins
 import com.dls.pymetask.utils.NotificationHelper
 import com.dls.pymetask.utils.formatAsDayMonth
 
+/**
+ * Card de una tarea en la Agenda.
+ * - isBlinking: si true, aplica una animación sutil de parpadeo al fondo.
+ * - tarea: datos de la tarea a mostrar.
+ * - onOpenTask: callback para navegar (ej: "tarea_form?taskId=$id").
+ */
 @Composable
 fun TareaCard(
-    isBlinking: Boolean,                 // ← controla si este item parpadea
+    isBlinking: Boolean,
     tarea: Tarea,
-    onOpenTask: (String) -> Unit, // lambda para navegar (ej: "tarea_form?taskId=$id")
+    onOpenTask: (String) -> Unit,
 ) {
     val context = LocalContext.current
 
-
-    // Animación infinita: alterna 0f ⇄ 1f cada 600 ms
+    // Animación infinita para el parpadeo del fondo
     val transition = rememberInfiniteTransition(label = "blink")
     val pulse by transition.animateFloat(
         initialValue = 0f,
@@ -66,8 +74,7 @@ fun TareaCard(
     val blinkA = Color.White
     val blinkB = Color(0xFFFFF59D) // Yellow 200 aprox.
 
-
-    // Si parpadea, interpolamos entre A y B; si no, usamos el color normal del card.
+    // Color del contenedor (con parpadeo opcional o surface por defecto).
     val containerColor = if (isBlinking) {
         lerp(blinkA, blinkB, pulse)
     } else {
@@ -77,28 +84,28 @@ fun TareaCard(
     Card(
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(containerColor = if (tarea.completado) Color(0xFFD0F0C0) else containerColor),
+        // Si la tarea está completada, fondo verde suave; si no, el calculado.
+        colors = CardDefaults.cardColors(
+            containerColor = if (tarea.completado) Color(0xFFD0F0C0) else containerColor
+        ),
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-
-                // 1) Parar el tono en reproducción (si lo hubiera)
+                // Al abrir: detiene cualquier alarma en curso y cierra notificación activa
                 NotificationHelper.stopAlarmSound()
-                // 2) Cerrar la notificación activa (id=1 en tu helper)
                 NotificationHelper.cancelActiveAlarmNotification(context)
-                // 3) Navegar al detalle/edición de la tarea
                 onOpenTask(tarea.id)
-                 }
+            }
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
 
-            // 🗓 Fecha y Hora
+            // 🗓 Fecha y Hora (texto de datos, no se localiza)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = tarea.fecha.formatAsDayMonth(),
+                    text = tarea.fecha.formatAsDayMonth(), // utiliza tu extensión (idealmente sensible al locale)
                     style = MaterialTheme.typography.labelSmall.copy(fontFamily = Poppins)
                 )
                 Text(
@@ -109,11 +116,11 @@ fun TareaCard(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // ✅ Título y estado
+            // ✅ Título y estado (icono con contentDescription localizado)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Default.Task,
-                    contentDescription = "Estado",
+                    contentDescription = stringResource(R.string.agenda_cd_task_status), // "Estado" / "Task status" / "Statut de la tâche"
                     tint = if (tarea.completado) Color(0xFF4CAF50) else Color.Gray
                 )
                 Spacer(Modifier.width(8.dp))
@@ -123,23 +130,26 @@ fun TareaCard(
                 )
             }
 
-            // 📝 Descripción
+            // 📝 Descripción (si la hay)
             if (tarea.descripcion.isNotBlank()) {
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(tarea.descripcion, style = MaterialTheme.typography.bodySmall)
+                Text(
+                    text = tarea.descripcion,
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // 🔔 Icono de alarma
+            // 🔔 Icono de alarma (solo si está activa) con contentDescription localizado
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ) {
                 if (tarea.activarAlarma) {
                     Icon(
-                        imageVector = Icons.Default.Alarm, // Puedes cambiar por otro como Icons.Default.Alarm
-                        contentDescription = "Alarma activa",
+                        imageVector = Icons.Default.Alarm,
+                        contentDescription = stringResource(R.string.agenda_cd_alarm_active), // "Alarma activa"
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
