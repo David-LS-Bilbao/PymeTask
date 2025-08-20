@@ -111,28 +111,10 @@ class AgendaViewModel @Inject constructor(
     }
 
 
-
-
-//    @RequiresApi(Build.VERSION_CODES.O)
-//    fun guardarTarea(tarea: Tarea) {
-//        viewModelScope.launch {
-//            val t = tarea.copy(userId = userId)
-//            tareaUseCases.addTarea(t, userId)
-//            if (t.activarAlarma) alarmUtils.programarAlarma(t)
-//            cargarTareas()
-//        }
-//    }
     fun limpiarTareaActual() {
         tareaActual = null
     }
 
-//    @RequiresApi(Build.VERSION_CODES.O)
-//    fun eliminarTareaPorId(id: String) {
-//        viewModelScope.launch {
-//            tareaUseCases.deleteTarea(id, userId)
-//            cargarTareas()
-//        }
-//    }
 
     fun actualizarFecha(nuevaFecha: String) {
         tareaActual = tareaActual?.copy(fecha = nuevaFecha)

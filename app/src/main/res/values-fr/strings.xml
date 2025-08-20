@@ -54,10 +54,7 @@
 
 
     <!-- Commun -->
-    <string name="common_back">Retour</string>
     <string name="common_save">Enregistrer</string>
-    <string name="common_delete">Supprimer</string>
-    <string name="common_cancel">Annuler</string>
     <string name="common_ok">OK</string>
     <string name="common_send">Envoyer</string>
     <string name="common_undo">Annuler</string>
@@ -65,6 +62,76 @@
     <string name="common_show_more">Afficher plus</string>
     <string name="common_empty_list">Aucun élément pour l’instant.</string>
     <string name="common_home">Accueil</string>
+
+    <!-- ArchivosScreen -->
+    <string name="files_title">Fichiers</string>
+    <string name="files_create_folder">Créer un dossier</string>
+    <string name="files_empty_title">📁 Pas encore de dossiers</string>
+    <string name="files_empty_hint">Appuyez sur le bouton ➕ pour créer un dossier.</string>
+    <string name="files_dialog_new_folder_title">Créer un nouveau dossier</string>
+    <string name="files_dialog_name_label">Nom du dossier</string>
+    <string name="common_create">Créer</string>
+
+    <!-- abrirArchivoLocal -->
+    <string name="files_toast_downloaded">Fichier téléchargé</string>
+    <string name="files_toast_opened">Fichier ouvert</string>
+    <string name="files_toast_download_error">Erreur lors du téléchargement du fichier</string>
+    <string name="files_toast_no_app">Aucune application pour ouvrir ce type de fichier</string>
+
+    <string name="files_error_loading_with_reason">Erreur lors du chargement des fichiers : %1$s</string>
+    <string name="files_folder_created">Dossier créé</string>
+    <string name="files_error_creating_with_reason">Erreur lors de la création du dossier : %1$s</string>
+
+    <string name="files_uploaded_success">Fichier téléversé</string>
+    <string name="files_error_uploading_with_reason">Erreur lors du téléversement : %1$s</string>
+    <string name="files_file_renamed">Fichier renommé</string>
+    <string name="files_error_renaming_with_reason">Erreur lors du renommage : %1$s</string>
+    <string name="files_folder_deleted">Dossier supprimé</string>
+    <string name="files_error_deleting_with_reason">Erreur lors de la suppression : %1$s</string>
+
+
+    <!-- ContenuDossierScreen -->
+    <string name="common_back">Retour</string>
+    <string name="common_cancel">Annuler</string>
+    <string name="common_delete">Supprimer</string>
+    <string name="common_rename">Renommer</string>
+    <string name="common_name">Nom</string>
+    <string name="common_options">Options</string>
+    <string name="common_send_whatsapp">Envoyer via WhatsApp</string>
+    <string name="common_send_email">Envoyer par e-mail</string>
+
+    <string name="files_upload_file">Téléverser un fichier</string>
+    <string name="files_menu_rename_folder">Renommer le dossier</string>
+    <string name="files_menu_delete_folder">Supprimer le dossier</string>
+
+    <string name="files_pick_image">Image 📷</string>
+    <string name="files_pick_audio">Audio 🎧</string>
+    <string name="files_pick_video">Vidéo 🎥</string>
+    <string name="files_pick_other">Autre fichier 📄</string>
+
+    <string name="files_folder_empty_title">📂 Ce dossier est vide</string>
+    <string name="files_folder_empty_hint">Appuyez sur le bouton + pour ajouter des fichiers.</string>
+
+    <string name="files_action_with_item">Que souhaitez-vous faire avec « %1$s » ?</string>
+    <string name="files_rename_file_title">Renommer le fichier</string>
+    <string name="files_rename_file_label">Nom</string>
+
+    <string name="files_delete_folder_title">Supprimer le dossier</string>
+    <string name="files_delete_folder_text">Êtes-vous sûr de vouloir supprimer ce dossier ? Les fichiers à l’intérieur ne seront pas supprimés.</string>
+
+    <string name="files_email_subject_from_app">Fichier depuis %1$s</string>
+
+
+    <string name="files_cd_menu">Menu</string>
+    <string name="files_cd_video">Vidéo</string>
+    <string name="files_cd_audio">Audio</string>
+    <string name="files_cd_folder">Dossier</string>
+    <string name="files_cd_file">Fichier</string>
+
+
+
+
+
 
     <!-- AgendaScreen -->
     <string name="agenda_title">Tâches</string>
@@ -181,8 +248,6 @@
     <string name="contacts_title">Contacts</string>
     <string name="contacts_add">Ajouter un contact</string>
     <string name="contacts_edit">Modifier le contact</string>
-    <string name="files_title">Fichiers</string>
-    <string name="files_create_folder">Créer un dossier</string>
     <string name="profile_title">Profil</string>
     <string name="profile_edit">Modifier le profil</string>
     <string name="dashboard_title">Tableau de bord</string>

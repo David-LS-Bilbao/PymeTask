@@ -118,6 +118,78 @@
     <string name="task_toast_saved">Tarea guardada</string>
 
 
+    <!-- ArchivosScreen -->
+    <string name="files_title">Archivos</string>
+    <string name="files_create_folder">Crear carpeta</string>
+    <string name="files_empty_title">📁 No hay carpetas aún</string>
+    <string name="files_empty_hint">Pulsa el botón ➕ para crear una carpeta.</string>
+    <string name="files_dialog_new_folder_title">Crear nueva carpeta</string>
+    <string name="files_dialog_name_label">Nombre de la carpeta</string>
+    <string name="common_create">Crear</string>
+
+    <!-- abrirArchivoLocal -->
+    <string name="files_toast_downloaded">Archivo descargado</string>
+    <string name="files_toast_opened">Archivo abierto</string>
+    <string name="files_toast_download_error">Error al descargar archivo</string>
+    <string name="files_toast_no_app">No hay app para abrir este tipo de archivo</string>
+
+    <string name="files_error_loading_with_reason">Error al cargar archivos: %1$s</string>
+    <string name="files_folder_created">Carpeta creada</string>
+    <string name="files_error_creating_with_reason">Error al crear carpeta: %1$s</string>
+
+
+    <string name="files_uploaded_success">Archivo añadido correctamente</string>
+    <string name="files_error_uploading_with_reason">Error al subir archivo: %1$s</string>
+    <string name="files_file_renamed">Archivo renombrado</string>
+    <string name="files_error_renaming_with_reason">Error al renombrar: %1$s</string>
+    <string name="files_folder_deleted">Carpeta eliminada</string>
+    <string name="files_error_deleting_with_reason">Error al eliminar: %1$s</string>
+
+
+    <!-- ArchivoCardExtendido (contentDescriptions + menú) -->
+    <string name="files_cd_menu">Menú</string>
+    <string name="files_cd_video">Vídeo</string>
+    <string name="files_cd_audio">Audio</string>
+    <string name="files_cd_folder">Carpeta</string>
+    <string name="files_cd_file">Archivo</string>
+
+
+
+
+
+
+
+
+    <!-- ContenidoCarpetaScreen -->
+
+    <string name="common_rename">Renombrar</string>
+    <string name="common_name">Nombre</string>
+    <string name="common_options">Opciones</string>
+    <string name="common_send_whatsapp">Enviar por WhatsApp</string>
+    <string name="common_send_email">Enviar por Email</string>
+
+    <string name="files_upload_file">Subir archivo</string>
+    <string name="files_menu_rename_folder">Renombrar carpeta</string>
+    <string name="files_menu_delete_folder">Eliminar carpeta</string>
+
+    <string name="files_pick_image">Imagen 📷</string>
+    <string name="files_pick_audio">Audio 🎧</string>
+    <string name="files_pick_video">Vídeo 🎥</string>
+    <string name="files_pick_other">Otro archivo 📄</string>
+
+    <string name="files_folder_empty_title">📂 Esta carpeta está vacía</string>
+    <string name="files_folder_empty_hint">Pulsa el botón + para añadir archivos.</string>
+
+    <string name="files_action_with_item">¿Qué deseas hacer con ‘%1$s’?</string>
+    <string name="files_rename_file_title">Renombrar archivo</string>
+    <string name="files_rename_file_label">Nombre</string>
+
+    <string name="files_delete_folder_title">Eliminar carpeta</string>
+    <string name="files_delete_folder_text">¿Seguro que deseas eliminar esta carpeta? Esto no borrará los archivos dentro.</string>
+
+    <string name="files_email_subject_from_app">Archivo desde %1$s</string>
+
+
 
 
 
@@ -205,13 +277,11 @@
     <string name="contacts_title">Contactos</string>
     <string name="contacts_add">Añadir contacto</string>
     <string name="contacts_edit">Editar contacto</string>
-    <string name="files_title">Archivos</string>
-    <string name="files_create_folder">Crear carpeta</string>
+
     <string name="profile_title">Perfil</string>
     <string name="profile_edit">Editar perfil</string>
     <string name="dashboard_title">Dashboard</string>
     <string name="stats_title">Estadísticas</string>
-    <string name="settings_instructions">instruciones de uso</string>
     <string name="settings_reset_mime">borrar preferencias</string>
 
 

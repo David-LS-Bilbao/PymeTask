@@ -7,12 +7,14 @@ import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dls.pymetask.R
 import com.dls.pymetask.data.mappers.toUiModel
 import com.dls.pymetask.domain.model.ArchivoUiModel
 import com.dls.pymetask.domain.useCase.archivo.ArchivoUseCase
+import com.dls.pymetask.presentation.commons.UiText
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
+import javax.inject.Inject // <-- usa javax para Hilt
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -20,25 +22,20 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-
-
 @HiltViewModel
 class ContenidoCarpetaViewModel @Inject constructor(
-
     private val archivoUseCase: ArchivoUseCase
 ) : ViewModel() {
 
     private val _archivos = MutableStateFlow<List<ArchivoUiModel>>(emptyList())
     val archivos: StateFlow<List<ArchivoUiModel>> = _archivos
 
-    private val _uiEvent = MutableSharedFlow<String>()
-    val uiEvent: SharedFlow<String> = _uiEvent
+    // Antes: SharedFlow<String>
+    private val _uiEvent = MutableSharedFlow<UiText>()
+    val uiEvent: SharedFlow<UiText> = _uiEvent
 
     private val _cargando = MutableStateFlow(true)
     val cargando: StateFlow<Boolean> = _cargando
-
-
-
 
     // Cargar archivos de una carpeta concreta
     fun cargarArchivosDeCarpeta(carpetaId: String) {
@@ -50,15 +47,15 @@ class ContenidoCarpetaViewModel @Inject constructor(
                 _archivos.value = lista
             } catch (e: Exception) {
                 Log.e("ContenidoCarpetaViewModel", "Error al cargar archivos: ${e.localizedMessage}")
-            }
-            finally {
+                val reason = e.localizedMessage ?: "—"
+                _uiEvent.emit(UiText.res(R.string.files_error_loading_with_reason, reason))
+            } finally {
                 _cargando.value = false
             }
         }
     }
 
     // Subir archivo dentro de una carpeta
-
     fun subirArchivo(
         context: Context,
         uri: Uri,
@@ -82,12 +79,14 @@ class ContenidoCarpetaViewModel @Inject constructor(
                 val archivo = archivoUseCase.subirArchivo(uri, nombreFinal).copy(carpetaId = carpetaId)
                 archivoUseCase.guardarArchivo(archivo)
                 cargarArchivosDeCarpeta(carpetaId)
+
                 Log.d("Archivos", "Archivo guardado en Firestore: ${archivo.nombre}")
-                _uiEvent.emit("Archivo añadido correctamente")
+                _uiEvent.emit(UiText.res(R.string.files_uploaded_success))
             } catch (e: Exception) {
                 Log.e("Archivos", "Error al subir o guardar archivo: ${e.localizedMessage}")
-                _uiEvent.emit("Error al subir archivo")
-            }finally {
+                val reason = e.localizedMessage ?: "—"
+                _uiEvent.emit(UiText.res(R.string.files_error_uploading_with_reason, reason))
+            } finally {
                 onFinalizado()
             }
         }
@@ -116,16 +115,16 @@ class ContenidoCarpetaViewModel @Inject constructor(
         }
     }
 
-    // Renombrar la carpeta actual
+    // Renombrar archivo (el nombre del método es correcto; el comentario anterior decía "carpeta")
     fun renombrarArchivo(id: String, nuevoNombre: String, carpetaId: String) {
         viewModelScope.launch {
             try {
                 archivoUseCase.renombrarArchivo(id, nuevoNombre)
-                cargarArchivosDeCarpeta(carpetaId) // 🔁 recarga tras renombrar
-
-                _uiEvent.emit("Carpeta renombrada")
+                cargarArchivosDeCarpeta(carpetaId)
+                _uiEvent.emit(UiText.res(R.string.files_file_renamed))
             } catch (e: Exception) {
-                _uiEvent.emit("Error al renombrar: ${e.localizedMessage}")
+                val reason = e.localizedMessage ?: "—"
+                _uiEvent.emit(UiText.res(R.string.files_error_renaming_with_reason, reason))
             }
         }
     }
@@ -134,15 +133,13 @@ class ContenidoCarpetaViewModel @Inject constructor(
     fun eliminarCarpeta(id: String) {
         viewModelScope.launch {
             try {
-                archivoUseCase.eliminarArchivosPorCarpeta(id)       // eliminar hijos
+                archivoUseCase.eliminarArchivosPorCarpeta(id) // eliminar hijos
                 archivoUseCase.eliminarArchivo(id)
-                _uiEvent.emit("Carpeta eliminada")
+                _uiEvent.emit(UiText.res(R.string.files_folder_deleted))
             } catch (e: Exception) {
-                _uiEvent.emit("Error al eliminar: ${e.localizedMessage}")
+                val reason = e.localizedMessage ?: "—"
+                _uiEvent.emit(UiText.res(R.string.files_error_deleting_with_reason, reason))
             }
         }
     }
 }
-
-
-

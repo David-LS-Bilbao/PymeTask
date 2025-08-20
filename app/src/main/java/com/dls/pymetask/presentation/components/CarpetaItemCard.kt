@@ -52,7 +52,6 @@ fun CarpetaItemCard(
                 Text(
                     text = archivo.nombre.take(20),//
                     maxLines = 1,
-
                     style = MaterialTheme.typography.titleMedium
                 )
             }
