@@ -13,7 +13,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -29,6 +31,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.dls.pymetask.domain.model.Contacto
 import java.util.*
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditarContactoScreen(
@@ -37,16 +40,91 @@ fun EditarContactoScreen(
     viewModel: ContactoViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    val contacto = viewModel.contactos.find { it.id == contactoId } ?: return
-
-    var nombre by remember { mutableStateOf(contacto.nombre) }
-    var telefono by remember { mutableStateOf(contacto.telefono) }
-    var direccion by remember { mutableStateOf(contacto.direccion) }
-    var email by remember { mutableStateOf(contacto.email) }
-    var tipo by remember { mutableStateOf(contacto.tipo) }
-    var fotoUrl by remember { mutableStateOf(contacto.fotoUrl) }
     val isUploading by viewModel.isUploading
 
+    // 1) Cargar contactos al entrar (snapshot listener a Firestore)
+    LaunchedEffect(Unit) {
+        viewModel.getContactos(context)
+    }
+
+    // 2) Mientras no haya contactos, muestra un loader (evita pantalla en blanco)
+    val contactos = viewModel.contactos
+    if (contactos.isEmpty()) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Editar contacto") },
+                    navigationIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                        }
+                    }
+                )
+            }
+        ) { padding ->
+            Box(
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+        return
+    }
+
+    // 3) Ya con datos, busca el contacto (SIN return temprano)
+    val contacto = contactos.find { it.id == contactoId }
+
+    // 4) Controla el caso "no encontrado"
+    if (contacto == null) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Editar contacto") },
+                    navigationIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                        }
+                    }
+                )
+            }
+        ) { padding ->
+            Box(
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("Contacto no encontrado")
+            }
+        }
+        return
+    }
+
+    // 5) Estados de UI: se inicializan UNA vez cuando llega el contacto
+    var nombre by remember { mutableStateOf("") }
+    var telefono by remember { mutableStateOf("") }
+    var direccion by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var tipo by remember { mutableStateOf("") }
+    var fotoUrl by remember { mutableStateOf<String?>(null) }
+    var inicializado by remember(contactoId) { mutableStateOf(false) }
+
+    LaunchedEffect(contacto) {
+        if (!inicializado) {
+            nombre = contacto.nombre
+            telefono = contacto.telefono
+            direccion = contacto.direccion
+            email = contacto.email
+            tipo = contacto.tipo
+            fotoUrl = contacto.fotoUrl
+            inicializado = true
+        }
+    }
+
+    // 6) Picker de galería (mantienes tu lógica de subirImagen)
     val galeriaLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -57,93 +135,261 @@ fun EditarContactoScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-
-        Box(
+    // 7) UI
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Editar contacto") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                    }
+                }
+            )
+        }
+    ) { padding ->
+        Column(
             modifier = Modifier
-                .size(120.dp)
-                .clip(CircleShape)
-                .background(Color.Gray)
-                .clickable { galeriaLauncher.launch("image/*") },
-            contentAlignment = Alignment.Center
+                .padding(padding)
+                .padding(16.dp)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (!fotoUrl.isNullOrBlank()) {
-                Image(
-                    painter = rememberAsyncImagePainter(fotoUrl),
-                    contentDescription = "Foto",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
-            } else {
-                Icon(Icons.Default.AddAPhoto, contentDescription = "Añadir foto")
+
+            Box(
+                modifier = Modifier
+                    .size(120.dp)
+                    .clip(CircleShape)
+                    .background(Color.Gray)
+                    .clickable { galeriaLauncher.launch("image/*") },
+                contentAlignment = Alignment.Center
+            ) {
+                if (!fotoUrl.isNullOrBlank()) {
+                    Image(
+                        painter = rememberAsyncImagePainter(fotoUrl),
+                        contentDescription = "Foto",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    Icon(Icons.Default.AddAPhoto, contentDescription = "Añadir foto")
+                }
             }
-        }
 
-        OutlinedTextField(
-            value = nombre,
-            onValueChange = { nombre = it },
-            label = { Text("Nombre") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        OutlinedTextField(
-            value = telefono,
-            onValueChange = { telefono = it },
-            label = { Text("Teléfono") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        OutlinedTextField(
-            value = direccion,
-            onValueChange = { direccion = it },
-            label = { Text("Dirección") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            RadioButton(
-                selected = tipo == "Cliente",
-                onClick = { tipo = "Cliente" }
+            OutlinedTextField(
+                value = nombre,
+                onValueChange = { nombre = it },
+                label = { Text("Nombre") },
+                modifier = Modifier.fillMaxWidth()
             )
-            Text("Cliente")
-            RadioButton(
-                selected = tipo == "Proveedor",
-                onClick = { tipo = "Proveedor" }
+            OutlinedTextField(
+                value = telefono,
+                onValueChange = { telefono = it },
+                label = { Text("Teléfono") },
+                modifier = Modifier.fillMaxWidth()
             )
-            Text("Proveedor")
-        }
+            OutlinedTextField(
+                value = direccion,
+                onValueChange = { direccion = it },
+                label = { Text("Dirección") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("Email") },
+                modifier = Modifier.fillMaxWidth()
+            )
 
-        Button(
-            onClick = {
-                val contactoActualizado = contacto.copy(
-                    nombre = nombre,
-                    telefono = telefono,
-                    direccion = direccion,
-                    email = email,
-                    tipo = tipo,
-                    fotoUrl = fotoUrl
-                )
-                viewModel.onUpdateContacto(context, contactoActualizado)
-                Toast.makeText(context, "Contacto actualizado", Toast.LENGTH_SHORT).show()
-                navController.popBackStack()
-            },
-            enabled = nombre.isNotBlank() && telefono.isNotBlank() && !isUploading,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Guardar cambios")
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                RadioButton(selected = tipo == "Cliente", onClick = { tipo = "Cliente" })
+                Text("Cliente")
+                RadioButton(selected = tipo == "Proveedor", onClick = { tipo = "Proveedor" })
+                Text("Proveedor")
+            }
+
+            Button(
+                onClick = {
+                    val contactoActualizado = contacto.copy(
+                        nombre = nombre,
+                        telefono = telefono,
+                        direccion = direccion,
+                        email = email,
+                        tipo = tipo,
+                        fotoUrl = fotoUrl
+                    )
+                    viewModel.onUpdateContacto(context, contactoActualizado)
+                    Toast.makeText(context, "Contacto actualizado", Toast.LENGTH_SHORT).show()
+                    navController.popBackStack()
+                },
+                enabled = nombre.isNotBlank() && telefono.isNotBlank() && !isUploading,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Guardar cambios")
+            }
         }
     }
 }
+
+
+
+
+
+
+
+
+
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun EditarContactoScreen(
+//    navController: NavController,
+//    contactoId: String,
+//    viewModel: ContactoViewModel = hiltViewModel()
+//) {
+//    val context = LocalContext.current
+//    val contacto = viewModel.contactos.find { it.id == contactoId }
+//
+//    var nombre by remember { mutableStateOf(contacto.nombre) }
+//    var telefono by remember { mutableStateOf(contacto.telefono) }
+//    var direccion by remember { mutableStateOf(contacto.direccion) }
+//    var email by remember { mutableStateOf(contacto.email) }
+//    var tipo by remember { mutableStateOf(contacto.tipo) }
+//    var fotoUrl by remember { mutableStateOf(contacto.fotoUrl) }
+//    val isUploading by viewModel.isUploading
+//
+//    val galeriaLauncher = rememberLauncherForActivityResult(
+//        contract = ActivityResultContracts.GetContent()
+//    ) { uri: Uri? ->
+//        uri?.let {
+//            viewModel.subirImagen(context, it, contacto.id) { url ->
+//                fotoUrl = url
+//            }
+//        }
+//    }
+//
+//
+//
+//
+//    // 1) Cargar contactos al entrar (snapshot listener)
+//    LaunchedEffect(Unit) {
+//        viewModel.getContactos(context)
+//    }
+//
+//    // 2) Mientras no haya contactos, muestra un loader (evita el return prematuro)
+//    val contactos = viewModel.contactos
+//    if (contactos.isEmpty()) {
+//        Scaffold(
+//            topBar = {
+//                TopAppBar(
+//                    title = { Text("Editar contacto") },
+//                    navigationIcon = {
+//                        IconButton(onClick = { navController.popBackStack() }) {
+//                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+//                        }
+//                    }
+//                )
+//            }
+//        ) { padding ->
+//            Box(
+//                modifier = Modifier
+//                    .padding(padding)
+//                    .fillMaxSize(),
+//                contentAlignment = Alignment.Center
+//            ) { CircularProgressIndicator() }
+//        }
+//        return
+//    }
+//
+//
+//
+//    Column(
+//        modifier = Modifier
+//            .padding(16.dp)
+//            .fillMaxSize(),
+//        verticalArrangement = Arrangement.spacedBy(12.dp),
+//        horizontalAlignment = Alignment.CenterHorizontally
+//    ) {
+//
+//        Box(
+//            modifier = Modifier
+//                .size(120.dp)
+//                .clip(CircleShape)
+//                .background(Color.Gray)
+//                .clickable { galeriaLauncher.launch("image/*") },
+//            contentAlignment = Alignment.Center
+//        ) {
+//            if (!fotoUrl.isNullOrBlank()) {
+//                Image(
+//                    painter = rememberAsyncImagePainter(fotoUrl),
+//                    contentDescription = "Foto",
+//                    contentScale = ContentScale.Crop,
+//                    modifier = Modifier.fillMaxSize()
+//                )
+//            } else {
+//                Icon(Icons.Default.AddAPhoto, contentDescription = "Añadir foto")
+//            }
+//        }
+//
+//        OutlinedTextField(
+//            value = nombre,
+//            onValueChange = { nombre = it },
+//            label = { Text("Nombre") },
+//            modifier = Modifier.fillMaxWidth()
+//        )
+//        OutlinedTextField(
+//            value = telefono,
+//            onValueChange = { telefono = it },
+//            label = { Text("Teléfono") },
+//            modifier = Modifier.fillMaxWidth()
+//        )
+//        OutlinedTextField(
+//            value = direccion,
+//            onValueChange = { direccion = it },
+//            label = { Text("Dirección") },
+//            modifier = Modifier.fillMaxWidth()
+//        )
+//        OutlinedTextField(
+//            value = email,
+//            onValueChange = { email = it },
+//            label = { Text("Email") },
+//            modifier = Modifier.fillMaxWidth()
+//        )
+//
+//        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+//            RadioButton(
+//                selected = tipo == "Cliente",
+//                onClick = { tipo = "Cliente" }
+//            )
+//            Text("Cliente")
+//            RadioButton(
+//                selected = tipo == "Proveedor",
+//                onClick = { tipo = "Proveedor" }
+//            )
+//            Text("Proveedor")
+//        }
+//
+//        Button(
+//            onClick = {
+//                val contactoActualizado = contacto.copy(
+//                    nombre = nombre,
+//                    telefono = telefono,
+//                    direccion = direccion,
+//                    email = email,
+//                    tipo = tipo,
+//                    fotoUrl = fotoUrl
+//                )
+//                viewModel.onUpdateContacto(context, contactoActualizado)
+//                Toast.makeText(context, "Contacto actualizado", Toast.LENGTH_SHORT).show()
+//                navController.popBackStack()
+//            },
+//            enabled = nombre.isNotBlank() && telefono.isNotBlank() && !isUploading,
+//            modifier = Modifier.fillMaxWidth()
+//        ) {
+//            Text("Guardar cambios")
+//        }
+//    }
+//}
 
 
 

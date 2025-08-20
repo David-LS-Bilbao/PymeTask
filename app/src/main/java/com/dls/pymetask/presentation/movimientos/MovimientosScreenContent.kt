@@ -59,7 +59,6 @@ private enum class FiltroTipo { TODOS, INGRESOS, GASTOS }
 @Composable
 fun MovimientosScreen(
     navController: NavController,
-//    oauthManager: OAuthManager? = null,                 // <-- se inyecta arriba y se pasa por callback
     viewModel: MovimientosViewModel = hiltViewModel()
 ) {
     // Estado de sync del VM (mutableStateOf en el VM)
@@ -106,9 +105,7 @@ fun MovimientosScreen(
         movimientos = movimientosUi,
         onAddClick = { navController.navigate("crear_movimiento") },
         onItemClick = { ui -> navController.navigate("editar_movimiento/${ui.id}") },
-//        onSyncBanco = { viewModel.syncBancoMes(year = year, month0 = month0) },
-//        onConectarBanco = { activity?.let { oauthManager?.startAuth(it) } },
-        onImportCsv = { picker.launch(arrayOf("text/*", "text/csv", "application/vnd.ms-excel")) },
+         onImportCsv = { picker.launch(arrayOf("text/*", "text/csv", "application/vnd.ms-excel")) },
         syncing = syncing,
         lastSyncMessage = lastMsg,
                 // 👇 NUEVO: secciones mensuales y control de paginación
@@ -117,9 +114,6 @@ fun MovimientosScreen(
         onMostrarMas = { viewModel.loadNextMonth(userId) },
 
     )
-
-    // (Opcional) Indicador global si quieres fijo en la pantalla
-    // if (syncing) { /* ... */ }
 }
 
 
@@ -182,8 +176,6 @@ fun MovimientosScreenContent(
                     ingresos = iTotal,
                     gastos = gTotal,
                     saldo = saldoTotal,
-//                    onConectarBanco = onConectarBanco,          // <-- PASAMOS el callback
-//                    onSyncBanco = onSyncBanco,
                     syncing = syncing,
                     onImportCsv = onImportCsv
                 )
@@ -372,7 +364,6 @@ private fun filtrarMovimientos(
             .thenByDescending { it.id }
     )
 }
-
 @Composable
 private fun SaldoStickyHeader(
     navController: NavController,
@@ -387,8 +378,6 @@ private fun SaldoStickyHeader(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-
-
 
         ) {
             Row(verticalAlignment = Alignment.CenterVertically,
