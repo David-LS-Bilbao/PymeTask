@@ -211,8 +211,8 @@
     <string name="profile_edit">Editar perfil</string>
     <string name="dashboard_title">Dashboard</string>
     <string name="stats_title">Estadísticas</string>
-
-
+    <string name="settings_instructions">instruciones de uso</string>
+    <string name="settings_reset_mime">borrar preferencias</string>
 
 
     <!-- Plurals de ejemplo (tareas, notas, contactos) -->

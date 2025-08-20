@@ -187,8 +187,7 @@
     <string name="profile_edit">Modifier le profil</string>
     <string name="dashboard_title">Tableau de bord</string>
     <string name="stats_title">Statistiques</string>
-
-
+    <string name="settings_reset_mime">borrar preferencias</string>
 
 
     <plurals name="count_tasks">

@@ -189,9 +189,7 @@
     <string name="profile_edit">Edit profile</string>
     <string name="dashboard_title">Dashboard</string>
     <string name="stats_title">Statistics</string>
-
-
-
+    <string name="settings_reset_mime">borrar preferencias</string>
 
 
     <plurals name="count_tasks">

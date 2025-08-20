@@ -1,6 +1,8 @@
 package com.dls.pymetask.presentation.ajustes
 
+import android.os.Build
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -12,11 +14,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.os.LocaleListCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.dls.pymetask.R
 import com.dls.pymetask.data.preferences.DefaultAppPreferences
 import com.dls.pymetask.data.preferences.ThemeMode
+import com.dls.pymetask.utils.LocaleManager
 import com.dls.pymetask.utils.applyAppLanguage
 
 
@@ -117,40 +121,40 @@ fun AjustesScreen(
             }
         )
 
-//        ListItem(
-//            headlineContent = { Text(stringResource(R.string.settings_instructions)) },
-//            modifier = Modifier.fillMaxWidth().clickable {
-//                Toast.makeText(context, (R.string.coming_soon_instructions), Toast.LENGTH_SHORT)
-//                    .show()
-//            }
-//        )
+        ListItem(
+            headlineContent = { Text(stringResource(R.string.settings_guide)) },
+            modifier = Modifier.fillMaxWidth().clickable {
+                Toast.makeText(context, (R.string.coming_soon_instructions), Toast.LENGTH_SHORT)
+                    .show()
+            }
+        )
 
         ListItem(
             headlineContent = { Text(stringResource(R.string.settings_app_info)) },
             modifier = Modifier.fillMaxWidth().clickable { showInfoDialog = true }
         )
 
-//        ListItem(
-//            headlineContent = { Text(stringResource(R.string.settings_reset_mime)) },
-//            supportingContent = { Text("__") },
-//            leadingContent = {
-//                Icon(
-//                    Icons.Default.Delete,
-//                    contentDescription = null,
-//                    tint = MaterialTheme.colorScheme.primary
-//                )
-//            },
-//            modifier = Modifier.fillMaxWidth().clickable {
-//                val prefs = DefaultAppPreferences(context)
-//                prefs.obtenerTodas().forEach { (mime, _) ->
-//                    if (mime.contains("*") || mime.contains("octet-stream")) {
-//                        prefs.eliminarApp(mime)
-//                    }
-//                }
-//                Toast.makeText(context, (R.string.settings_reset_done), Toast.LENGTH_SHORT).show()
-//
-//            }
-//        )
+        ListItem(
+            headlineContent = { Text(stringResource(R.string.settings_reset_prefs)) },
+            supportingContent = { Text("__") },
+            leadingContent = {
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
+            modifier = Modifier.fillMaxWidth().clickable {
+                val prefs = DefaultAppPreferences(context)
+                prefs.obtenerTodas().forEach { (mime, _) ->
+                    if (mime.contains("*") || mime.contains("octet-stream")) {
+                        prefs.eliminarApp(mime)
+                    }
+                }
+                Toast.makeText(context, (R.string.settings_reset_done), Toast.LENGTH_SHORT).show()
+
+            }
+        )
 
 
         // ===================== DIÁLOGOS =====================
@@ -169,17 +173,30 @@ fun AjustesScreen(
             )
         }
 
-        // Diálogo selección de Idioma
+// Diálogo selección de Idioma
         if (showLanguageDialog) {
             OpcionesDialog(
-                titulo = stringResource(R.string.select_language),
+                // ⚠️ usa la clave que tengas en strings: settings_select_language
+                titulo = stringResource(R.string.settings_select_language),
                 opciones = idiomasVisibles,
                 seleccionada = idiomasCodigos.indexOf(languageCode).coerceAtLeast(0),
                 onSeleccionar = { index ->
-                    val code = listOf("es","en","fr")[index]
-                    languageViewModel.setLanguage(code)                  // 1) Persistir en DataStore
-                    applyAppLanguage(context, code) // 2) Aplicar (13+ o compat)
-                    activity?.recreate()                                  // 3) Re-crear para recomponer strings
+                    val code = idiomasCodigos.getOrElse(index) { "es" }
+
+                    // 1) Persistir en DataStore
+                    languageViewModel.setLanguage(code)
+
+                    // 2) Aplicar inmediatamente:
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        // Android 13+: AppCompat fuerza la recreación automáticamente
+                        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(code))
+                    } else {
+                        // Android 12 o menos: aplicamos el locale y recreamos la Activity visible
+                        LocaleManager.setLocale(context, code)
+                        activity?.recreate()
+                    }
+
+                    // 3) Cerrar diálogo
                     showLanguageDialog = false
                 },
                 onCerrar = { showLanguageDialog = false }
