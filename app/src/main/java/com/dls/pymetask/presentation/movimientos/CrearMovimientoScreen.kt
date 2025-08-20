@@ -70,7 +70,7 @@ fun CrearMovimientoScreen(
 
     // 👉 Mostrar DatePickerDialog al pulsar el botón
     val context = LocalContext.current
-    val datePickerDialog = remember {
+    remember {
         android.app.DatePickerDialog(
             context,
             { _, year, month, dayOfMonth ->

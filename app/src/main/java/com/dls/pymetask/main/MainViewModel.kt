@@ -28,7 +28,6 @@ class MainViewModel @Inject constructor(
 
         Log.d("AuthCheck", "UID: ${user?.uid}, Email: ${user?.email}, Marcada=$marcada")
 
-       // _isUserLoggedIn.value = (user != null || marcada)
 
         // nueva funcion para mantener login en firebase con dispositivos nuevos
         if (user != null || marcada) {
@@ -37,9 +36,5 @@ class MainViewModel @Inject constructor(
             _isUserLoggedIn.value = false
         }
     }
-
-
-
-
 
 }

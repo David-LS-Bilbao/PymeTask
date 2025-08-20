@@ -36,7 +36,6 @@ import com.dls.pymetask.presentation.notas.NotaFormScreen
 import com.dls.pymetask.presentation.notas.NotasScreen
 import com.dls.pymetask.presentation.perfil.EditarPerfilScreen
 import com.dls.pymetask.presentation.perfil.PerfilUserScreen
-import com.dls.pymetask.presentation.settings.BancosSettingsScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -83,8 +82,7 @@ fun PymeNavGraph(
         }
         composable("movimientos") {
             MovimientosScreen(
-                navController = navController,
-                oauthManager = oauthManager
+                navController = navController
             )
         }
         composable("crear_movimiento") {
@@ -178,9 +176,9 @@ fun PymeNavGraph(
             ContenidoCarpetaScreen(carpetaId = carpetaId, navController = navController)
         }
 
-        composable("ajustes_bancos") {
-            BancosSettingsScreen(oauthManager = oauthManager)
-        }
+//        composable("ajustes_bancos") {
+//            BancosSettingsScreen(oauthManager = oauthManager)
+//        }
 
 
     }// NavHost--------------------------------------------------------------------------------------

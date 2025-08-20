@@ -55,7 +55,7 @@ fun EditarMovimientoScreen(
     var cantidad by remember { mutableStateOf(movimiento?.cantidad?.let { "%.2f".format(it) }.orEmpty()) }
     var tipoIngreso by remember { mutableStateOf(movimiento?.ingreso ?: true) }
     var cantidadFocus by remember { mutableStateOf(false) }
-    var (fechaSeleccionada, setFechaSeleccionada) = remember { mutableStateOf(movimiento?.fecha?.let { java.util.Date(it) }) }
+    var (fechaSeleccionada, _) = remember { mutableStateOf(movimiento?.fecha?.let { java.util.Date(it) }) }
 
     fun guardarMovimientoYVolver() {
         val nuevaCantidad = cantidad.replace(",", ".").toDoubleOrNull() ?: movimiento?.cantidad ?: 0.0
@@ -142,7 +142,7 @@ fun EditarMovimientoScreen(
                 label = { Text("Cantidad (€)") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .onFocusChanged {
+                    .onFocusChanged { it ->
                         cantidadFocus = it.isFocused
                         if (!cantidadFocus) {
                             cantidad = cantidad.replace(",", ".").toDoubleOrNull()?.let {

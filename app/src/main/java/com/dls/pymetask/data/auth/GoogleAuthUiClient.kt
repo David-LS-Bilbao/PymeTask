@@ -71,7 +71,6 @@ class GoogleAuthUiClient(
     }
 
 }
-
 data class SignInResult(
     val user: FirebaseUser? = null,
     val errorMessage: String? = null,

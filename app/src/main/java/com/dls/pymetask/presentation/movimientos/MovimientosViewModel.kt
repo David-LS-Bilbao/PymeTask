@@ -10,49 +10,31 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dls.pymetask.data.local.AccountPrefs
 import com.dls.pymetask.domain.model.Movimiento
-import com.dls.pymetask.domain.repository.BankRepository
 import com.dls.pymetask.domain.repository.MovimientoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.io.BufferedReader
-import java.io.InputStreamReader
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
-import java.util.UUID
 import javax.inject.Inject
-import kotlin.math.abs
 
 @SuppressLint("AutoboxingStateCreation")
 @RequiresApi(Build.VERSION_CODES.O)
 @HiltViewModel
 class MovimientosViewModel @Inject constructor(
     private val repository: MovimientoRepository,
-    private val bankRepository: BankRepository, // <-- inyecta
-    private val prefs: AccountPrefs
-
 
 ) : ViewModel() {
-
-    private val _selectedMonth = MutableStateFlow(LocalDate.now().monthValue)
-    val selectedMonth: StateFlow<Int> = _selectedMonth.asStateFlow()
-    private val _selectedYear = MutableStateFlow(LocalDate.now().year)
-    val selectedYear: StateFlow<Int> = _selectedYear.asStateFlow()
 
     // Flujo con todos los movimientos del usuario (todos los meses)
     private val _movimientos = MutableStateFlow<List<Movimiento>>(emptyList())
     val movimientos: StateFlow<List<Movimiento>> = _movimientos.asStateFlow()
-    private val _tipoSeleccionado = MutableStateFlow("Todos") // "Ingresos", "Gastos" o "Todos"
-    val tipoSeleccionado: StateFlow<String> = _tipoSeleccionado.asStateFlow()
-    fun setTipo(tipo: String) {
-        _tipoSeleccionado.value = tipo
-    }
 
     // Estado de sincronización para la UI
     var syncing by mutableStateOf(false)
@@ -60,48 +42,6 @@ class MovimientosViewModel @Inject constructor(
     var lastSyncResult by mutableStateOf<String?>(null)
         private set
 
-
-    val selectedAccountId = prefs.selectedAccountId()
-        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
-
-
-    /**
-     * Sincroniza un MES concreto de una cuenta bancaria:
-     * - accountId viene del proveedor (temporalmente, introduce un hardcode para probar).
-     * - year/month0 definen el rango
-     */
-    fun syncBancoMes( year: Int, month0: Int) {
-        val accountId = selectedAccountId.value ?: return
-        viewModelScope.launch {
-            syncing = true
-            lastSyncResult = null
-            val (fromMillis, toMillis) = monthBounds(year, month0)
-            val result = bankRepository.syncAccount(accountId, fromMillis, toMillis)
-            syncing = false
-            lastSyncResult = result.fold(
-                onSuccess = { count -> "Importadas/actualizadas: $count" },
-                onFailure = { t -> "Error: ${t.message ?: t::class.java.simpleName}" }
-            )
-        }
-    }
-
-    /** Devuelve (inicio, fin) de mes en epoch millis */
-    private fun monthBounds(year: Int, month0: Int): Pair<Long, Long> {
-        val c1 = java.util.Calendar.getInstance().apply {
-            set(java.util.Calendar.YEAR, year)
-            set(java.util.Calendar.MONTH, month0)
-            set(java.util.Calendar.DAY_OF_MONTH, 1)
-            set(java.util.Calendar.HOUR_OF_DAY, 0)
-            set(java.util.Calendar.MINUTE, 0)
-            set(java.util.Calendar.SECOND, 0)
-            set(java.util.Calendar.MILLISECOND, 0)
-        }
-        val c2 = (c1.clone() as java.util.Calendar).apply {
-            add(java.util.Calendar.MONTH, 1)
-            add(java.util.Calendar.MILLISECOND, -1)
-        }
-        return c1.timeInMillis to c2.timeInMillis
-    }
 
     init { loadMovimientos()}
 
@@ -133,9 +73,7 @@ class MovimientosViewModel @Inject constructor(
             }
         }
     }
-    fun getMovimientoById(id: String): Movimiento? {
-        return _movimientos.value.find { it.id == id }
-    }
+
     fun deleteMovimiento(id: String) {
         viewModelScope.launch {
             repository.deleteMovimiento(id)
@@ -163,44 +101,11 @@ class MovimientosViewModel @Inject constructor(
             }
         }
     }
-    /** Genera N movimientos de demo y los guarda */
-//    fun generateDemo(context: Context, count: Int = 25) {
-//        viewModelScope.launch {
-//            try {
-//                syncing = true
-//                lastSyncResult = null
-//
-//                val userId = com.dls.pymetask.utils.Constants.getUserIdSeguro(context) ?: ""
-//                val now = System.currentTimeMillis()
-//                val demo = (1..count).map {
-//                    val ingreso = (Math.random() > 0.5)
-//                    val days = (0..30).random()
-//                    val whenMs = now - days * 24L * 60 * 60 * 1000
-//                    Movimiento(
-//                        id = UUID.randomUUID().toString(),
-//                        titulo = if (ingreso) "Ingreso demo" else "Gasto demo",
-//                        subtitulo = "EUR",
-//                        cantidad = if (ingreso) (50..1200).random().toDouble() else (5..250).random().toDouble(),
-//                        ingreso = ingreso,
-//                        fecha = whenMs,
-//                        userId = userId
-//                    )
-//                }
-//                var countSaved = 0
-//                demo.forEach { repository.insertMovimiento(it); countSaved++ }
-//                lastSyncResult = "Generados $countSaved movimientos demo"
-//            } catch (t: Throwable) {
-//                lastSyncResult = "Error al generar demo: ${t.message}"
-//            } finally {
-//                syncing = false
-//            }
-//        }
-//    }
     /** Parser CSV sencillo (coma o punto y coma; coma decimal soportada) */
 
     // Parser universal de CSV bancario español → List<Movimiento>
 // Solo usa columnas necesarias; ignora el resto.
-    private fun parseCsvInternal(context: Context, uri: Uri): List<com.dls.pymetask.domain.model.Movimiento> {
+    private fun parseCsvInternal(context: Context, uri: Uri): List<Movimiento> {
 
         // ---------- 1) Cargar texto con encoding robusto ----------
         val cr = context.contentResolver
@@ -258,7 +163,7 @@ class MovimientosViewModel @Inject constructor(
         }
 
         // ---------- 4) Auxiliares de parseo ----------
-        val tz = java.time.ZoneId.systemDefault()
+        val tz = ZoneId.systemDefault()
         val dfISO = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val dfES1 = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")
         val dfES2 = java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy")
@@ -267,12 +172,12 @@ class MovimientosViewModel @Inject constructor(
             val t = s.trim()
             return when {
                 t.contains('-') && t.count { it == '-' } == 2 ->
-                    runCatching { java.time.LocalDate.parse(t, dfISO) }.getOrNull()
+                    runCatching { LocalDate.parse(t, dfISO) }.getOrNull()
                         ?.atStartOfDay(tz)?.toInstant()?.toEpochMilli()
                 t.contains('/') ->
-                    runCatching { java.time.LocalDate.parse(t, dfES1) }.getOrNull()
+                    runCatching { LocalDate.parse(t, dfES1) }.getOrNull()
                         ?.atStartOfDay(tz)?.toInstant()?.toEpochMilli()
-                        ?: runCatching { java.time.LocalDate.parse(t, dfES2) }.getOrNull()
+                        ?: runCatching { LocalDate.parse(t, dfES2) }.getOrNull()
                             ?.atStartOfDay(tz)?.toInstant()?.toEpochMilli()
                 else -> null
             }
@@ -302,7 +207,7 @@ class MovimientosViewModel @Inject constructor(
 
         // ---------- 5) Recorrer filas de datos ----------
         val dataLines = allLines.drop(headerIndex + 1)
-        val out = mutableListOf<com.dls.pymetask.domain.model.Movimiento>()
+        val out = mutableListOf<Movimiento>()
 
         for (line in dataLines) {
             if (line.isBlank()) continue
@@ -329,9 +234,9 @@ class MovimientosViewModel @Inject constructor(
             val divisa  = if (iDivisa   >= 0) parts.getOrNull(iDivisa).orEmpty().trim().ifBlank { "EUR" } else "EUR"
 
             // Construir Movimiento (solo campos que usa tu modelo)
-            out += com.dls.pymetask.domain.model.Movimiento(
+            out += Movimiento(
                 id = java.util.UUID.randomUUID().toString(),
-                titulo = if (concept.isNotEmpty()) concept else "Movimiento",
+                titulo = concept.ifEmpty { "Movimiento" },
                 subtitulo = divisa,                          // usamos divisa si viene; si no, EUR
                 cantidad = kotlin.math.abs(importe),
                 ingreso = importe >= 0.0,
@@ -369,59 +274,6 @@ class MovimientosViewModel @Inject constructor(
         out += cur.toString()
         return out
     }
-
-//    private fun parseCsvInternal(context: Context, uri: Uri): List<Movimiento> {
-//        val cr = context.contentResolver
-//        val isr = InputStreamReader(cr.openInputStream(uri) ?: return emptyList())
-//        val br = BufferedReader(isr)
-//        val lines = br.readLines()
-//        if (lines.isEmpty()) return emptyList()
-//
-//        val header = lines.first().lowercase()
-//        val sep = if (header.contains(";")) ";" else ","
-//        val cols = header.split(sep).map { it.trim() }
-//        val iDate = cols.indexOf("date")
-//        val iDesc = cols.indexOf("description")
-//        val iAmt  = cols.indexOf("amount")
-//        val iCur  = cols.indexOf("currency")
-//
-//        val df = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-//        val tz = ZoneId.systemDefault()
-//
-//        fun parseAmount(s: String): Double {
-//            val cleaned = s.replace("€", "").trim()
-//            // Soporta coma decimal: "1.234,56" -> "1234.56"
-//            val normalized = cleaned.replace(".", "").replace(",", ".")
-//            return normalized.toDoubleOrNull() ?: 0.0
-//        }
-//
-//        return lines.drop(1).mapNotNull { row ->
-//            if (row.isBlank()) return@mapNotNull null
-//            val parts = row.split(sep)
-//            fun get(i: Int) = parts.getOrNull(i)?.trim().orEmpty()
-//
-//            val d = if (iDate >= 0) get(iDate) else ""
-//            val desc = if (iDesc >= 0) get(iDesc) else "Movimiento"
-//            val amt = if (iAmt >= 0) parseAmount(get(iAmt)) else 0.0
-//            val cur = if (iCur >= 0) get(iCur) else "EUR"
-//            if (d.isBlank()) return@mapNotNull null
-//
-//            val date = runCatching { LocalDate.parse(d, df) }.getOrNull() ?: return@mapNotNull null
-//            val millis = date.atStartOfDay(tz).toInstant().toEpochMilli()
-//            val ingreso = amt >= 0.0
-//            Movimiento(
-//                id = UUID.randomUUID().toString(),
-//                titulo = desc,
-//                subtitulo = cur,
-//                cantidad = abs(amt),
-//                ingreso = ingreso,
-//                fecha = millis,
-//                userId = "" // se rellena al guardar
-//            )
-//        }
-//    }
-
-
 
 // ====== MODELO DE SECCIÓN PARA LA UI ======
     /** Agrupa movimientos por mes (year-month) para pintarlos con cabecera */
@@ -497,6 +349,4 @@ class MovimientosViewModel @Inject constructor(
             }
         }
     }
-
-
 }
