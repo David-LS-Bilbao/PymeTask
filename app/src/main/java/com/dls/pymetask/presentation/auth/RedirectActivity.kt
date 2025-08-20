@@ -5,7 +5,6 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
-import com.dls.pymetask.data.remote.bank.auth.OAuthManager
 import com.dls.pymetask.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -19,7 +18,7 @@ import kotlin.jvm.java
 @AndroidEntryPoint
 class RedirectActivity : ComponentActivity() {
 
-    @Inject lateinit var oauthManager: OAuthManager
+//    @Inject lateinit var oauthManager: OAuthManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +30,6 @@ class RedirectActivity : ComponentActivity() {
         }
 
         lifecycleScope.launch {
-            oauthManager.handleRedirect(uri)
             finishToMain()
         }
     }

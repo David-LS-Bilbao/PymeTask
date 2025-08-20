@@ -12,7 +12,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.dls.pymetask.data.remote.bank.auth.OAuthManager
+//import com.dls.pymetask.data.remote.bank.auth.OAuthManager
 import com.dls.pymetask.presentation.agenda.AgendaScreen
 import com.dls.pymetask.presentation.agenda.TareaFormScreen
 import com.dls.pymetask.presentation.auth.login.LoginScreen
@@ -31,7 +31,6 @@ import com.dls.pymetask.presentation.archivos.ContenidoCarpetaScreen
 import com.dls.pymetask.presentation.contactos.CrearContactoScreen
 import com.dls.pymetask.presentation.contactos.DetalleContactoScreen
 import com.dls.pymetask.presentation.contactos.EditarContactoScreen
-
 import com.dls.pymetask.presentation.notas.NotaFormScreen
 import com.dls.pymetask.presentation.notas.NotasScreen
 import com.dls.pymetask.presentation.perfil.EditarPerfilScreen
@@ -41,7 +40,6 @@ import com.dls.pymetask.presentation.perfil.PerfilUserScreen
 @Composable
 fun PymeNavGraph(
     navController: NavHostController,
-    oauthManager: OAuthManager,
     startDestination: String = "login"
 ) {
     NavHost(navController = navController, startDestination = startDestination) {
@@ -175,12 +173,6 @@ fun PymeNavGraph(
             val carpetaId = backStackEntry.arguments?.getString("carpetaId") ?: ""
             ContenidoCarpetaScreen(carpetaId = carpetaId, navController = navController)
         }
-
-//        composable("ajustes_bancos") {
-//            BancosSettingsScreen(oauthManager = oauthManager)
-//        }
-
-
     }// NavHost--------------------------------------------------------------------------------------
 }
 

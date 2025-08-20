@@ -12,13 +12,4 @@ import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
 class PymeTaskApp : Application(){
-    override fun onCreate() {
-        super.onCreate()
-        TrueLayerUI.init(this) {
-          //  environment = Environment.SANDBOX
-            httpConnection = HttpConnectionConfiguration(
-                httpDebugLoggingLevel = HttpLoggingLevel.None
-            )
-        }
-    }
 }

@@ -79,9 +79,6 @@ class RenombrarArchivoUseCase(
     suspend operator fun invoke(id: String, nuevoNombre: String) {
         repository.renombrarArchivo(id, nuevoNombre)
     }
-//    suspend operator fun invoke(id: String) {
-//        repository.eliminarArchivo(id)
-//    }
 }
 class SubirArchivoUseCase @Inject constructor(
     private val repository: ArchivoRepository

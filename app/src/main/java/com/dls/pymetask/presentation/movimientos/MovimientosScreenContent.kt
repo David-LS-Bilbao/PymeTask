@@ -12,18 +12,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -31,27 +20,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.BarChart
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -59,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+//import com.dls.pymetask.data.remote.bank.auth.OAuthManager
 import com.dls.pymetask.domain.model.Movimiento
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -77,6 +48,9 @@ data class MovimientoUi(
     val fechaMillis: Long     // para filtros por mes
 )
 
+// ===== Enum para el tipo de filtro =====
+private enum class FiltroTipo { TODOS, INGRESOS, GASTOS }
+
 // ------------------------------------------------------------
 // WRAPPER: conecta VM -> ordena por fecha -> mapea a UI -> Content
 // ------------------------------------------------------------
@@ -85,11 +59,9 @@ data class MovimientoUi(
 @Composable
 fun MovimientosScreen(
     navController: NavController,
+//    oauthManager: OAuthManager? = null,                 // <-- se inyecta arriba y se pasa por callback
     viewModel: MovimientosViewModel = hiltViewModel()
 ) {
-    // Fecha actual para usar en la sync mock/real del mes en curso
-    remember { Calendar.getInstance() }
-
     // Estado de sync del VM (mutableStateOf en el VM)
     val syncing = viewModel.syncing
     val lastMsg = viewModel.lastSyncResult
@@ -134,6 +106,8 @@ fun MovimientosScreen(
         movimientos = movimientosUi,
         onAddClick = { navController.navigate("crear_movimiento") },
         onItemClick = { ui -> navController.navigate("editar_movimiento/${ui.id}") },
+//        onSyncBanco = { viewModel.syncBancoMes(year = year, month0 = month0) },
+//        onConectarBanco = { activity?.let { oauthManager?.startAuth(it) } },
         onImportCsv = { picker.launch(arrayOf("text/*", "text/csv", "application/vnd.ms-excel")) },
         syncing = syncing,
         lastSyncMessage = lastMsg,
@@ -143,7 +117,12 @@ fun MovimientosScreen(
         onMostrarMas = { viewModel.loadNextMonth(userId) },
 
     )
+
+    // (Opcional) Indicador global si quieres fijo en la pantalla
+    // if (syncing) { /* ... */ }
 }
+
+
 // ------------------------------------------------------------
 // CONTENT PURO: header fijo + lista scroll + totales
 // ------------------------------------------------------------
@@ -154,7 +133,7 @@ fun MovimientosScreenContent(
     navController: NavController,
     movimientos: List<MovimientoUi>,
     onAddClick: () -> Unit = {},
-    onItemClick: (MovimientoUi) -> Unit = {},                   // <-- callback que dispara el OAuth
+    onItemClick: (MovimientoUi) -> Unit = {},
     syncing: Boolean = false,
     lastSyncMessage: String? = null,
     onImportCsv: () -> Unit = {},            // NUEVO
@@ -163,7 +142,15 @@ fun MovimientosScreenContent(
     onMostrarMas: () -> Unit = {}
 ) {
     // --- Estado de filtros (si decides activarlos abajo) ---
-    remember { Calendar.getInstance().apply { timeInMillis = System.currentTimeMillis() } }
+    var filtroTipo by remember { mutableStateOf(FiltroTipo.TODOS) }
+    val calNow = remember { Calendar.getInstance().apply { timeInMillis = System.currentTimeMillis() } }
+    var filtroYear by remember { mutableIntStateOf(calNow.get(Calendar.YEAR)) }
+    var filtroMonth by remember { mutableIntStateOf(calNow.get(Calendar.MONTH)) } // 0..11
+
+    // --- Aplica filtros (ahora no se renderiza la barra; la dejamos lista) ---
+    remember(movimientos, filtroTipo, filtroYear, filtroMonth) {
+        filtrarMovimientos(movimientos, filtroTipo, filtroYear, filtroMonth)
+    }
 
     // Totales (puedes cambiar a 'movimientosFiltrados' si quieres que el header refleje el filtro)
     val (iTotal, gTotal, saldoTotal) = remember(movimientos) { calcularTotales(movimientos) }
@@ -195,6 +182,8 @@ fun MovimientosScreenContent(
                     ingresos = iTotal,
                     gastos = gTotal,
                     saldo = saldoTotal,
+//                    onConectarBanco = onConectarBanco,          // <-- PASAMOS el callback
+//                    onSyncBanco = onSyncBanco,
                     syncing = syncing,
                     onImportCsv = onImportCsv
                 )
@@ -248,6 +237,8 @@ fun MovimientosScreenContent(
                     Spacer(Modifier.height(48.dp))
                 }
             }
+
+
         }
     }
 }
@@ -345,7 +336,42 @@ private fun Double.toCurrency(withSign: Boolean = false): String {
     val base = nf.format(kotlin.math.abs(this))
     return if (!withSign) nf.format(this) else if (this >= 0) "+$base" else "-$base"
 }
+// ===== Lógica de filtro =====
+private fun filtrarMovimientos(
+    movimientos: List<MovimientoUi>,
+    filtroTipo: FiltroTipo,
+    year: Int,
+    monthZeroBased: Int
+): List<MovimientoUi> {
+    val inicioMes = Calendar.getInstance().apply {
+        set(Calendar.YEAR, year)
+        set(Calendar.MONTH, monthZeroBased)
+        set(Calendar.DAY_OF_MONTH, 1)
+        set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
+    }.timeInMillis
 
+    val finMes = Calendar.getInstance().apply {
+        set(Calendar.YEAR, year)
+        set(Calendar.MONTH, monthZeroBased)
+        set(Calendar.DAY_OF_MONTH, 1)
+        set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
+        add(Calendar.MONTH, 1)
+        add(Calendar.MILLISECOND, -1)
+    }.timeInMillis
+
+    val porMes = movimientos.filter { it.fechaMillis in inicioMes..finMes }
+    val porTipo = when (filtroTipo) {
+        FiltroTipo.TODOS -> porMes
+        FiltroTipo.INGRESOS -> porMes.filter { it.importe >= 0 }
+        FiltroTipo.GASTOS -> porMes.filter { it.importe < 0 }
+    }
+    return porTipo.sortedWith(
+        compareByDescending<MovimientoUi> { it.fechaMillis }
+            .thenByDescending { it.id }
+    )
+}
 
 @Composable
 private fun SaldoStickyHeader(
@@ -362,9 +388,12 @@ private fun SaldoStickyHeader(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
 
+
+
         ) {
             Row(verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
+                // scroll horizontal
                 modifier = Modifier.horizontalScroll(rememberScrollState())
                 ) {
                 // botón atrás
@@ -372,18 +401,13 @@ private fun SaldoStickyHeader(
                     Icon(Icons.Default.ArrowBackIosNew, contentDescription = "volver al menú")
                 }
                 Text("Resumen", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-              //  Spacer(Modifier.weight(1f))
-                Spacer(Modifier.width(24.dp))
-                // boton ver ingresos / gastos  y total  del mes actual
-
+                Spacer(Modifier.weight(1f))
 
                 // boton importar CSV
-                OutlinedButton(onClick = onImportCsv) {
-                    Icon(Icons.Default.Download, contentDescription = "importar CSV")
-                    Text(" CSV") }
+                OutlinedButton(onClick = onImportCsv) { Text("Importar CSV") }
                 Spacer(Modifier.width(8.dp))
 
-//                Spacer(Modifier.width(24.dp))
+                Spacer(Modifier.width(24.dp))
                 // botón para ir a estadísticas
                 OutlinedButton(onClick = { navController.navigate("estadisticas") }) {
                     Icon(Icons.Default.BarChart, contentDescription = "ir a estadísticas")

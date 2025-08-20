@@ -4,18 +4,15 @@
 package com.dls.pymetask.presentation.estadisticas
 
 // ==== imports de utilidades/calculadoras puras (StatsCalculations.kt) ====
-import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,7 +22,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -87,8 +83,6 @@ import java.util.Date
 import java.util.Locale
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.text.style.TextAlign
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -104,31 +98,10 @@ fun EstadisticasScreen(
     // Estado de estadísticas
     val ui by statsVm.ui.collectAsState()
 
-
-    rememberDeviceClass()
-
-
     // UI local
     var showRangePicker by remember { mutableStateOf(false) }
 
     var selectedCategory by remember { mutableStateOf<String?>(null) }
-
-
-    val device = rememberDeviceClass()
-
-// Espaciados y tamaños adaptativos
-    val screenPadding = if (device == DeviceClass.Compact) 12.dp else 16.dp
-    val chartHeight = when (device) {
-        DeviceClass.Compact -> 160.dp
-        DeviceClass.Medium  -> 180.dp
-        DeviceClass.Expanded-> 240.dp
-    }
-    val donutMaxVisible = when (device) {
-        DeviceClass.Compact -> 6   // top 6 + "Otros"
-        DeviceClass.Medium  -> 8
-        DeviceClass.Expanded-> 12
-    }
-    val donutThickness = if (device == DeviceClass.Compact) 16.dp else 22.dp
 
 
     // formatos
@@ -171,7 +144,7 @@ fun EstadisticasScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(screenPadding),
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
@@ -179,7 +152,7 @@ fun EstadisticasScreen(
             item {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     PeriodChip("Hoy", ui.periodo == Periodo.HOY) { statsVm.setPeriodo(Periodo.HOY) }
                     PeriodChip("Esta semana", ui.periodo == Periodo.SEMANA) { statsVm.setPeriodo(Periodo.SEMANA) }
@@ -246,68 +219,61 @@ fun EstadisticasScreen(
                 // EstadisticasScreen.kt — dentro del LazyColumn, en modo Mes
 
                 item {
-                    val allSlices = remember(ui.listaA) { buildExpenseSlicesAll(ui.listaA) }
+                    val allSlices = remember(ui.listaA) { buildExpenseSlicesAll(ui.listaA) } // <-- TODAS
                     CategoryBreakdownCard(
                         title = "Gastos por categorías — ${ui.tituloMesA}",
                         allSlices = allSlices,
                         selectedLabel = selectedCategory,
                         onSelect = { label -> selectedCategory = if (selectedCategory == label) null else label },
-                        maxVisible = donutMaxVisible,
-                        height = chartHeight,
-                        ringThickness = donutThickness
+                        maxVisible = 8 // ← sube a 8 (o lo que quieras)
                     )
                 }
+//                item {
+//                    val slices = remember(ui.listaA) { buildExpenseSlices(ui.listaA, maxSlices = 6) }
+//                    CategoryBreakdownCard(
+//                        title = "Gastos por categorías — ${ui.tituloMesA}",
+//                        slices = slices,
+//                        selectedLabel = selectedCategory,
+//                        onSelect = { label -> selectedCategory = if (selectedCategory == label) null else label }
+//                    )
+//                }
 
+//                item {
+//                    val slices = remember(ui.listaA) { buildExpenseSlices(ui.listaA, maxSlices = 6) }
+//                    CategoryBreakdownCard(
+//                        title = "Gastos por categorías — ${ui.tituloMesA}",
+//                        slices = slices
+//                    )
+//                }
             }
 
             // ---------- Gráficos ----------
-
             if (ui.modo == Modo.MES && ui.periodo == Periodo.MES) {
-                if (device == DeviceClass.Expanded) {
-                    item {
-                        Row(
-                            Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            Tarjeta("Ingresos vs Gastos — ${ui.tituloMesA}",) {
-                                if (ui.diarioA.dias == 0) TextoVacio("No hay datos en este mes.")
-                                else BarChartIngresosGastosPorDia(
-                                    ingresosPorDia = ui.diarioA.ingresosPorDia,
-                                    gastosPorDia = ui.diarioA.gastosPorDia,
-                                    height = chartHeight
-                                )
-                            }.let { Box(Modifier.weight(1f)) { it } }
+                item {
+                    Tarjeta("Ingresos vs Gastos por día — ${ui.tituloMesA}") {
+                        if (ui.diarioA.dias == 0) TextoVacio("No hay datos en este mes.")
+                        else BarChartIngresosGastosPorDia(
+                            ingresosPorDia = ui.diarioA.ingresosPorDia,
+                            gastosPorDia = ui.diarioA.gastosPorDia,
+                            height = 180.dp
+                        )
+                    }
+                    if (selectedCategory != null) {
+                        Spacer(Modifier.height(4.dp))
+                        AssistChip(
+                            onClick = { selectedCategory = null },
+                            label = { Text("Filtro: $selectedCategory  ✕") }
+                        )
+                    }
 
-                            Tarjeta("Saldo acumulado — ${ui.tituloMesA}") {
-                                if (ui.diarioA.dias == 0) TextoVacio("No hay datos en este mes.")
-                                else LineChartSaldoAcumulado(
-                                    saldoAcumulado = ui.diarioA.saldoAcumulado,
-                                    height = chartHeight
-                                )
-                            }.let { Box(Modifier.weight(1f)) { it } }
-                        }
-                    }
-                } else {
-                    item {
-                        Tarjeta("Ingresos vs Gastos por día — ${ui.tituloMesA}") {
-                            if (ui.diarioA.dias == 0) TextoVacio("No hay datos en este mes.")
-                            else BarChartIngresosGastosPorDia(
-                                ingresosPorDia = ui.diarioA.ingresosPorDia,
-                                gastosPorDia = ui.diarioA.gastosPorDia,
-                                height = chartHeight
-                            )
-                        }
-                    }
-                    item {
-                        Tarjeta("Saldo acumulado — ${ui.tituloMesA}") {
-                            if (ui.diarioA.dias == 0) TextoVacio("No hay datos en este mes.")
-                            else LineChartSaldoAcumulado(ui.diarioA.saldoAcumulado, chartHeight)
-                        }
+                }
+                item {
+                    Tarjeta("Saldo acumulado — ${ui.tituloMesA}") {
+                        if (ui.diarioA.dias == 0) TextoVacio("No hay datos en este mes.")
+                        else LineChartSaldoAcumulado(ui.diarioA.saldoAcumulado, 180.dp)
                     }
                 }
-            }
-
-            else if (ui.modo == Modo.COMPARAR) {
+            } else if (ui.modo == Modo.COMPARAR) {
                 item {
                     Tarjeta("Comparativa de totales") {
                         if (ui.listaA.isEmpty() && ui.listaB.isEmpty()) {
@@ -329,7 +295,7 @@ fun EstadisticasScreen(
                 item {
                     Tarjeta("Tendencia últimos 12 meses") {
                         if (ui.tendencia12m.isEmpty()) TextoVacio("Sin datos")
-                        else MonthlyTrendChart(ui.tendencia12m, height = chartHeight)
+                        else MonthlyTrendChart(ui.tendencia12m, 200.dp)
                     }
                 }
             }
@@ -851,19 +817,31 @@ private fun buildExpenseSlices(
     return if (rest > 0.0) top + CategorySlice("Otros", rest) else top
 }
 
+// Paleta simple y estable (reutiliza si hay más slices)
+//private val donutPalette = listOf(
+//    Color(0xFF3B82F6), // azul
+//    Color(0xFF22C55E), // verde
+//    Color(0xFFF59E0B), // ámbar
+//    Color(0xFFEF4444), // rojo
+//    Color(0xFF8B5CF6), // violeta
+//    Color(0xFF06B6D4)  // cian
+//)
+
+
 @Composable
 private fun CategoryBreakdownCard(
     title: String,
-    allSlices: List<CategorySlice>,         // TODAS (sin agrupar)
+    allSlices: List<CategorySlice>,         // <- pásame TODAS (sin agrupar)
     selectedLabel: String?,
     onSelect: (String) -> Unit,
     modifier: Modifier = Modifier,
-    maxVisible: Int = 8,
+    maxVisible: Int = 8,                   // <- Top N por defecto
     height: Dp = 180.dp,
-    ringThickness: Dp = 22.dp,
-    compact: Boolean = false                // ← pásame si la pantalla es compacta
+    ringThickness: Dp = 22.dp
 ) {
     var expanded by remember { mutableStateOf(false) }
+
+    // Decide qué mostrar en donut/leyenda
     val display = remember(allSlices, expanded, maxVisible) {
         if (expanded) allSlices else collapseSlices(allSlices, maxVisible)
     }
@@ -875,24 +853,15 @@ private fun CategoryBreakdownCard(
         shape = MaterialTheme.shapes.large
     ) {
         Column(Modifier.fillMaxWidth().padding(16.dp)) {
-            // Header
             Row(
                 Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    title,
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.weight(1f)
-                )
-                TextButton(
-                    onClick = { expanded = !expanded },
-                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
-                ) {
-                    Text(
-                        if (expanded) "Ver top $maxVisible" else "Ver todas",
-                        maxLines = 1
-                    )
+                Text(title, style = MaterialTheme.typography.titleMedium)
+                // Toggle expand/compact
+                TextButton(onClick = { expanded = !expanded }) {
+                    Text(if (expanded) "Ver top $maxVisible" else "Ver todas")
                 }
             }
 
@@ -903,45 +872,26 @@ private fun CategoryBreakdownCard(
                 return@Column
             }
 
-            if (compact) {
-                // 📱 Pantallas estrechas: DONUT ARRIBA + LEYENDA DEBAJO (ancho completo)
-                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    DonutChart(
-                        slices = display.mapIndexed { i, s -> s.value to donutPalette[i % donutPalette.size] },
-                        modifier = Modifier.size(height),
-                        thickness = ringThickness
-                    )
-                    Spacer(Modifier.height(12.dp))
-                    LegendList(
-                        slices = display,
-                        selectedLabel = selectedLabel,
-                        onSelect = onSelect,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            } else {
-                // 🧊 Pantallas medias/anchas: DONUT IZQ + LEYENDA DERECHA (scrollable y con weight)
-                Row(
-                    Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    DonutChart(
-                        slices = display.mapIndexed { i, s -> s.value to donutPalette[i % donutPalette.size] },
-                        modifier = Modifier.size(height),
-                        thickness = ringThickness
-                    )
-                    LegendList(
-                        slices = display,
-                        selectedLabel = selectedLabel,
-                        onSelect = onSelect,
-                        modifier = Modifier
-                            .weight(1f)                     // ← aquí ganamos ancho
-                            .fillMaxWidth()
-                            .heightIn(max = height)        // igual altura que el donut
-                            .verticalScroll(rememberScrollState())
-                    )
-                }
+            Row(
+                Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                DonutChart(
+                    slices = display.mapIndexed { i, s -> s.value to donutPalette[i % donutPalette.size] },
+                    modifier = Modifier.size(height),
+                    thickness = ringThickness
+                )
+                Spacer(Modifier.width(16.dp))
+                LegendList(
+                    slices = display,
+                    selectedLabel = selectedLabel,
+                    onSelect = onSelect,
+                    // Para que quepan más de 3 sin recortar:
+                    modifier = Modifier
+                        .weight(1f)
+                        .heightIn(max = height) // altura ~ al donut
+                        .verticalScroll(rememberScrollState())
+                )
             }
         }
     }
@@ -961,18 +911,21 @@ private fun LegendList(
         slices.forEachIndexed { i, s ->
             val pct = if (total == 0.0) 0 else ((s.value / total) * 100).toInt()
             val isSel = s.label == selectedLabel
-
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(12.dp))
-                    .background(if (isSel) MaterialTheme.colorScheme.primary.copy(alpha = 0.10f) else Color.Transparent)
+                    .background(
+                        if (isSel) MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)
+                        else Color.Transparent
+                    )
                     .clickable { onSelect(s.label) }
                     .padding(horizontal = 8.dp, vertical = 6.dp)
             ) {
                 Box(
-                    Modifier.size(10.dp)
+                    Modifier
+                        .size(10.dp)
                         .background(donutPalette[i % donutPalette.size], CircleShape)
                 )
                 Spacer(Modifier.width(8.dp))
@@ -981,23 +934,17 @@ private fun LegendList(
                     style = MaterialTheme.typography.labelLarge.copy(
                         fontWeight = if (isSel) FontWeight.SemiBold else FontWeight.Normal
                     ),
-                    modifier = Modifier.weight(1f),
-                    maxLines = 1
+                    modifier = Modifier.weight(1f)
                 )
-                // Mantén un mínimo para que no se “aplasten” a 1 carácter
                 Text(
                     "${currency.format(s.value)}  ·  $pct%",
                     style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.End,
-                    modifier = Modifier.widthIn(min = 96.dp),
-                    maxLines = 1
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
     }
 }
-
 
 @Composable
 private fun DonutChart(
@@ -1032,6 +979,137 @@ private fun DonutChart(
         }
     }
 }
+
+
+
+
+
+//
+//@Composable
+//private fun CategoryBreakdownCard(
+//    title: String,
+//    slices: List<CategorySlice>,
+//    selectedLabel: String?,
+//    onSelect: (String) -> Unit,
+//    modifier: Modifier = Modifier,
+//    height: Dp = 180.dp,
+//    ringThickness: Dp = 22.dp
+//) {
+//    Card(
+//        modifier = modifier,
+//        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+//        elevation = CardDefaults.cardElevation(2.dp),
+//        shape = MaterialTheme.shapes.large
+//    ) {
+//        Column(Modifier.fillMaxWidth().padding(16.dp)) {
+//            Text(title, style = MaterialTheme.typography.titleMedium)
+//            Spacer(Modifier.height(12.dp))
+//
+//            if (slices.isEmpty() || slices.sumOf { it.value } <= 0.0) {
+//                TextoVacio("Sin gastos en este periodo")
+//                return@Column
+//            }
+//
+//            Row(
+//                Modifier.fillMaxWidth(),
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                DonutChart(
+//                    slices = slices.mapIndexed { i, s -> s.value to donutPalette[i % donutPalette.size] },
+//                    modifier = Modifier.size(height),
+//                    thickness = ringThickness
+//                )
+//                Spacer(Modifier.width(16.dp))
+//                LegendList(
+//                    slices = slices,
+//                    selectedLabel = selectedLabel,
+//                    onSelect = onSelect
+//                )
+//            }
+//        }
+//    }
+//}
+//
+//@Composable
+//private fun LegendList(
+//    slices: List<CategorySlice>,
+//    selectedLabel: String?,
+//    onSelect: (String) -> Unit
+//) {
+//    val total = slices.sumOf { it.value }
+//    val currency = remember { NumberFormat.getCurrencyInstance(Locale("es", "ES")) }
+//
+//    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+//        slices.forEachIndexed { i, s ->
+//            val pct = if (total == 0.0) 0 else ((s.value / total) * 100).toInt()
+//            val isSel = s.label == selectedLabel
+//            Row(
+//                verticalAlignment = Alignment.CenterVertically,
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .clip(RoundedCornerShape(12.dp))
+//                    .background(
+//                        if (isSel) MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)
+//                        else Color.Transparent
+//                    )
+//                    .padding(horizontal = 8.dp, vertical = 6.dp)
+//                    .then(Modifier.clickable { onSelect(s.label) })
+//            ) {
+//                Box(
+//                    Modifier
+//                        .size(10.dp)
+//                        .background(donutPalette[i % donutPalette.size], CircleShape)
+//                )
+//                Spacer(Modifier.width(8.dp))
+//                Text(
+//                    s.label,
+//                    style = MaterialTheme.typography.labelLarge.copy(
+//                        fontWeight = if (isSel) FontWeight.SemiBold else FontWeight.Normal
+//                    ),
+//                    modifier = Modifier.weight(1f)
+//                )
+//                Text(
+//                    "${currency.format(s.value)}  ·  $pct%",
+//                    style = MaterialTheme.typography.labelMedium,
+//                    color = MaterialTheme.colorScheme.onSurfaceVariant
+//                )
+//            }
+//        }
+//    }
+//}
+//
+//
+//@Composable
+//private fun DonutChart(
+//    slices: List<Pair<Double, Color>>,
+//    modifier: Modifier = Modifier,
+//    thickness: Dp = 20.dp
+//) {
+//    val total = slices.sumOf { it.first }.takeIf { it > 0 } ?: return
+//    Canvas(modifier) {
+//        val diameter = size.minDimension
+//        val strokeWidth = thickness.toPx()
+//        val radius = diameter / 2f
+//        val rect = androidx.compose.ui.geometry.Rect(
+//            center = Offset(size.width / 2f, size.height / 2f),
+//            radius = radius - strokeWidth / 2f
+//        )
+//        var start = -90f
+//        slices.forEach { (value, color) ->
+//            val sweep = (value / total).toFloat() * 360f
+//            drawArc(
+//                color = color,
+//                startAngle = start,
+//                sweepAngle = sweep,
+//                useCenter = false,
+//                topLeft = rect.topLeft,
+//                size = rect.size,
+//                style = androidx.compose.ui.graphics.drawscope.Stroke(width = strokeWidth)
+//            )
+//            start += sweep
+//        }
+//    }
+//}
 
 
 // DONNUT
@@ -1070,12 +1148,15 @@ private fun movimientoCategoryLabel(m: Movimiento): String {
     return base.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
 }
 
-// ---------- Modelo y agregación ----------
 
+
+
+// ---------- Modelo y agregación ----------
+//private data class CategorySlice(val label: String, val value: Double)
 
 /** Devuelve TODAS las categorías (sin agrupar "Otros"), ordenadas por importe desc. */
 private fun buildExpenseSlicesAll(
-    movimientos: List<Movimiento>
+    movimientos: List<com.dls.pymetask.domain.model.Movimiento>
 ): List<CategorySlice> {
     if (movimientos.isEmpty()) return emptyList()
     val byLabel = movimientos
@@ -1106,32 +1187,15 @@ private fun collapseSlices(
 
 // Paleta
 private val donutPalette = listOf(
-    Color(0xFF3B82F6),
-    Color(0xFF22C55E),
-    Color(0xFFF59E0B),
-    Color(0xFFEF4444),
-    Color(0xFF8B5CF6),
-    Color(0xFF06B6D4),
-    Color(0xFF10B981),
-    Color(0xFFE11D48),
+    androidx.compose.ui.graphics.Color(0xFF3B82F6),
+    androidx.compose.ui.graphics.Color(0xFF22C55E),
+    androidx.compose.ui.graphics.Color(0xFFF59E0B),
+    androidx.compose.ui.graphics.Color(0xFFEF4444),
+    androidx.compose.ui.graphics.Color(0xFF8B5CF6),
+    androidx.compose.ui.graphics.Color(0xFF06B6D4),
+    androidx.compose.ui.graphics.Color(0xFF10B981),
+    androidx.compose.ui.graphics.Color(0xFFE11D48),
 )
 
 
 
-
-/* ======================== Adaptación a dispositivo ======================== */
-
-private enum class DeviceClass { Compact, Medium, Expanded }
-
-@SuppressLint("ConfigurationScreenWidthHeight")
-@Composable
-private fun rememberDeviceClass(): DeviceClass {
-    val widthDp = LocalConfiguration.current.screenWidthDp
-    return remember(widthDp) {
-        when {
-            widthDp < 360 -> DeviceClass.Compact   // móviles muy pequeños
-            widthDp < 600 -> DeviceClass.Medium    // móviles normales
-            else          -> DeviceClass.Expanded  // tablets / pantallas grandes
-        }
-    }
-}
