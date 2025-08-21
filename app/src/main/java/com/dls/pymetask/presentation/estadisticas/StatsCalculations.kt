@@ -65,20 +65,6 @@ fun monthShortEs(year: Int, month0: Int): String {
     return s.replace(".", "").uppercase(loc)
 }
 
-
-//fun monthYearTitle(year: Int, month0: Int): String {
-//    val c = Calendar.getInstance().apply { set(year, month0, 1) }
-//    val f = SimpleDateFormat("LLLL yyyy", Locale("es", "ES"))
-//    val raw = f.format(c.time)
-//    return raw.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale("es","ES")) else it.toString() }
-//}
-//
-//fun monthShortEs(year: Int, month0: Int): String {
-//    val c = Calendar.getInstance().apply { set(year, month0, 1) }
-//    val s = SimpleDateFormat("LLL", Locale("es","ES")).format(c.time)
-//    return s.replace(".", "").uppercase()
-//}
-
 // ===== Cálculos principales =====
 fun totalesMes(lista: List<Movimiento>): Totales {
     val ing = lista.filter { it.ingreso }.sumOf { it.cantidad }

@@ -43,8 +43,7 @@ data class EstadisticasUiState(
 
 @HiltViewModel
 class EstadisticasViewModel @Inject constructor(
-    // Si quieres inyectar repo más adelante:
-    // private val repo: MovimientoRepository
+
 ) : ViewModel() {
 
     private val _ui = MutableStateFlow(EstadisticasUiState())

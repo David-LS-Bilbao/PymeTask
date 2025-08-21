@@ -288,7 +288,6 @@ private fun MovimientoItem(
     )
 }
 
-
 @Composable
 private fun EstadoVacioMovimientos() {
     Box(Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) {

@@ -159,33 +159,8 @@ fun AjustesScreen(
         )
 
 
-        // ====== Formato de fecha ======
-        ListItem(
-            headlineContent = { Text(stringResource(R.string.settings_date_format)) },
-            supportingContent = {
-                val txt = when (dateFormat) {
-                    DateFormatOption.DMY_SLASH -> "dd/MM/yyyy"
-                    DateFormatOption.DMY_TEXT -> "dd MMM"
-                    DateFormatOption.RELATIVE -> stringResource(R.string.relative_today_tomorrow)
-                }
-                Text(txt)
-            },
-            modifier = Modifier.fillMaxWidth().clickable { showDateFormatDialog = true }
-        )
 
-// ====== Moneda por defecto ======
-        ListItem(
-            headlineContent = { Text(stringResource(R.string.settings_currency)) },
-            supportingContent = {
-                val txt = when (currency) {
-                    CurrencyOption.EUR -> "€ Euro"
-                    CurrencyOption.USD -> "$ USD"
-                    CurrencyOption.GBP -> "£ GBP"
-                }
-                Text(txt)
-            },
-            modifier = Modifier.fillMaxWidth().clickable { showCurrencyDialog = true }
-        )
+
 
 // ====== Recordatorios por defecto ======
         ListItem(
