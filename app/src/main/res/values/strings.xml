@@ -247,7 +247,6 @@
     <string name="note_field_content">Contenido</string>
     <string name="note_confirm_delete_title">Confirmar eliminación</string>
 
-
     <string name="notes_back_and_save">Atrás y guardar</string>
     <string name="note_title_fallback">Nota</string>
 
@@ -262,15 +261,11 @@
     <string name="note_saved">Nota guardada</string>
     <string name="note_deleted">Nota eliminada</string>
     <string name="error_note_not_found">Error: nota no encontrada</string>
-
     <string name="delete_confirm_title_note">¿Eliminar nota?</string>
     <string name="delete_confirm_text">Esta acción no se puede deshacer.</string>
     <string name="delete_confirm_yes">Sí, borrar</string>
-
     <string name="note_title_label">Título</string>
     <string name="note_content_label">Contenido</string>
-
-
 
 
     <!-- ===== AjustesScreen ===== -->
@@ -494,6 +489,23 @@
     <string name="dashboard_title">Dashboard</string>
     <string name="settings_reset_mime">borrar preferencias</string>
     <string name="contacts_empty_hint">Lista Vacia</string>
+
+
+    <string name="profile_photo_cd">Foto de perfil</string>
+    <string name="profile_icon_cd">Icono de perfil</string>
+    <string name="profile_phone_value">📞 %1$s</string>
+    <string name="profile_address_value">📍 %1$s</string>
+
+    <string name="profile_edit_title">Editar perfil</string>
+    <string name="profile_change_image">Cambiar imagen</string>
+    <string name="profile_full_name">Nombre completo</string>
+    <string name="profile_phone">Teléfono</string>
+    <string name="profile_address">Dirección</string>
+    <string name="profile_name_required">El nombre es obligatorio</string>
+    <string name="profile_updated">Perfil actualizado</string>
+
+
+
 
     <!-- Plurals de ejemplo (tareas, notas, contactos) -->
     <plurals name="count_tasks">

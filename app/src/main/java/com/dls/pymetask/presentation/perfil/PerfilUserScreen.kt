@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource // <-- i18n
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -22,6 +23,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.dls.pymetask.R
 import com.dls.pymetask.ui.theme.Poppins
 import com.dls.pymetask.ui.theme.Roboto
 
@@ -36,22 +38,31 @@ fun PerfilUserScreen(
     Scaffold(
         topBar = {
             TopAppBar(
+                // Título localizado
                 title = {
                     Text(
-                        "Mi Perfil",
+                        text = stringResource(R.string.profile_title),
                         fontFamily = Poppins,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 22.sp
                     )
                 },
+                // Botón atrás localizado (contentDescription)
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Atrás")
+                        Icon(
+                            Icons.Default.ArrowBackIosNew,
+                            contentDescription = stringResource(R.string.common_back)
+                        )
                     }
                 },
+                // Acción editar perfil localizada (contentDescription)
                 actions = {
                     IconButton(onClick = { navController.navigate("editar_perfil") }) {
-                        Icon(Icons.Default.Edit, contentDescription = "Editar perfil")
+                        Icon(
+                            Icons.Default.Edit,
+                            contentDescription = stringResource(R.string.profile_edit)
+                        )
                     }
                 }
             )
@@ -65,7 +76,7 @@ fun PerfilUserScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Imagen de perfil o icono por defecto
+            // Imagen de perfil o icono por defecto (contentDescription localizado)
             if (!perfil.fotoUrl.isNullOrBlank()) {
                 Image(
                     painter = rememberAsyncImagePainter(
@@ -74,7 +85,7 @@ fun PerfilUserScreen(
                             .crossfade(true)
                             .build()
                     ),
-                    contentDescription = "Foto de perfil",
+                    contentDescription = stringResource(R.string.profile_photo_cd),
                     modifier = Modifier
                         .size(140.dp)
                         .clip(CircleShape)
@@ -83,7 +94,7 @@ fun PerfilUserScreen(
             } else {
                 Icon(
                     imageVector = Icons.Default.AccountCircle,
-                    contentDescription = "Icono de perfil",
+                    contentDescription = stringResource(R.string.profile_icon_cd),
                     modifier = Modifier
                         .size(140.dp)
                         .clip(CircleShape),
@@ -91,7 +102,7 @@ fun PerfilUserScreen(
                 )
             }
 
-            // Datos del usuario
+            // Nombre (sin cambios, es dato del usuario)
             Text(
                 text = perfil.nombre,
                 style = MaterialTheme.typography.titleLarge.copy(
@@ -100,6 +111,7 @@ fun PerfilUserScreen(
                 )
             )
 
+            // Email (dato del usuario)
             Text(
                 text = perfil.email,
                 style = MaterialTheme.typography.bodyMedium.copy(
@@ -108,19 +120,21 @@ fun PerfilUserScreen(
                 )
             )
 
+            // Teléfono y dirección con formato localizado (prefijo con emoji + valor)
             if (perfil.telefono.isNotBlank()) {
                 Text(
-                    text = "📞 ${perfil.telefono}",
+                    text = stringResource(R.string.profile_phone_value, perfil.telefono),
                     style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp)
                 )
             }
 
             if (perfil.direccion.isNotBlank()) {
                 Text(
-                    text = "📍 ${perfil.direccion}",
+                    text = stringResource(R.string.profile_address_value, perfil.direccion),
                     style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp)
                 )
             }
         }
     }
 }
+

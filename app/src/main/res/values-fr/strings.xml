@@ -450,6 +450,22 @@
     <string name="contacts_empty_hint">List empty</string>
 
 
+    <string name="profile_photo_cd">Photo de profil</string>
+    <string name="profile_icon_cd">Icône de profil</string>
+    <string name="profile_phone_value">📞 %1$s</string>
+    <string name="profile_address_value">📍 %1$s</string>
+
+    <string name="profile_edit_title">Modifier le profil</string>
+    <string name="profile_change_image">Changer l’image</string>
+    <string name="profile_full_name">Nom complet</string>
+    <string name="profile_phone">Téléphone</string>
+    <string name="profile_address">Adresse</string>
+    <string name="profile_name_required">Le nom est obligatoire</string>
+    <string name="profile_updated">Profil mis à jour</string>
+
+
+
+
     <plurals name="count_tasks">
         <item quantity="one">%1$d tâche</item>
         <item quantity="other">%1$d tâches</item>

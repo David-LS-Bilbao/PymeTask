@@ -365,37 +365,6 @@ fun NotaFormScreen(
                     .imePadding()                  // 👈 empuja el contenido sobre el teclado
                     .padding(bottom = overlayHeight) // 👈 hueco para el overlay inferior
             ) {
-                // ───────────────────────── CAMPO: Título de la nota ─────────────────────────
-
-                // ── Título SIEMPRE editable, con estilo de cabecera y sin bordes ──
-//                OutlinedTextField(
-//                    value = titulo,
-//                    onValueChange = { titulo = it }, // actualiza estado
-//                    singleLine = true,
-//                    maxLines = 1,
-//                    // Etiqueta traducida
-//                    label = { Text(stringResource(R.string.note_title_label), color = onBg.copy(alpha = 0.75f)) },
-//                    // Estilo "headline" para que parezca un título
-//                    textStyle = MaterialTheme.typography.headlineSmall.copy(color = onBg, fontWeight = FontWeight.SemiBold),
-//                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next), // pasa al contenido
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(horizontal = 16.dp),
-//                    // Quitar bordes/rellenos para que se integre con el fondo
-//                    colors = OutlinedTextFieldDefaults.colors(
-//                        focusedTextColor = onBg,
-//                        unfocusedTextColor = onBg,
-//                        focusedLabelColor = onBg.copy(alpha = 0.90f),
-//                        unfocusedLabelColor = onBg.copy(alpha = 0.75f),
-//                        cursorColor = onBg,
-//                        focusedBorderColor = Color.Transparent,
-//                        unfocusedBorderColor = Color.Transparent,
-//                        focusedContainerColor = Color.Transparent,
-//                        unfocusedContainerColor = Color.Transparent
-//                    )
-//                )
-
-// ───────────────────────── FIN CAMPO Título ─────────────────────────
 
                 if (mostrarSelectorColor) {
                     Spacer(modifier = Modifier.height(12.dp))
@@ -600,9 +569,4 @@ fun guardarYSalir(
     }
     navController.popBackStack()
 }
-
-
-
-
-
 
