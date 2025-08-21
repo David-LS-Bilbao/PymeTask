@@ -53,6 +53,7 @@ class MainActivity : ComponentActivity() {
         // Procesa el intent que abrió la Activity (por ejemplo desde notificación)
         handleIntent(intent)
 
+
         // Carga el árbol de Compose. El NavController se crea DENTRO de Compose.
         setContent {
             PymeTaskAppRoot()

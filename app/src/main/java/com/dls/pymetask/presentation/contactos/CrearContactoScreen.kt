@@ -1,4 +1,5 @@
-// ADAPTADO: CrearContactoScreen.kt
+
+
 package com.dls.pymetask.presentation.contactos
 
 import android.content.Context
@@ -25,16 +26,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource // <-- i18n
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.dls.pymetask.R
 import com.dls.pymetask.domain.model.Contacto
+import com.dls.pymetask.presentation.commons.UiText
 import java.util.*
-
-
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,27 +43,38 @@ fun CrearContactoScreen(
     navController: NavController,
     viewModel: ContactoViewModel = hiltViewModel()
 ) {
+    // Contexto y eventos del VM (mostramos toasts localizados)
     val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { uiText: UiText ->
+            Toast.makeText(context, uiText.asString(context), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // Estado de subida de imagen
     val isUploading by viewModel.isUploading
+
+    // Estados del formulario
     var nombre by remember { mutableStateOf("") }
     var telefono by remember { mutableStateOf("") }
     var direccion by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
-    var tipo by remember { mutableStateOf("Cliente") }
+    var tipo by remember { mutableStateOf("Cliente") } // guardamos valor de dominio
     var fotoUrl by remember { mutableStateOf<String?>(null) }
 
-    // ---------- IMAGEN
+    // ---------- Selector de imagen (galería)
     val galeriaLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
+            // Subir imagen y guardar URL
             viewModel.subirImagen(context, it, UUID.randomUUID().toString()) { url ->
                 fotoUrl = url
             }
         }
     }
 
-    // Launcher para elegir contacto de la agenda
+    // ---------- Importar desde agenda (CONTACTS)
     val pickPhoneLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { res ->
@@ -80,7 +92,6 @@ fun CrearContactoScreen(
                 val name = cursor.getString(0) ?: ""
                 val numberRaw = cursor.getString(1) ?: ""
                 val contactId = cursor.getString(2) ?: ""
-
                 val number = numberRaw.replace(" ", "").replace("-", "")
 
                 nombre = name
@@ -92,26 +103,28 @@ fun CrearContactoScreen(
         }
     }
 
-// Launcher para pedir permiso de contactos
+    // Permiso de contactos
     val requestContactsPermission = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { granted ->
         if (granted) {
-            val intent =
-                Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
+            val intent = Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
             pickPhoneLauncher.launch(intent)
         } else {
-            Toast.makeText(context, "Permiso de contactos denegado", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context,context.getString(R.string.contacts_permission_denied), Toast.LENGTH_SHORT).show()
         }
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Crear contacto nuevo") },
+                title = { Text(stringResource(R.string.contacts_create_title)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.common_back)
+                        )
                     }
                 }
             )
@@ -121,12 +134,13 @@ fun CrearContactoScreen(
         Column(
             modifier = Modifier
                 .padding(padding)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            // ---------- Tu selector de imagen tal cual
+            // ---------- Imagen del contacto (CD localizada)
             Box(
                 modifier = Modifier
                     .size(120.dp)
@@ -138,48 +152,53 @@ fun CrearContactoScreen(
                 if (fotoUrl != null) {
                     Image(
                         painter = rememberAsyncImagePainter(fotoUrl),
-                        contentDescription = "Foto",
+                        contentDescription = stringResource(R.string.contacts_photo_cd_generic),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()
                     )
                 } else {
-                    Icon(Icons.Default.AddAPhoto, contentDescription = "Añadir foto")
+                    Icon(
+                        Icons.Default.AddAPhoto,
+                        contentDescription = stringResource(R.string.contacts_photo_add)
+                    )
                 }
             }
 
+            // ---------- Campos (localizados)
             OutlinedTextField(
                 value = nombre,
                 onValueChange = { nombre = it },
-                label = { Text("Nombre") },
+                label = { Text(stringResource(R.string.contacts_field_name)) },
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
                 value = telefono,
                 onValueChange = { telefono = it },
-                label = { Text("Teléfono") },
+                label = { Text(stringResource(R.string.contacts_field_phone)) },
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
                 value = direccion,
                 onValueChange = { direccion = it },
-                label = { Text("Dirección") },
+                label = { Text(stringResource(R.string.contacts_field_address)) },
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email") },
+                label = { Text(stringResource(R.string.contacts_field_email)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
+            // ---------- Tipo Cliente/Proveedor (etiquetas localizadas)
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 RadioButton(selected = tipo == "Cliente", onClick = { tipo = "Cliente" })
-                Text("Cliente")
+                Text(stringResource(R.string.contact_type_client))
                 RadioButton(selected = tipo == "Proveedor", onClick = { tipo = "Proveedor" })
-                Text("Proveedor")
+                Text(stringResource(R.string.contact_type_supplier))
             }
 
-            // ---------- Botón Guardar
+            // ---------- Guardar (sin toast local: lo emite el VM)
             Button(
                 onClick = {
                     val nuevoContacto = Contacto(
@@ -188,21 +207,19 @@ fun CrearContactoScreen(
                         telefono = telefono,
                         direccion = direccion,
                         email = email,
-                        tipo = tipo,
+                        tipo = tipo,        // guardamos valor de dominio "Cliente"/"Proveedor"
                         fotoUrl = fotoUrl
                     )
                     viewModel.onAddContacto(context, nuevoContacto)
-                    Toast.makeText(context, "Contacto guardado", Toast.LENGTH_SHORT).show()
                     navController.popBackStack()
                 },
                 enabled = nombre.isNotBlank() && telefono.isNotBlank() && !isUploading,
                 modifier = Modifier.fillMaxWidth()
-            ) { Text("Guardar contacto") }
+            ) { Text(stringResource(R.string.contacts_save)) }
 
-            // ---------- 🔵 NUEVO: botón Importar
+            // ---------- Importar de la agenda
             OutlinedButton(
                 onClick = {
-                    // Comprobamos permiso en caliente
                     val hasPermission = ContextCompat.checkSelfPermission(
                         context, android.Manifest.permission.READ_CONTACTS
                     ) == PackageManager.PERMISSION_GRANTED
@@ -218,17 +235,12 @@ fun CrearContactoScreen(
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
-            ) { Text("Importar de la agenda") }
-
-
+            ) { Text(stringResource(R.string.contacts_import_from_phonebook)) }
         }
     }
 }
 
-/**
- *  intenta recuperar un email del contacto usando su CONTACT_ID.
- * Devuelve el primero que encuentre o null si no hay.
- */
+/** Busca un email por CONTACT_ID en la agenda; devuelve el primero o null. */
 private fun cargarEmailPorContactId(context: Context, contactId: String): String? {
     val projection = arrayOf(ContactsContract.CommonDataKinds.Email.ADDRESS)
     val selection = "${ContactsContract.CommonDataKinds.Email.CONTACT_ID}=?"
@@ -236,14 +248,9 @@ private fun cargarEmailPorContactId(context: Context, contactId: String): String
 
     context.contentResolver.query(
         ContactsContract.CommonDataKinds.Email.CONTENT_URI,
-        projection,
-        selection,
-        selectionArgs,
-        null
+        projection, selection, selectionArgs, null
     )?.use { cursor ->
-        if (cursor.moveToFirst()) {
-            return cursor.getString(0)
-        }
+        if (cursor.moveToFirst()) return cursor.getString(0)
     }
     return null
 }
@@ -251,119 +258,4 @@ private fun cargarEmailPorContactId(context: Context, contactId: String): String
 
 
 
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun CrearContactoScreen(
-//    navController: NavController,
-//    viewModel: ContactoViewModel = hiltViewModel()
-//) {
-//    val context = LocalContext.current
-//    val isUploading by viewModel.isUploading
-//    var nombre by remember { mutableStateOf("") }
-//    var telefono by remember { mutableStateOf("") }
-//    var direccion by remember { mutableStateOf("") }
-//    var email by remember { mutableStateOf("") }
-//    var tipo by remember { mutableStateOf("Cliente") }
-//    var fotoUrl by remember { mutableStateOf<String?>(null) }
-//
-//    // Launcher para seleccionar imagen de la galería
-//    val galeriaLauncher = rememberLauncherForActivityResult(
-//        contract = ActivityResultContracts.GetContent()
-//    ) { uri: Uri? ->
-//        uri?.let {
-//            viewModel.subirImagen(context, it, UUID.randomUUID().toString()) { url ->
-//                fotoUrl = url
-//            }
-//        }
-//    }
-//
-//    Column(
-//        modifier = Modifier
-//            .padding(16.dp)
-//            .fillMaxSize(),
-//        verticalArrangement = Arrangement.spacedBy(12.dp),
-//        horizontalAlignment = Alignment.CenterHorizontally
-//    ) {
-//
-//        // Imagen del contacto
-//        Box(
-//            modifier = Modifier
-//                .size(120.dp)
-//                .clip(CircleShape)
-//                .background(Color.Gray)
-//                .clickable { galeriaLauncher.launch("image/*") },
-//            contentAlignment = Alignment.Center
-//        ) {
-//            if (fotoUrl != null) {
-//                Image(
-//                    painter = rememberAsyncImagePainter(fotoUrl),
-//                    contentDescription = "Foto",
-//                    contentScale = ContentScale.Crop,
-//                    modifier = Modifier.fillMaxSize()
-//                )
-//            } else {
-//                Icon(Icons.Default.AddAPhoto, contentDescription = "Añadir foto")
-//            }
-//        }
-//
-//        OutlinedTextField(
-//            value = nombre,
-//            onValueChange = { nombre = it },
-//            label = { Text("Nombre") },
-//            modifier = Modifier.fillMaxWidth()
-//        )
-//        OutlinedTextField(
-//            value = telefono,
-//            onValueChange = { telefono = it },
-//            label = { Text("Teléfono") },
-//            modifier = Modifier.fillMaxWidth()
-//        )
-//        OutlinedTextField(
-//            value = direccion,
-//            onValueChange = { direccion = it },
-//            label = { Text("Dirección") },
-//            modifier = Modifier.fillMaxWidth()
-//        )
-//        OutlinedTextField(
-//            value = email,
-//            onValueChange = { email = it },
-//            label = { Text("Email") },
-//            modifier = Modifier.fillMaxWidth()
-//        )
-//
-//        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-//            RadioButton(
-//                selected = tipo == "Cliente",
-//                onClick = { tipo = "Cliente" }
-//            )
-//            Text("Cliente")
-//            RadioButton(
-//                selected = tipo == "Proveedor",
-//                onClick = { tipo = "Proveedor" }
-//            )
-//            Text("Proveedor")
-//        }
-//
-//        Button(
-//            onClick = {
-//                val nuevoContacto = Contacto(
-//                    id = UUID.randomUUID().toString(),
-//                    nombre = nombre,
-//                    telefono = telefono,
-//                    direccion = direccion,
-//                    email = email,
-//                    tipo = tipo,
-//                    fotoUrl = fotoUrl
-//                )
-//                viewModel.onAddContacto(context, nuevoContacto)
-//                Toast.makeText(context, "Contacto guardado", Toast.LENGTH_SHORT).show()
-//                navController.popBackStack()
-//            },
-//            enabled = nombre.isNotBlank() && telefono.isNotBlank() && !isUploading,
-//            modifier = Modifier.fillMaxWidth()
-//        ) {
-//            Text("Guardar contacto")
-//        }
-//    }
-//}
 

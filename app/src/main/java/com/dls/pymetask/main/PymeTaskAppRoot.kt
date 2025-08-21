@@ -2,6 +2,7 @@ package com.dls.pymetask.main
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.core.os.LocaleListCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.dls.pymetask.presentation.ajustes.ThemeViewModel
@@ -35,6 +37,9 @@ fun PymeTaskAppRoot(
 
     // Tema actual de la app
     val themeMode by themeViewModel.themeMode.collectAsState()
+
+
+
 
     LaunchedEffect(Unit) {
         mainViewModel.checkLoginStatus()

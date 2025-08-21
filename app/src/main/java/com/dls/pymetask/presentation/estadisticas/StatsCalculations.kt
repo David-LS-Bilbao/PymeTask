@@ -1,7 +1,5 @@
 package com.dls.pymetask.presentation.estadisticas
 
-
-
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -49,18 +47,37 @@ fun daysInMonth(year: Int, month0: Int): Int =
         set(Calendar.YEAR, year); set(Calendar.MONTH, month0); set(Calendar.DAY_OF_MONTH, 1)
     }.getActualMaximum(Calendar.DAY_OF_MONTH)
 
+
 fun monthYearTitle(year: Int, month0: Int): String {
     val c = Calendar.getInstance().apply { set(year, month0, 1) }
-    val f = SimpleDateFormat("LLLL yyyy", Locale("es", "ES"))
+    val loc = Locale.getDefault() // <-- idioma activo
+    val f = SimpleDateFormat("LLLL yyyy", loc)
     val raw = f.format(c.time)
-    return raw.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale("es","ES")) else it.toString() }
+    return raw.replaceFirstChar { if (it.isLowerCase()) it.titlecase(loc) else it.toString() }
 }
 
 fun monthShortEs(year: Int, month0: Int): String {
+    // Conservamos el nombre para no romper imports, pero ya no fuerza "es".
     val c = Calendar.getInstance().apply { set(year, month0, 1) }
-    val s = SimpleDateFormat("LLL", Locale("es","ES")).format(c.time)
-    return s.replace(".", "").uppercase()
+    val loc = Locale.getDefault()
+    val s = SimpleDateFormat("LLL", loc).format(c.time)
+    // Algunas locales ponen punto en abreviaturas
+    return s.replace(".", "").uppercase(loc)
 }
+
+
+//fun monthYearTitle(year: Int, month0: Int): String {
+//    val c = Calendar.getInstance().apply { set(year, month0, 1) }
+//    val f = SimpleDateFormat("LLLL yyyy", Locale("es", "ES"))
+//    val raw = f.format(c.time)
+//    return raw.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale("es","ES")) else it.toString() }
+//}
+//
+//fun monthShortEs(year: Int, month0: Int): String {
+//    val c = Calendar.getInstance().apply { set(year, month0, 1) }
+//    val s = SimpleDateFormat("LLL", Locale("es","ES")).format(c.time)
+//    return s.replace(".", "").uppercase()
+//}
 
 // ===== Cálculos principales =====
 fun totalesMes(lista: List<Movimiento>): Totales {

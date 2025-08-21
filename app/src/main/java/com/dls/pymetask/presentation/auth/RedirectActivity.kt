@@ -18,8 +18,6 @@ import kotlin.jvm.java
 @AndroidEntryPoint
 class RedirectActivity : ComponentActivity() {
 
-//    @Inject lateinit var oauthManager: OAuthManager
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

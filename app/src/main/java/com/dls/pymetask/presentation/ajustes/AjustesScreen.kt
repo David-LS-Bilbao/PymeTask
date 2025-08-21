@@ -1,15 +1,32 @@
 package com.dls.pymetask.presentation.ajustes
 
-import android.os.Build
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -20,8 +37,8 @@ import androidx.navigation.NavController
 import com.dls.pymetask.R
 import com.dls.pymetask.data.preferences.DefaultAppPreferences
 import com.dls.pymetask.data.preferences.ThemeMode
-import com.dls.pymetask.utils.LocaleManager
-import com.dls.pymetask.utils.applyAppLanguage
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,7 +57,9 @@ fun AjustesScreen(
     val languageCode by languageViewModel.languageCode.collectAsState()
 
     val context = LocalContext.current
-    val activity = context as? android.app.Activity
+    context as? android.app.Activity
+
+    val scope = rememberCoroutineScope()
 
     // Estados para abrir diálogos
     var showThemeDialog by remember { mutableStateOf(false) }
@@ -183,21 +202,22 @@ fun AjustesScreen(
                 onSeleccionar = { index ->
                     val code = idiomasCodigos.getOrElse(index) { "es" }
 
-                    // 1) Persistir en DataStore
-                    languageViewModel.setLanguage(code)
+                    scope.launch {
+                        // 1) Pide guardar (si no es suspend, no pasa nada; seguimos)
+                        languageViewModel.setLanguage(code)
 
-                    // 2) Aplicar inmediatamente:
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        // Android 13+: AppCompat fuerza la recreación automáticamente
-                        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(code))
-                    } else {
-                        // Android 12 o menos: aplicamos el locale y recreamos la Activity visible
-                        LocaleManager.setLocale(context, code)
-                        activity?.recreate()
+                        // 2) ESPERA hasta que el StateFlow refleje el nuevo valor
+                        languageViewModel.languageCode.first { it == code }
+
+                        // 3) Aplica locales y recrea (ya persistido -> no se pisa en attachBaseContext)
+                        AppCompatDelegate.setApplicationLocales(
+                            LocaleListCompat.forLanguageTags(code)
+                        )
+                        (context as? android.app.Activity)?.recreate()
+
+                        showLanguageDialog = false
                     }
 
-                    // 3) Cerrar diálogo
-                    showLanguageDialog = false
                 },
                 onCerrar = { showLanguageDialog = false }
             )

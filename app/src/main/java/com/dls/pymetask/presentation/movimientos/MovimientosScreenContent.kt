@@ -25,17 +25,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-//import com.dls.pymetask.data.remote.bank.auth.OAuthManager
 import com.dls.pymetask.domain.model.Movimiento
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import com.dls.pymetask.R
+import java.util.Currency
 
 // ------------------------------------------------------------
 // MODELO DE UI (exclusivo de la vista)
@@ -108,14 +110,12 @@ fun MovimientosScreen(
          onImportCsv = { picker.launch(arrayOf("text/*", "text/csv", "application/vnd.ms-excel")) },
         syncing = syncing,
         lastSyncMessage = lastMsg,
-                // 👇 NUEVO: secciones mensuales y control de paginación
         meses = meses,
         noHayMas = noHayMas,
         onMostrarMas = { viewModel.loadNextMonth(userId) },
 
     )
 }
-
 
 // ------------------------------------------------------------
 // CONTENT PURO: header fijo + lista scroll + totales
@@ -155,11 +155,12 @@ fun MovimientosScreenContent(
         if (lastSyncMessage != null) snackbarHostState.showSnackbar(lastSyncMessage)
     }
 
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },      // <-- ahora sí se muestra el snackbar
         floatingActionButton = {
             FloatingActionButton(onClick = onAddClick) {
-                Icon(Icons.Default.Add, contentDescription = "Añadir movimiento")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.movements_add))
             }
         }
     ) { padding ->
@@ -209,23 +210,21 @@ fun MovimientosScreenContent(
                 // Footer: Mostrar más / No hay más
                 item(key = "footer") {
                     Spacer(Modifier.height(12.dp))
+
                     if (!noHayMas) {
                         OutlinedButton(
                             onClick = onMostrarMas,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp)
-                        ) { Text("Mostrar más") }
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                        ) { Text(stringResource(R.string.movements_show_more)) }
                     } else {
                         Text(
-                            "No hay más movimientos",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
+                            stringResource(R.string.movements_no_more),
+                            modifier = Modifier.fillMaxWidth().padding(16.dp),
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
+
                     Spacer(Modifier.height(48.dp))
                 }
             }
@@ -289,10 +288,15 @@ private fun MovimientoItem(
     )
 }
 
+
 @Composable
 private fun EstadoVacioMovimientos() {
     Box(Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) {
-        Text("No hay movimientos aún.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            stringResource(R.string.movements_empty),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 
@@ -302,7 +306,7 @@ private fun EstadoVacioMovimientos() {
 
 /** Mapper dominio -> UI para esta pantalla. */
 private fun Movimiento.toUi(): MovimientoUi {
-    val sdf = SimpleDateFormat("dd/MM/yyyy", Locale("es", "ES"))
+    val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
     val fechaFormateada = sdf.format(Date(this.fecha))
     val importeUi = if (this.ingreso) this.cantidad else -this.cantidad
     return MovimientoUi(
@@ -324,9 +328,15 @@ private fun calcularTotales(movimientos: List<MovimientoUi>): Triple<Double, Dou
 
 /** Formatea en EUR/ES; withSign añade +/− en pantalla. */
 private fun Double.toCurrency(withSign: Boolean = false): String {
-    val nf = NumberFormat.getCurrencyInstance(Locale("es", "ES"))
-    val base = nf.format(kotlin.math.abs(this))
-    return if (!withSign) nf.format(this) else if (this >= 0) "+$base" else "-$base"
+    val nf = NumberFormat.getCurrencyInstance(Locale.getDefault()).apply {
+        currency = Currency.getInstance("EUR")
+        maximumFractionDigits = 2
+    }
+    val base = nf.format(this)
+    if (!withSign) return base
+
+    val absText = nf.format(kotlin.math.abs(this))
+    return if (this >= 0) "+$absText" else "-$absText"
 }
 // ===== Lógica de filtro =====
 private fun filtrarMovimientos(
@@ -387,28 +397,28 @@ private fun SaldoStickyHeader(
                 ) {
                 // botón atrás
                 IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.Default.ArrowBackIosNew, contentDescription = "volver al menú")
+                    Icon(Icons.Default.ArrowBackIosNew, contentDescription = stringResource(R.string.nav_back_to_menu))
                 }
-                Text("Resumen", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                Spacer(Modifier.weight(1f))
 
-                // boton importar CSV
-                OutlinedButton(onClick = onImportCsv) { Text("Importar CSV") }
-                Spacer(Modifier.width(8.dp))
+                Text(stringResource(R.string.movements_summary), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
 
-                Spacer(Modifier.width(24.dp))
-                // botón para ir a estadísticas
+                OutlinedButton(onClick = onImportCsv) { Text(stringResource(R.string.movements_import_csv)) }
+
                 OutlinedButton(onClick = { navController.navigate("estadisticas") }) {
-                    Icon(Icons.Default.BarChart, contentDescription = "ir a estadísticas")
+                    Icon(Icons.Default.BarChart, contentDescription = stringResource(R.string.movements_go_stats))
                 }
             }
             if (syncing) { LinearProgressIndicator(Modifier.fillMaxWidth()) }
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp),
-                modifier = Modifier.horizontalScroll(rememberScrollState())) {
-                ResumenChip("Ingresos", ingresos, true)
-                ResumenChip("Gastos", gastos, false)
-                ResumenChip("Saldo", saldo, saldo >= 0)
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                modifier = Modifier.horizontalScroll(rememberScrollState())
+            ) {
+                ResumenChip(stringResource(R.string.movements_income), ingresos, true)
+                ResumenChip(stringResource(R.string.movements_expenses), gastos, false)
+                ResumenChip(stringResource(R.string.movements_balance), saldo, saldo >= 0)
             }
+
         }
     }
 }

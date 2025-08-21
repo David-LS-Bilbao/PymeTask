@@ -1,47 +1,35 @@
+
+
 @file:OptIn(ExperimentalMaterial3Api::class)
 @file:Suppress("DEPRECATION")
 
 package com.dls.pymetask.presentation.estadisticas
 
-// ==== imports de utilidades/calculadoras puras (StatsCalculations.kt) ====
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.CompareArrows
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.*
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -50,13 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDateRangePickerState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -66,12 +48,14 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.dls.pymetask.R
 import com.dls.pymetask.domain.model.Movimiento
 import com.dls.pymetask.presentation.movimientos.MovimientosViewModel
 import java.text.NumberFormat
@@ -81,8 +65,6 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
 import java.util.Locale
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -95,17 +77,23 @@ fun EstadisticasScreen(
     val movimientos by movimientosVm.movimientos.collectAsState(initial = emptyList())
     LaunchedEffect(movimientos) { statsVm.setMovimientos(movimientos) }
 
+    val currency = remember {
+        NumberFormat.getCurrencyInstance(Locale.getDefault()).apply {
+            currency = java.util.Currency.getInstance("EUR")   // 👈 €
+            maximumFractionDigits = 2
+        }
+    }
+
+
     // Estado de estadísticas
     val ui by statsVm.ui.collectAsState()
 
     // UI local
     var showRangePicker by remember { mutableStateOf(false) }
-
     var selectedCategory by remember { mutableStateOf<String?>(null) }
 
-
-    // formatos
-    val currency = remember { NumberFormat.getCurrencyInstance(Locale("es", "ES")) }
+    // Formatos (se deja como estaba para no tocar lógica ajena al idioma)
+  //  val currency = remember { NumberFormat.getCurrencyInstance(Locale("es", "ES")) }
     val sdfFecha = remember { SimpleDateFormat("dd/MM/yyyy", Locale("es", "ES")) }
 
     val listaParaLista = remember(ui.listaA, ui.filtro, selectedCategory) {
@@ -115,15 +103,17 @@ fun EstadisticasScreen(
         } ?: base
     }
 
-
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text("Estadísticas") },
+                title = { Text(stringResource(R.string.stats_title)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.stats_back)
+                        )
                     }
                 },
                 actions = {
@@ -133,7 +123,7 @@ fun EstadisticasScreen(
                                 Icons.AutoMirrored.Filled.CompareArrows
                             else
                                 Icons.Filled.DateRange,
-                            contentDescription = "Cambiar modo"
+                            contentDescription = stringResource(R.string.stats_toggle_mode)
                         )
                     }
                 }
@@ -152,12 +142,12 @@ fun EstadisticasScreen(
             item {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())
                 ) {
-                    PeriodChip("Hoy", ui.periodo == Periodo.HOY) { statsVm.setPeriodo(Periodo.HOY) }
-                    PeriodChip("Esta semana", ui.periodo == Periodo.SEMANA) { statsVm.setPeriodo(Periodo.SEMANA) }
-                    PeriodChip("Este mes", ui.periodo == Periodo.MES) { statsVm.setPeriodo(Periodo.MES) }
-                    PeriodChip("Personalizado", ui.periodo == Periodo.PERSONALIZADO) {
+                    PeriodChip(stringResource(R.string.stats_period_today),   ui.periodo == Periodo.HOY)       { statsVm.setPeriodo(Periodo.HOY) }
+                    PeriodChip(stringResource(R.string.stats_period_week),    ui.periodo == Periodo.SEMANA)    { statsVm.setPeriodo(Periodo.SEMANA) }
+                    PeriodChip(stringResource(R.string.stats_period_month),   ui.periodo == Periodo.MES)       { statsVm.setPeriodo(Periodo.MES) }
+                    PeriodChip(stringResource(R.string.stats_period_custom),  ui.periodo == Periodo.PERSONALIZADO) {
                         statsVm.setPeriodo(Periodo.PERSONALIZADO)
                         showRangePicker = true
                     }
@@ -165,7 +155,7 @@ fun EstadisticasScreen(
                 Spacer(Modifier.height(8.dp))
                 if (ui.periodo == Periodo.MES && ui.modo == Modo.MES) {
                     SelectorMes(
-                        title = "Mes",
+                        title = stringResource(R.string.stats_month),
                         year = ui.year,
                         monthZero = ui.month0,
                         onPrev = { statsVm.mesPrevA() },
@@ -177,7 +167,9 @@ fun EstadisticasScreen(
             // ---------- Resumen ----------
             item {
                 if (ui.movimientos.isEmpty()) {
-                    Tarjeta("Resumen") { TextoVacio("Aún no hay movimientos") }
+                    Tarjeta(stringResource(R.string.stats_summary)) {
+                        TextoVacio(stringResource(R.string.stats_empty_movements))
+                    }
                 } else if (ui.modo == Modo.MES) {
                     ResumenGlobal(
                         saldo = currency.format(ui.totA.saldo),
@@ -187,14 +179,14 @@ fun EstadisticasScreen(
                 } else {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         SelectorMes(
-                            title = "Mes A",
+                            title = stringResource(R.string.stats_month_a),
                             year = ui.year,
                             monthZero = ui.month0,
                             onPrev = { statsVm.mesPrevA() },
                             onNext = { statsVm.mesNextA() }
                         )
                         SelectorMes(
-                            title = "Mes B",
+                            title = stringResource(R.string.stats_month_b),
                             year = ui.yearB,
                             monthZero = ui.month0B,
                             onPrev = { statsVm.mesPrevB() },
@@ -213,45 +205,25 @@ fun EstadisticasScreen(
                 }
             }
 
-            // ---------- Filtro por tipo (modo Mes) ----------
+            // ---------- Gastos por categorías (modo Mes) ----------
             if (ui.modo == Modo.MES) {
-
-                // EstadisticasScreen.kt — dentro del LazyColumn, en modo Mes
-
                 item {
-                    val allSlices = remember(ui.listaA) { buildExpenseSlicesAll(ui.listaA) } // <-- TODAS
+                    val allSlices = remember(ui.listaA) { buildExpenseSlicesAll(ui.listaA) }
                     CategoryBreakdownCard(
-                        title = "Gastos por categorías — ${ui.tituloMesA}",
+                        title = stringResource(R.string.stats_expenses_by_category, ui.tituloMesA),
                         allSlices = allSlices,
                         selectedLabel = selectedCategory,
                         onSelect = { label -> selectedCategory = if (selectedCategory == label) null else label },
-                        maxVisible = 8 // ← sube a 8 (o lo que quieras)
+                        maxVisible = 8
                     )
                 }
-//                item {
-//                    val slices = remember(ui.listaA) { buildExpenseSlices(ui.listaA, maxSlices = 6) }
-//                    CategoryBreakdownCard(
-//                        title = "Gastos por categorías — ${ui.tituloMesA}",
-//                        slices = slices,
-//                        selectedLabel = selectedCategory,
-//                        onSelect = { label -> selectedCategory = if (selectedCategory == label) null else label }
-//                    )
-//                }
-
-//                item {
-//                    val slices = remember(ui.listaA) { buildExpenseSlices(ui.listaA, maxSlices = 6) }
-//                    CategoryBreakdownCard(
-//                        title = "Gastos por categorías — ${ui.tituloMesA}",
-//                        slices = slices
-//                    )
-//                }
             }
 
             // ---------- Gráficos ----------
             if (ui.modo == Modo.MES && ui.periodo == Periodo.MES) {
                 item {
-                    Tarjeta("Ingresos vs Gastos por día — ${ui.tituloMesA}") {
-                        if (ui.diarioA.dias == 0) TextoVacio("No hay datos en este mes.")
+                    Tarjeta(stringResource(R.string.stats_chart_income_vs_expenses_day, ui.tituloMesA)) {
+                        if (ui.diarioA.dias == 0) TextoVacio(stringResource(R.string.stats_chart_no_data_month))
                         else BarChartIngresosGastosPorDia(
                             ingresosPorDia = ui.diarioA.ingresosPorDia,
                             gastosPorDia = ui.diarioA.gastosPorDia,
@@ -262,22 +234,21 @@ fun EstadisticasScreen(
                         Spacer(Modifier.height(4.dp))
                         AssistChip(
                             onClick = { selectedCategory = null },
-                            label = { Text("Filtro: $selectedCategory  ✕") }
+                            label = { Text("Filtro: $selectedCategory  ✕") } // (opcional) si lo quieres también en recursos, avísame
                         )
                     }
-
                 }
                 item {
-                    Tarjeta("Saldo acumulado — ${ui.tituloMesA}") {
-                        if (ui.diarioA.dias == 0) TextoVacio("No hay datos en este mes.")
+                    Tarjeta(stringResource(R.string.stats_chart_accumulated_balance, ui.tituloMesA)) {
+                        if (ui.diarioA.dias == 0) TextoVacio(stringResource(R.string.stats_chart_no_data_month))
                         else LineChartSaldoAcumulado(ui.diarioA.saldoAcumulado, 180.dp)
                     }
                 }
             } else if (ui.modo == Modo.COMPARAR) {
                 item {
-                    Tarjeta("Comparativa de totales") {
+                    Tarjeta(stringResource(R.string.stats_compare_totals)) {
                         if (ui.listaA.isEmpty() && ui.listaB.isEmpty()) {
-                            TextoVacio("No hay datos para comparar.")
+                            TextoVacio(stringResource(R.string.stats_compare_no_data))
                         } else {
                             BarChartComparativaTotales(
                                 tituloA = ui.tituloMesA, tituloB = ui.tituloMesB,
@@ -293,28 +264,28 @@ fun EstadisticasScreen(
             // Tendencia 12 meses
             if (ui.modo == Modo.MES) {
                 item {
-                    Tarjeta("Tendencia últimos 12 meses") {
-                        if (ui.tendencia12m.isEmpty()) TextoVacio("Sin datos")
+                    Tarjeta(stringResource(R.string.stats_trend_12m)) {
+                        if (ui.tendencia12m.isEmpty()) TextoVacio(stringResource(R.string.stats_no_data))
                         else MonthlyTrendChart(ui.tendencia12m, 200.dp)
                     }
                 }
             }
-
             // ---------- Lista ----------
             if (ui.modo == Modo.MES && listaParaLista.isNotEmpty()) {
-                val tituloLista = when (ui.periodo) {
-                    Periodo.MES -> "Movimientos de ${ui.tituloMesA}"
-                    Periodo.HOY -> "Movimientos de hoy"
-                    Periodo.SEMANA -> "Movimientos de esta semana"
-                    Periodo.PERSONALIZADO -> "Movimientos (rango personalizado)"
+                item {
+                    val tituloLista = when (ui.periodo) {
+                        Periodo.MES           -> stringResource(R.string.stats_list_month, ui.tituloMesA)
+                        Periodo.HOY           -> stringResource(R.string.stats_list_today)
+                        Periodo.SEMANA        -> stringResource(R.string.stats_list_week)
+                        Periodo.PERSONALIZADO -> stringResource(R.string.stats_list_custom)
+                    }
+                    Text(tituloLista, style = MaterialTheme.typography.titleMedium)
                 }
-                item { Text(tituloLista, style = MaterialTheme.typography.titleMedium) }
                 items(listaParaLista.sortedByDescending { it.fecha }, key = { it.id }) { mov ->
                     MovimientoRow(mov, sdfFecha, currency)
                     HorizontalDivider()
                 }
             }
-
         }
     }
 
@@ -334,22 +305,6 @@ fun EstadisticasScreen(
 
 @Composable
 private fun PeriodChip(text: String, selected: Boolean, onClick: () -> Unit) {
-    FilterChip(
-        selected = selected,
-        onClick = onClick,
-        label = { Text(text) },
-        colors = FilterChipDefaults.filterChipColors(
-            containerColor = Color.Transparent,
-            labelColor = MaterialTheme.colorScheme.onSurface,
-            selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.16f),
-            selectedLabelColor = MaterialTheme.colorScheme.primary
-        )
-        // border por defecto (evita problemas de firma entre versiones)
-    )
-}
-
-@Composable
-private fun TypeChip(text: String, selected: Boolean, onClick: () -> Unit) {
     FilterChip(
         selected = selected,
         onClick = onClick,
@@ -417,7 +372,7 @@ private fun ResumenGlobal(saldo: String, ingresos: String, gastos: String) {
             shape = MaterialTheme.shapes.large
         ) {
             Column(Modifier.padding(16.dp)) {
-                Text("Saldo")
+                Text(stringResource(R.string.stats_balance))
                 Text(saldo, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
             }
         }
@@ -427,13 +382,13 @@ private fun ResumenGlobal(saldo: String, ingresos: String, gastos: String) {
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(2.dp),
                 shape = MaterialTheme.shapes.large
-            ) { Column(Modifier.padding(16.dp)) { Text("Ingresos"); Text(ingresos, fontWeight = FontWeight.SemiBold) } }
+            ) { Column(Modifier.padding(16.dp)) { Text(stringResource(R.string.stats_income));  Text(ingresos, fontWeight = FontWeight.SemiBold) } }
             Card(
                 Modifier.weight(1f),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(2.dp),
                 shape = MaterialTheme.shapes.large
-            ) { Column(Modifier.padding(16.dp)) { Text("Gastos"); Text(gastos, fontWeight = FontWeight.SemiBold) } }
+            ) { Column(Modifier.padding(16.dp)) { Text(stringResource(R.string.stats_expenses)); Text(gastos,  fontWeight = FontWeight.SemiBold) } }
         }
     }
 }
@@ -453,7 +408,9 @@ private fun ResumenComparativa(
         ) {
             Column(Modifier.padding(12.dp)) {
                 Text(tituloA, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold)
-                Text("Saldo: $saldoA"); Text("Ingresos: $ingresosA"); Text("Gastos: $gastosA")
+                Text("${stringResource(R.string.stats_balance)}: $saldoA")
+                Text("${stringResource(R.string.stats_income)}: $ingresosA")
+                Text("${stringResource(R.string.stats_expenses)}: $gastosA")
             }
         }
         Card(
@@ -464,7 +421,9 @@ private fun ResumenComparativa(
         ) {
             Column(Modifier.padding(12.dp)) {
                 Text(tituloB, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold)
-                Text("Saldo: $saldoB"); Text("Ingresos: $ingresosB"); Text("Gastos: $gastosB")
+                Text("${stringResource(R.string.stats_balance)}: $saldoB")
+                Text("${stringResource(R.string.stats_income)}: $ingresosB")
+                Text("${stringResource(R.string.stats_expenses)}: $gastosB")
             }
         }
     }
@@ -570,12 +529,21 @@ private fun BarChartComparativaTotales(
     val colorB = MaterialTheme.colorScheme.error
     val gridColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.25f)
 
-    val labels = listOf("Ingresos", "Gastos", "Saldo")
+    val labels = listOf(
+        stringResource(R.string.stats_income),
+        stringResource(R.string.stats_expenses),
+        stringResource(R.string.stats_balance)
+    )
     val valsA = listOf(ingresosA, gastosA, saldoA)
     val valsB = listOf(ingresosB, gastosB, saldoB)
 
     val maxV = (valsA + valsB).maxOrNull()?.takeIf { it > 0 } ?: 1.0
-    val currency = remember { NumberFormat.getCurrencyInstance(Locale("es", "ES")) }
+    val currency = remember {
+        NumberFormat.getCurrencyInstance(Locale.getDefault()).apply {
+            currency = java.util.Currency.getInstance("EUR")   // 👈 €
+            maximumFractionDigits = 2
+        }
+    }
 
     val onSurface = MaterialTheme.colorScheme.onSurface
     val textSizePx = with(LocalDensity.current) { 11.sp.toPx() }
@@ -643,8 +611,8 @@ private fun BarChartComparativaTotales(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            LegendChip(MaterialTheme.colorScheme.primary, "A: $tituloA")
-            LegendChip(MaterialTheme.colorScheme.error, "B: $tituloB")
+            LegendChip(MaterialTheme.colorScheme.primary, stringResource(R.string.stats_legend_a, tituloA))
+            LegendChip(MaterialTheme.colorScheme.error,   stringResource(R.string.stats_legend_b, tituloB))
         }
     }
 }
@@ -696,7 +664,7 @@ private fun MonthlyTrendChart(data: List<MonthAgg>, height: Dp) {
                 val hGas = ((m.gastos / maxV).toFloat() * usableH)
 
                 drawRect(colorIngresos, topLeft = Offset(xStart, baseY - hIng), size = androidx.compose.ui.geometry.Size(barW, hIng))
-                drawRect(colorGastos, topLeft = Offset(xStart + barW + gap, baseY - hGas), size = androidx.compose.ui.geometry.Size(barW, hGas))
+                drawRect(colorGastos,   topLeft = Offset(xStart + barW + gap, baseY - hGas), size = androidx.compose.ui.geometry.Size(barW, hGas))
             }
         }
         Row(
@@ -716,8 +684,8 @@ private fun MonthlyTrendChart(data: List<MonthAgg>, height: Dp) {
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            LegendChip(MaterialTheme.colorScheme.primary, "Ingresos")
-            LegendChip(MaterialTheme.colorScheme.error, "Gastos")
+            LegendChip(MaterialTheme.colorScheme.primary, stringResource(R.string.stats_income))
+            LegendChip(MaterialTheme.colorScheme.error,   stringResource(R.string.stats_expenses))
         }
     }
 }
@@ -745,18 +713,17 @@ private fun DateRangePickerDialog(
             TextButton(
                 enabled = state.selectedStartDateMillis != null && state.selectedEndDateMillis != null,
                 onClick = {
-                    // ⬇️ usa la extensión con PARÉNTESIS
                     val start = state.selectedStartDateMillis!!.toLocalDate()
                     val end = state.selectedEndDateMillis!!.toLocalDate()
                     onConfirm(start, end)
                 }
-            ) { Text("Aplicar") }
+            ) { Text(stringResource(R.string.common_apply)) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancelar") } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.common_cancel)) } }
     ) {
         DateRangePicker(
             state = state,
-            title = { Text("Rango personalizado") },
+            title = { Text(stringResource(R.string.stats_daterange_title)) },
             colors = DatePickerDefaults.colors(
                 selectedDayContainerColor = MaterialTheme.colorScheme.primary,
                 selectedDayContentColor = MaterialTheme.colorScheme.onPrimary,
@@ -771,34 +738,23 @@ private fun DateRangePickerDialog(
 /* ======================== Utils fecha UI ======================== */
 @RequiresApi(Build.VERSION_CODES.O)
 private fun Long.toLocalDate(): LocalDate =
-    ofEpochMilli(this)             // ← FQN: java.time.Instant
-        .atZone(ZoneId.systemDefault())
-        .toLocalDate()
+    ofEpochMilli(this).atZone(ZoneId.systemDefault()).toLocalDate()
 
 @RequiresApi(Build.VERSION_CODES.O)
 private fun LocalDate.toEpochMillisAtStart(): Long =
-    atStartOfDay(ZoneId.systemDefault())
-        .toInstant()
-        .toEpochMilli()
+    atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
 @RequiresApi(Build.VERSION_CODES.O)
 private fun LocalDate.toEpochMillisAtEnd(): Long =
-    plusDays(1)
-        .atStartOfDay(ZoneId.systemDefault())
-        .toInstant()
-        .toEpochMilli() - 1
+    plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() - 1
 
-// ---------- Modelo y agregación de "categorías light" ----------
+/* ======================== Modelo/agrupación categorías ======================== */
+
 private data class CategorySlice(val label: String, val value: Double)
 
-private fun buildExpenseSlices(
-    movimientos: List<Movimiento>,
-    maxSlices: Int = 6
-): List<CategorySlice> {
+private fun buildExpenseSlicesAll(movimientos: List<Movimiento>): List<CategorySlice> {
     if (movimientos.isEmpty()) return emptyList()
-
-    // Solo GASTOS; sumamos cantidades positivas (tu dominio ya guarda positivas)
-    val byLabel: Map<String, Double> = movimientos
+    val byLabel = movimientos
         .asSequence()
         .filter { !it.ingreso }
         .groupBy { m ->
@@ -806,42 +762,34 @@ private fun buildExpenseSlices(
             base.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
         }
         .mapValues { (_, list) -> list.sumOf { it.cantidad } }
+        .filterValues { it > 0.0 }
 
-    if (byLabel.isEmpty()) return emptyList()
-
-    // Top N y "Otros"
-    val sorted = byLabel.entries.sortedByDescending { it.value }
-    val takeN = (maxSlices - 1).coerceAtLeast(1)
-    val top = sorted.take(takeN).map { CategorySlice(it.key, it.value) }
-    val rest = sorted.drop(takeN).sumOf { it.value }
-    return if (rest > 0.0) top + CategorySlice("Otros", rest) else top
+    return byLabel.entries
+        .sortedByDescending { it.value }
+        .map { CategorySlice(it.key, it.value) }
 }
 
-// Paleta simple y estable (reutiliza si hay más slices)
-//private val donutPalette = listOf(
-//    Color(0xFF3B82F6), // azul
-//    Color(0xFF22C55E), // verde
-//    Color(0xFFF59E0B), // ámbar
-//    Color(0xFFEF4444), // rojo
-//    Color(0xFF8B5CF6), // violeta
-//    Color(0xFF06B6D4)  // cian
-//)
+private fun collapseSlices(all: List<CategorySlice>, maxVisible: Int): List<CategorySlice> {
+    if (all.size <= maxVisible) return all
+    val top = all.take(maxVisible - 1)
+    val rest = all.drop(maxVisible - 1).sumOf { it.value }
+    return top + CategorySlice("Otros", rest)
+}
 
+/* ======================== Donut & leyenda ======================== */
 
 @Composable
 private fun CategoryBreakdownCard(
     title: String,
-    allSlices: List<CategorySlice>,         // <- pásame TODAS (sin agrupar)
+    allSlices: List<CategorySlice>,
     selectedLabel: String?,
     onSelect: (String) -> Unit,
     modifier: Modifier = Modifier,
-    maxVisible: Int = 8,                   // <- Top N por defecto
+    maxVisible: Int = 8,
     height: Dp = 180.dp,
     ringThickness: Dp = 22.dp
 ) {
     var expanded by remember { mutableStateOf(false) }
-
-    // Decide qué mostrar en donut/leyenda
     val display = remember(allSlices, expanded, maxVisible) {
         if (expanded) allSlices else collapseSlices(allSlices, maxVisible)
     }
@@ -859,16 +807,20 @@ private fun CategoryBreakdownCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(title, style = MaterialTheme.typography.titleMedium)
-                // Toggle expand/compact
                 TextButton(onClick = { expanded = !expanded }) {
-                    Text(if (expanded) "Ver top $maxVisible" else "Ver todas")
+                    Text(
+                        if (expanded)
+                            stringResource(R.string.stats_see_top_n, maxVisible)
+                        else
+                            stringResource(R.string.stats_see_all)
+                    )
                 }
             }
 
             Spacer(Modifier.height(12.dp))
 
             if (display.isEmpty() || display.sumOf { it.value } <= 0.0) {
-                TextoVacio("Sin gastos en este periodo")
+                TextoVacio(stringResource(R.string.stats_no_expenses_period))
                 return@Column
             }
 
@@ -886,10 +838,9 @@ private fun CategoryBreakdownCard(
                     slices = display,
                     selectedLabel = selectedLabel,
                     onSelect = onSelect,
-                    // Para que quepan más de 3 sin recortar:
                     modifier = Modifier
                         .weight(1f)
-                        .heightIn(max = height) // altura ~ al donut
+                        .heightIn(max = height)
                         .verticalScroll(rememberScrollState())
                 )
             }
@@ -905,12 +856,19 @@ private fun LegendList(
     modifier: Modifier = Modifier
 ) {
     val total = slices.sumOf { it.value }
-    val currency = remember { java.text.NumberFormat.getCurrencyInstance(java.util.Locale("es", "ES")) }
+    val currency = remember {
+        NumberFormat.getCurrencyInstance(Locale.getDefault()).apply {
+            currency = java.util.Currency.getInstance("EUR")   // 👈 €
+            maximumFractionDigits = 2
+        }
+    }
 
     Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         slices.forEachIndexed { i, s ->
             val pct = if (total == 0.0) 0 else ((s.value / total) * 100).toInt()
             val isSel = s.label == selectedLabel
+            val shownLabel = if (s.label == "Otros") stringResource(R.string.stats_others) else s.label
+
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
@@ -930,7 +888,7 @@ private fun LegendList(
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    s.label,
+                    shownLabel,
                     style = MaterialTheme.typography.labelLarge.copy(
                         fontWeight = if (isSel) FontWeight.SemiBold else FontWeight.Normal
                     ),
@@ -980,222 +938,15 @@ private fun DonutChart(
     }
 }
 
-
-
-
-
-//
-//@Composable
-//private fun CategoryBreakdownCard(
-//    title: String,
-//    slices: List<CategorySlice>,
-//    selectedLabel: String?,
-//    onSelect: (String) -> Unit,
-//    modifier: Modifier = Modifier,
-//    height: Dp = 180.dp,
-//    ringThickness: Dp = 22.dp
-//) {
-//    Card(
-//        modifier = modifier,
-//        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-//        elevation = CardDefaults.cardElevation(2.dp),
-//        shape = MaterialTheme.shapes.large
-//    ) {
-//        Column(Modifier.fillMaxWidth().padding(16.dp)) {
-//            Text(title, style = MaterialTheme.typography.titleMedium)
-//            Spacer(Modifier.height(12.dp))
-//
-//            if (slices.isEmpty() || slices.sumOf { it.value } <= 0.0) {
-//                TextoVacio("Sin gastos en este periodo")
-//                return@Column
-//            }
-//
-//            Row(
-//                Modifier.fillMaxWidth(),
-//                verticalAlignment = Alignment.CenterVertically
-//            ) {
-//                DonutChart(
-//                    slices = slices.mapIndexed { i, s -> s.value to donutPalette[i % donutPalette.size] },
-//                    modifier = Modifier.size(height),
-//                    thickness = ringThickness
-//                )
-//                Spacer(Modifier.width(16.dp))
-//                LegendList(
-//                    slices = slices,
-//                    selectedLabel = selectedLabel,
-//                    onSelect = onSelect
-//                )
-//            }
-//        }
-//    }
-//}
-//
-//@Composable
-//private fun LegendList(
-//    slices: List<CategorySlice>,
-//    selectedLabel: String?,
-//    onSelect: (String) -> Unit
-//) {
-//    val total = slices.sumOf { it.value }
-//    val currency = remember { NumberFormat.getCurrencyInstance(Locale("es", "ES")) }
-//
-//    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-//        slices.forEachIndexed { i, s ->
-//            val pct = if (total == 0.0) 0 else ((s.value / total) * 100).toInt()
-//            val isSel = s.label == selectedLabel
-//            Row(
-//                verticalAlignment = Alignment.CenterVertically,
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .clip(RoundedCornerShape(12.dp))
-//                    .background(
-//                        if (isSel) MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)
-//                        else Color.Transparent
-//                    )
-//                    .padding(horizontal = 8.dp, vertical = 6.dp)
-//                    .then(Modifier.clickable { onSelect(s.label) })
-//            ) {
-//                Box(
-//                    Modifier
-//                        .size(10.dp)
-//                        .background(donutPalette[i % donutPalette.size], CircleShape)
-//                )
-//                Spacer(Modifier.width(8.dp))
-//                Text(
-//                    s.label,
-//                    style = MaterialTheme.typography.labelLarge.copy(
-//                        fontWeight = if (isSel) FontWeight.SemiBold else FontWeight.Normal
-//                    ),
-//                    modifier = Modifier.weight(1f)
-//                )
-//                Text(
-//                    "${currency.format(s.value)}  ·  $pct%",
-//                    style = MaterialTheme.typography.labelMedium,
-//                    color = MaterialTheme.colorScheme.onSurfaceVariant
-//                )
-//            }
-//        }
-//    }
-//}
-//
-//
-//@Composable
-//private fun DonutChart(
-//    slices: List<Pair<Double, Color>>,
-//    modifier: Modifier = Modifier,
-//    thickness: Dp = 20.dp
-//) {
-//    val total = slices.sumOf { it.first }.takeIf { it > 0 } ?: return
-//    Canvas(modifier) {
-//        val diameter = size.minDimension
-//        val strokeWidth = thickness.toPx()
-//        val radius = diameter / 2f
-//        val rect = androidx.compose.ui.geometry.Rect(
-//            center = Offset(size.width / 2f, size.height / 2f),
-//            radius = radius - strokeWidth / 2f
-//        )
-//        var start = -90f
-//        slices.forEach { (value, color) ->
-//            val sweep = (value / total).toFloat() * 360f
-//            drawArc(
-//                color = color,
-//                startAngle = start,
-//                sweepAngle = sweep,
-//                useCenter = false,
-//                topLeft = rect.topLeft,
-//                size = rect.size,
-//                style = androidx.compose.ui.graphics.drawscope.Stroke(width = strokeWidth)
-//            )
-//            start += sweep
-//        }
-//    }
-//}
-
-
-// DONNUT
-@Composable
-private fun LegendList(slices: List<CategorySlice>) {
-    val total = slices.sumOf { it.value }
-    val currency = remember { NumberFormat.getCurrencyInstance(Locale("es", "ES")) }
-
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        slices.forEachIndexed { i, s ->
-            val pct = if (total == 0.0) 0 else ((s.value / total) * 100).toInt()
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    Modifier
-                        .size(10.dp)
-                        .background(donutPalette[i % donutPalette.size], CircleShape)
-                )
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    s.label,
-                    style = MaterialTheme.typography.labelLarge,
-                    modifier = Modifier.weight(1f)
-                )
-                Text(
-                    "${currency.format(s.value)}  ·  $pct%",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-    }
-}
-
+// Etiqueta de categoría por movimiento (se deja sin cambios funcionales)
 private fun movimientoCategoryLabel(m: Movimiento): String {
     val base = (m.subtitulo.ifBlank { m.titulo }).ifBlank { "Otros" }.trim()
     return base.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
 }
 
-
-
-
-// ---------- Modelo y agregación ----------
-//private data class CategorySlice(val label: String, val value: Double)
-
-/** Devuelve TODAS las categorías (sin agrupar "Otros"), ordenadas por importe desc. */
-private fun buildExpenseSlicesAll(
-    movimientos: List<com.dls.pymetask.domain.model.Movimiento>
-): List<CategorySlice> {
-    if (movimientos.isEmpty()) return emptyList()
-    val byLabel = movimientos
-        .asSequence()
-        .filter { !it.ingreso }
-        .groupBy { m ->
-            val base = (m.subtitulo.ifBlank { m.titulo }).ifBlank { "Otros" }.trim()
-            base.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
-        }
-        .mapValues { (_, list) -> list.sumOf { it.cantidad } }
-        .filterValues { it > 0.0 }
-
-    return byLabel.entries
-        .sortedByDescending { it.value }
-        .map { CategorySlice(it.key, it.value) }
-}
-
-/** Colapsa a Top N + "Otros" */
-private fun collapseSlices(
-    all: List<CategorySlice>,
-    maxVisible: Int
-): List<CategorySlice> {
-    if (all.size <= maxVisible) return all
-    val top = all.take(maxVisible - 1)
-    val rest = all.drop(maxVisible - 1).sumOf { it.value }
-    return top + CategorySlice("Otros", rest)
-}
-
-// Paleta
+// Paleta usada en el donut
 private val donutPalette = listOf(
-    androidx.compose.ui.graphics.Color(0xFF3B82F6),
-    androidx.compose.ui.graphics.Color(0xFF22C55E),
-    androidx.compose.ui.graphics.Color(0xFFF59E0B),
-    androidx.compose.ui.graphics.Color(0xFFEF4444),
-    androidx.compose.ui.graphics.Color(0xFF8B5CF6),
-    androidx.compose.ui.graphics.Color(0xFF06B6D4),
-    androidx.compose.ui.graphics.Color(0xFF10B981),
-    androidx.compose.ui.graphics.Color(0xFFE11D48),
+    Color(0xFF3B82F6), Color(0xFF22C55E), Color(0xFFF59E0B), Color(0xFFEF4444),
+    Color(0xFF8B5CF6), Color(0xFF06B6D4), Color(0xFF10B981), Color(0xFFE11D48),
 )
-
-
 

@@ -1,5 +1,4 @@
 
-// ADAPTADO: DetalleContactoScreen.kt
 package com.dls.pymetask.presentation.contactos
 
 import android.annotation.SuppressLint
@@ -22,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource // <-- i18n
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
@@ -42,31 +42,23 @@ fun DetalleContactoScreen(
     val contactos = viewModel.contactos
     val contacto = contactos.find { it.id == contactoId }
 
-    // desactivar modo landscape
+    // Bloquear en vertical
     val activity = context as? Activity
-    LaunchedEffect(Unit) {
-        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-    }
-    DisposableEffect(Unit) {
-        onDispose {
-            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-        }
-    }
+    LaunchedEffect(Unit) { activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT }
+    DisposableEffect(Unit) { onDispose { activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED } }
 
-    // 🔹 Lanza la carga de contactos de Firebase al entrar a la pantalla (snapshot listener)
-    LaunchedEffect(Unit) {
-        viewModel.getContactos(context)
-    }
+    // Cargar contactos al entrar
+    LaunchedEffect(Unit) { viewModel.getContactos(context) }
 
-    // 🔹 Mientras aún no haya llegado ningún contacto, muestra loader centrado
+    // Loader si aún no hay datos
     if (contactos.isEmpty()) {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Contacto") },
+                    title = { Text(stringResource(R.string.contact_detail_title)) },
                     navigationIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.common_back))
                         }
                     }
                 )
@@ -77,30 +69,24 @@ fun DetalleContactoScreen(
                     .padding(padding)
                     .fillMaxSize(),
                 contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
+            ) { CircularProgressIndicator() }
+        }
+        return
+    }
+
+    if (contacto == null) {
+        // Contacto no encontrado
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(stringResource(R.string.contacts_not_found), fontSize = 24.sp)
+                Spacer(Modifier.height(16.dp))
+                Button(onClick = { navController.popBackStack() }) {
+                    Text(stringResource(R.string.common_back))
+                }
             }
         }
         return
     }
-
-
-    if (contacto == null) {
-        // texto centrado
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text("Contacto no encontrado\n\n\n", fontSize = 24.sp)
-            Button(onClick = {
-                navController.popBackStack() }
-            ) { Text("Volver") }
-        }
-
-        return
-    }
-
-
 
     Scaffold(
         topBar = {
@@ -108,14 +94,12 @@ fun DetalleContactoScreen(
                 title = { Text(contacto.nombre) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.common_back))
                     }
                 },
                 actions = {
-                    IconButton(onClick = {
-                        navController.navigate("editar_contacto/${contacto.id}")
-                    }) {
-                        Icon(Icons.Default.Edit, contentDescription = "Editar")
+                    IconButton(onClick = { navController.navigate("editar_contacto/${contacto.id}") }) {
+                        Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.common_edit))
                     }
                 }
             )
@@ -129,7 +113,7 @@ fun DetalleContactoScreen(
             verticalArrangement = Arrangement.spacedBy(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Imagen o inicial
+            // Imagen o inicial (CD localizada)
             Box(
                 modifier = Modifier
                     .size(120.dp)
@@ -140,7 +124,7 @@ fun DetalleContactoScreen(
                 if (!contacto.fotoUrl.isNullOrBlank()) {
                     AsyncImage(
                         model = contacto.fotoUrl,
-                        contentDescription = "Foto de contacto",
+                        contentDescription = stringResource(R.string.contacts_photo_cd_generic),
                         modifier = Modifier.fillMaxSize()
                     )
                 } else {
@@ -154,13 +138,15 @@ fun DetalleContactoScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Text("📞 ${contacto.telefono}", fontSize = 24.sp)
-            Text("✉️ ${contacto.email}", fontSize = 24.sp)
-            Text("🏠 ${contacto.direccion}", fontSize = 24.sp)
-            Text("Tipo: ${contacto.tipo}", fontSize = 24.sp)
+            // Datos (textos localizados con formato)
+            Text(stringResource(R.string.contact_phone_fmt, contacto.telefono), fontSize = 24.sp)
+            Text(stringResource(R.string.contact_email_fmt, contacto.email), fontSize = 24.sp)
+            Text(stringResource(R.string.contact_address_fmt, contacto.direccion), fontSize = 24.sp)
+            Text(stringResource(R.string.contacts_type_prefix, contacto.tipo), fontSize = 24.sp)
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // Acciones: Llamar, SMS, WhatsApp, Email (CD localizados)
             Row(
                 horizontalArrangement = Arrangement.spacedBy(24.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -171,21 +157,19 @@ fun DetalleContactoScreen(
                 }) {
                     Icon(
                         imageVector = Icons.Default.Phone,
-                        contentDescription = "Llamar",
+                        contentDescription = stringResource(R.string.contacts_call),
                         tint = Color(0xFF4CAF50),
                         modifier = Modifier.size(48.dp)
                     )
                 }
 
                 IconButton(onClick = {
-                    val intent = Intent(Intent.ACTION_SENDTO).apply {
-                        data = "smsto:${contacto.telefono}".toUri()
-                    }
+                    val intent = Intent(Intent.ACTION_SENDTO).apply { data = "smsto:${contacto.telefono}".toUri() }
                     context.startActivity(intent)
                 }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Message,
-                        contentDescription = "SMS",
+                        contentDescription = stringResource(R.string.contacts_sms),
                         tint = Color(0xFF03A9F4),
                         modifier = Modifier.size(48.dp)
                     )
@@ -194,16 +178,15 @@ fun DetalleContactoScreen(
                 IconButton(onClick = {
                     val numero = contacto.telefono.replace(" ", "").replace("-", "")
                     val uri = "https://wa.me/$numero".toUri()
-                    val intent = Intent(Intent.ACTION_VIEW, uri)
                     try {
-                        context.startActivity(intent)
+                        context.startActivity(Intent(Intent.ACTION_VIEW, uri))
                     } catch (_: Exception) {
-                        Toast.makeText(context, "No se pudo abrir WhatsApp", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context,context.getString(R.string.contacts_whatsapp_open_error), Toast.LENGTH_SHORT).show()
                     }
                 }) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_whatsapp),
-                        contentDescription = "WhatsApp",
+                        contentDescription = stringResource(R.string.contacts_whatsapp),
                         tint = Color(0xFF25D366),
                         modifier = Modifier.size(48.dp)
                     )
@@ -211,17 +194,15 @@ fun DetalleContactoScreen(
 
                 IconButton(onClick = {
                     if (contacto.email.isNotBlank()) {
-                        val intent = Intent(Intent.ACTION_SENDTO).apply {
-                            data = "mailto:${contacto.email}".toUri()
-                        }
+                        val intent = Intent(Intent.ACTION_SENDTO).apply { data = "mailto:${contacto.email}".toUri() }
                         context.startActivity(intent)
                     } else {
-                        Toast.makeText(context, "Este contacto no tiene email", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context,context.getString(R.string.contacts_no_email), Toast.LENGTH_SHORT).show()
                     }
                 }) {
                     Icon(
                         imageVector = Icons.Default.Email,
-                        contentDescription = "Email",
+                        contentDescription = stringResource(R.string.contacts_email),
                         tint = Color(0xFF673AB7),
                         modifier = Modifier.size(48.dp)
                     )
@@ -230,5 +211,3 @@ fun DetalleContactoScreen(
         }
     }
 }
-
-

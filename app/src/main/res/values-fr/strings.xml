@@ -188,6 +188,35 @@
     <string name="mov_expenses">Dépenses</string>
     <string name="mov_balance">Solde</string>
 
+    <string name="movements_add">Ajouter un mouvement</string>
+    <string name="movements_summary">Résumé</string>
+    <string name="movements_import_csv">Importer un CSV</string>
+    <string name="movements_go_stats">Aller aux statistiques</string>
+    <string name="movements_empty">Aucun mouvement pour l’instant.</string>
+    <string name="movements_show_more">Afficher plus</string>
+    <string name="movements_no_more">Plus de mouvements</string>
+    <string name="movements_income">Recettes</string>
+    <string name="movements_expenses">Dépenses</string>
+    <string name="movements_balance">Solde</string>
+    <string name="nav_back_to_menu">Retour au menu</string>
+
+
+
+    <string name="movement_new_title">Nouveau mouvement</string>
+    <string name="movement_edit_title">Modifier le mouvement</string>
+    <string name="movement_title_label">Titre</string>
+    <string name="movement_description_label">Description</string>
+    <string name="movement_desc_client_supplier">Description / Client / Fournisseur</string>
+    <string name="movement_amount_label">Montant (€)</string>
+    <string name="movement_income">Recette</string>
+    <string name="movement_expense">Dépense</string>
+    <string name="toast_movement_updated">Mouvement mis à jour</string>
+    <string name="toast_movement_deleted">Mouvement supprimé</string>
+    <string name="delete_confirm_title">Confirmer la suppression</string>
+    <string name="delete_confirm_text">Voulez-vous vraiment supprimer ce mouvement ?</string>
+
+
+
     <!-- NotasScreen -->
     <string name="notes_title">Notes</string>
     <string name="notes_empty">Aucune note pour l’instant</string>
@@ -244,15 +273,160 @@
     <string name="register_have_account">Vous avez déjà un compte ? </string>
     <string name="auth_sign_in">Se connecter</string>
 
-    <!-- Autres -->
+    <!-- Contacts -->
+    <string name="contact_type_client">Client</string>
+    <string name="contact_type_supplier">Fournisseur</string>
+    <string name="contact_photo_cd">Photo de %1$s</string>
+    <string name="contact_initial_cd">Initiale du contact</string>
     <string name="contacts_title">Contacts</string>
     <string name="contacts_add">Ajouter un contact</string>
     <string name="contacts_edit">Modifier le contact</string>
+    <string name="contacts_error_loading_with_reason">Erreur de chargement des contacts : %1$s</string>
+    <string name="contacts_saved">Contact enregistré</string>
+    <string name="contacts_error_saving_with_reason">Erreur lors de l’enregistrement : %1$s</string>
+    <string name="contacts_updated">Contact mis à jour</string>
+    <string name="contacts_error_updating_with_reason">Erreur de mise à jour : %1$s</string>
+    <string name="contacts_deleted">Contact supprimé</string>
+    <string name="contacts_error_deleting_with_reason">Erreur de suppression : %1$s</string>
+    <string name="contacts_photo_uploaded">Photo téléversée</string>
+    <string name="contacts_error_uploading_photo_with_reason">Erreur lors du téléversement : %1$s</string>
+
+    <!-- ContactsScreen -->
+    <string name="contacts_search_cd">Rechercher</string>
+    <string name="contacts_search_label">Rechercher un contact</string>
+    <string name="contacts_search_placeholder">Saisissez le nom ou le téléphone...</string>
+    <string name="contacts_delete_title">Supprimer le contact</string>
+    <string name="contacts_delete_text">Êtes-vous sûr de vouloir supprimer %1$s ?</string>
+
+
+
+    <string name="contacts_create_title">Nouveau contact</string>
+    <string name="contacts_edit_title">Modifier le contact</string>
+    <string name="contact_detail_title">Contact</string>
+    <string name="common_edit">Modifier</string>
+
+    <string name="contacts_field_name">Nom</string>
+    <string name="contacts_field_phone">Téléphone</string>
+    <string name="contacts_field_address">Adresse</string>
+    <string name="contacts_field_email">E-mail</string>
+
+
+    <string name="contacts_type_prefix">Type : %1$s</string>
+
+    <string name="contacts_save">Enregistrer le contact</string>
+    <string name="contacts_save_changes">Enregistrer les modifications</string>
+    <string name="contacts_import_from_phonebook">Importer du répertoire</string>
+
+    <string name="contacts_photo_add">Ajouter une photo</string>
+    <string name="contacts_photo_cd_generic">Photo du contact</string>
+    <string name="contacts_back">Retour</string>
+    <string name="contacts_call">Appeler</string>
+    <string name="contacts_sms">SMS</string>
+    <string name="contacts_whatsapp">WhatsApp</string>
+    <string name="contacts_email">E-mail</string>
+
+    <string name="contact_phone_fmt">📞 %1$s</string>
+    <string name="contact_email_fmt">✉️ %1$s</string>
+    <string name="contact_address_fmt">🏠 %1$s</string>
+
+    <string name="contacts_not_found">Contact introuvable</string>
+    <string name="contacts_permission_denied">Autorisation contacts refusée</string>
+    <string name="contacts_whatsapp_open_error">Impossible d’ouvrir WhatsApp</string>
+    <string name="contacts_no_email">Ce contact n’a pas d’e-mail</string>
+
+    <!--Dash board -->
+
+    <string name="dashboard_welcome_title">Bienvenue</string>
+    <string name="dashboard_welcome_subtitle">Gérez votre PME facilement</string>
+    <string name="dashboard_cd_user">Utilisateur</string>
+    <string name="common_logout">Se déconnecter</string>
+    <string name="nav_home">Accueil</string>
+    <string name="nav_stats">Statistiques</string>
+    <string name="nav_contacts">Contacts</string>
+    <string name="nav_settings">Paramètres</string>
+    <string name="user_generic_name">Utilisateur</string>
+
+    <string name="dashboard_card_movements_title">Mouvements</string>
+    <string name="dashboard_card_movements_subtitle">Voir les mouvements enregistrés</string>
+    <string name="dashboard_card_files_title">Fichiers</string>
+    <string name="dashboard_card_files_subtitle">Voir les fichiers enregistrés</string>
+    <string name="dashboard_card_agenda_title">Agenda</string>
+    <string name="dashboard_card_agenda_subtitle">Agenda des tâches</string>
+    <string name="dashboard_card_notes_title">Notes</string>
+    <string name="dashboard_card_notes_subtitle">Voir les notes enregistrées</string>
+
+    <string name="greeting_morning">Bonjour %1$s,</string>
+    <string name="greeting_night">Bonne nuit %1$s.</string>
+    <string name="greeting_hello">Salut %1$s</string>
+    <string name="dashboard_tasks_today_none">vous n’avez pas de tâches aujourd’hui</string>
+    <string name="dashboard_tasks_tomorrow_none">Vous n’avez pas de tâches pour demain</string>
+    <plurals name="dashboard_tasks_today">
+        <item quantity="one">vous avez %d tâche aujourd’hui</item>
+        <item quantity="other">vous avez %d tâches aujourd’hui</item>
+    </plurals>
+    <plurals name="dashboard_tasks_tomorrow">
+        <item quantity="one">Vous avez %d tâche prévue pour demain</item>
+        <item quantity="other">Vous avez %d tâches prévues pour demain</item>
+    </plurals>
+
+    <string name="logout_title">Se déconnecter ?</string>
+    <string name="logout_text">Voulez-vous vraiment vous déconnecter ?</string>
+
+
+    <string name="stats_back">Retour</string>
+    <string name="stats_toggle_mode">Changer le mode</string>
+
+    <string name="stats_period_today">Aujourd’hui</string>
+    <string name="stats_period_week">Cette semaine</string>
+    <string name="stats_period_month">Ce mois-ci</string>
+    <string name="stats_period_custom">Personnalisé</string>
+
+    <string name="stats_month">Mois</string>
+    <string name="stats_month_a">Mois A</string>
+    <string name="stats_month_b">Mois B</string>
+
+    <string name="stats_summary">Résumé</string>
+    <string name="stats_empty_movements">Aucun mouvement pour le moment</string>
+    <string name="stats_balance">Solde</string>
+    <string name="stats_income">Recettes</string>
+    <string name="stats_expenses">Dépenses</string>
+
+    <string name="stats_expenses_by_category">Dépenses par catégorie — %1$s</string>
+    <string name="stats_see_top_n">Voir top %1$d</string>
+    <string name="stats_see_all">Voir tout</string>
+    <string name="stats_no_expenses_period">Aucune dépense sur cette période</string>
+    <string name="stats_others">Autres</string>
+
+    <string name="stats_chart_income_vs_expenses_day">Recettes vs Dépenses par jour — %1$s</string>
+    <string name="stats_chart_no_data_month">Pas de données ce mois-ci.</string>
+    <string name="stats_chart_accumulated_balance">Solde cumulé — %1$s</string>
+    <string name="stats_compare_totals">Comparaison des totaux</string>
+    <string name="stats_compare_no_data">Pas de données à comparer.</string>
+    <string name="stats_trend_12m">Tendance des 12 derniers mois</string>
+    <string name="stats_no_data">Aucune donnée</string>
+    <string name="stats_legend_a">A : %1$s</string>
+    <string name="stats_legend_b">B : %1$s</string>
+
+    <string name="stats_list_month">Mouvements de %1$s</string>
+    <string name="stats_list_today">Mouvements du jour</string>
+    <string name="stats_list_week">Mouvements de la semaine</string>
+    <string name="stats_list_custom">Mouvements (plage personnalisée)</string>
+
+    <string name="stats_daterange_title">Plage personnalisée</string>
+    <string name="common_apply">Appliquer</string>
+
+
+
+
+
+    <!-- Autres -->
+
     <string name="profile_title">Profil</string>
     <string name="profile_edit">Modifier le profil</string>
     <string name="dashboard_title">Tableau de bord</string>
     <string name="stats_title">Statistiques</string>
-    <string name="settings_reset_mime">borrar preferencias</string>
+    <string name="settings_reset_mime">Delete Preferences</string>
+    <string name="contacts_empty_hint">List empty</string>
 
 
     <plurals name="count_tasks">

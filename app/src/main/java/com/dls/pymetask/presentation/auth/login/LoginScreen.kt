@@ -1,19 +1,11 @@
 package com.dls.pymetask.presentation.auth.login
 
-
-
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -26,19 +18,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource // <-- i18n en Compose
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -60,33 +46,35 @@ fun LoginScreen(
     onNavigateToRegister: () -> Unit,
     onLoginSuccess: () -> Unit
 ) {
+    // --- Estado de VM ---
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
     val loginSuccess by viewModel.loginSuccess.collectAsState()
     val googleIntent by viewModel.googleSignInIntent.collectAsState()
-    val context = LocalContext.current
 
+    // --- Estado local ---
+    val context = LocalContext.current
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
-        val data = result.data
-       // if (data != null) viewModel.onGoogleSignInResult(data)
-        if (data != null) viewModel.onGoogleSignInResult(context, data)
-
+    // Launcher para Google Sign-In
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult()
+    ) { result ->
+        result.data?.let { data ->
+            viewModel.onGoogleSignInResult(context, data)
+        }
     }
 
-
-    // Lanza navegación cuando el login es exitoso
+    // Navega cuando el login termina bien
     LaunchedEffect(loginSuccess) {
         if (loginSuccess) onLoginSuccess()
     }
+    // Lanza flujo de Google cuando el intent está listo
     LaunchedEffect(googleIntent) {
-        googleIntent?.let {
-            launcher.launch(IntentSenderRequest.Builder(it).build())
-        }
+        googleIntent?.let { launcher.launch(IntentSenderRequest.Builder(it).build()) }
     }
 
     Column(
@@ -96,16 +84,16 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterVertically)
     ) {
-        // Logo
+        // Logo (decorativo -> contentDescription = null)
         Image(
             painter = painterResource(id = R.drawable.ic_logo),
-            contentDescription = "Logo",
+            contentDescription = null,
             modifier = Modifier.size(200.dp)
         )
 
-        // Título
+        // Título localizado
         Text(
-            text = "Bienvenido a PymeTask",
+            text = stringResource(R.string.login_welcome_title),
             style = TextStyle(
                 fontFamily = Poppins,
                 fontWeight = FontWeight.SemiBold,
@@ -115,9 +103,9 @@ fun LoginScreen(
             )
         )
 
-        // Subtítulo
+        // Subtítulo localizado
         Text(
-            text = "Gestiona tu negocio de forma simple y profesional",
+            text = stringResource(R.string.login_welcome_subtitle),
             style = TextStyle(
                 fontFamily = Roboto,
                 fontSize = 16.sp,
@@ -126,27 +114,27 @@ fun LoginScreen(
             )
         )
 
-        // Email
+        // Campo Email
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Correo electrónico") },
+            label = { Text(stringResource(R.string.auth_email)) },
             leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email)
         )
 
-        // Contraseña
+        // Campo Contraseña
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Contraseña") },
+            label = { Text(stringResource(R.string.auth_password)) },
             leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
             trailingIcon = {
                 IconButton(onClick = { showPassword = !showPassword }) {
                     Icon(
                         imageVector = if (showPassword) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                        contentDescription = null
+                        contentDescription = null // decorativo
                     )
                 }
             },
@@ -155,7 +143,7 @@ fun LoginScreen(
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password)
         )
 
-        // Error
+        // Mensaje de error (si el VM emite cadenas localizadas, saldrán ya traducidas)
         if (!errorMessage.isNullOrBlank()) {
             Text(
                 text = errorMessage ?: "",
@@ -164,11 +152,12 @@ fun LoginScreen(
             )
         }
 
-        // Botón de inicio de sesión
+        // Botón "Iniciar sesión"
         Button(
             onClick = {
                 if (email.isBlank() || password.isBlank()) {
-                    scope.launch { viewModel.setError("Rellena todos los campos") }
+                    // Envía el error ya localizado al VM (si tu VM muestra este mismo campo)
+                    scope.launch { viewModel.setError(context.getString(R.string.auth_fill_all)) }
                 } else {
                     viewModel.login(email, password)
                 }
@@ -176,23 +165,23 @@ fun LoginScreen(
             modifier = Modifier.fillMaxWidth(),
             enabled = !isLoading
         ) {
-            Text("Iniciar sesión")
+            Text(stringResource(R.string.login_sign_in))
         }
 
-        // Botón de inicio de sesión con Google
+        // Botón "Iniciar sesión con Google"
         Button(
             onClick = { viewModel.launchGoogleSignIn() },
             modifier = Modifier.fillMaxWidth(),
             enabled = !isLoading
         ) {
-            Text("Iniciar sesión con Google")
+            Text(stringResource(R.string.login_sign_in_google))
         }
 
-        // Registro
+        // Pie: "¿No tienes cuenta? Registrarse"
         Row {
-            Text("¿No tienes cuenta? ")
+            Text(stringResource(R.string.login_no_account))
             Text(
-                text = "Registrarse",
+                text = stringResource(R.string.auth_register),
                 color = Color(0xFF1976D2),
                 modifier = Modifier.clickable { onNavigateToRegister() }
             )
@@ -200,19 +189,11 @@ fun LoginScreen(
     }
 }
 
-
-
-
-
-
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun LoginScreenPreview() {
     PymeTaskTheme {
-        var email by remember { mutableStateOf("") }
-        var password by remember { mutableStateOf("") }
-        var showPassword by remember { mutableStateOf(false) }
-
+        // Preview simple usando strings localizados
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -222,56 +203,55 @@ fun LoginScreenPreview() {
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_logo),
-                contentDescription = "Logo",
+                contentDescription = null,
                 modifier = Modifier.size(200.dp)
             )
-            Text("Bienvenido a PymeTask", fontFamily = Poppins, fontWeight = FontWeight.SemiBold, fontSize = 22.sp)
-            Text("Gestiona tu negocio de forma simple y profesional", fontFamily = Roboto, fontSize = 16.sp)
+            Text(
+                stringResource(R.string.login_welcome_title),
+                fontFamily = Poppins,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 22.sp
+            )
+            Text(
+                stringResource(R.string.login_welcome_subtitle),
+                fontFamily = Roboto,
+                fontSize = 16.sp
+            )
 
             OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Correo electrónico") },
+                value = "",
+                onValueChange = {},
+                label = { Text(stringResource(R.string.auth_email)) },
                 leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth()
             )
 
             OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Contraseña") },
+                value = "",
+                onValueChange = {},
+                label = { Text(stringResource(R.string.auth_password)) },
                 leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                 trailingIcon = {
-                    IconButton(onClick = { showPassword = !showPassword }) {
-                        Icon(
-                            if (showPassword) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            contentDescription = null
-                        )
+                    IconButton(onClick = {}) {
+                        Icon(Icons.Default.Visibility, contentDescription = null)
                     }
                 },
-                visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Button(
-                onClick = {},
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Iniciar sesión")
+            Button(onClick = {}, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.login_sign_in))
             }
 
-
-
             Row {
-                Text("¿No tienes cuenta? ")
+                Text(stringResource(R.string.login_no_account))
                 Text(
-                    text = "Registrarse",
-                color = Color(0xFF1976D2),
-                modifier = Modifier.clickable { }
+                    text = stringResource(R.string.auth_register),
+                    color = Color(0xFF1976D2)
                 )
             }
         }
     }
 }
-
 

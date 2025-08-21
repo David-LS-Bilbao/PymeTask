@@ -301,7 +301,6 @@ class MovimientosViewModel @Inject constructor(
 
     private val _noHayMas = MutableStateFlow(false)
     val noHayMas = _noHayMas.asStateFlow()
-
     /** Llamar una vez (por ejemplo en LaunchedEffect de la pantalla) */
     fun startMonthPaging(userId: String) = viewModelScope.launch {
         // Obtenemos el movimiento más antiguo UNA sola vez para saber cuándo parar
@@ -311,8 +310,6 @@ class MovimientosViewModel @Inject constructor(
         _noHayMas.value = false
         loadNextMonth(userId) // carga el mes actual
     }
-
-    /** Carga el mes correspondiente a monthOffset y, si está vacío y aún queda, avanza */
 
     fun loadNextMonth(userId: String) {
         viewModelScope.launch {

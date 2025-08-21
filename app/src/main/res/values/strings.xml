@@ -73,7 +73,6 @@
 
 
 
-
     <!-- ===== Comunes ===== -->
     <string name="common_back">Volver</string>
     <string name="common_save">Guardar</string>
@@ -155,11 +154,6 @@
 
 
 
-
-
-
-
-
     <!-- ContenidoCarpetaScreen -->
 
     <string name="common_rename">Renombrar</string>
@@ -191,8 +185,6 @@
 
 
 
-
-
     <!-- ===== CrearMovimientoScreen ===== -->
     <string name="mov_new_title">Nuevo movimiento</string>
     <string name="mov_field_title">Título</string>
@@ -200,6 +192,19 @@
     <string name="mov_field_amount">Cantidad (€)</string>
     <string name="mov_type_income">Ingreso</string>
     <string name="mov_type_expense">Gasto</string>
+
+    <string name="movements_add">Añadir movimiento</string>
+    <string name="movements_summary">Resumen</string>
+    <string name="movements_import_csv">Importar CSV</string>
+    <string name="movements_go_stats">Ir a estadísticas</string>
+    <string name="movements_empty">No hay movimientos aún.</string>
+    <string name="movements_show_more">Mostrar más</string>
+    <string name="movements_no_more">No hay más movimientos</string>
+    <string name="movements_income">Ingresos</string>
+    <string name="movements_expenses">Gastos</string>
+    <string name="movements_balance">Saldo</string>
+    <string name="nav_back_to_menu">Volver al menú</string>
+
 
     <!-- ===== EditarMovimientoScreen ===== -->
     <string name="mov_edit_title">Editar movimiento</string>
@@ -217,6 +222,23 @@
     <string name="mov_incomes">Ingresos</string>
     <string name="mov_expenses">Gastos</string>
     <string name="mov_balance">Saldo</string>
+
+
+    <string name="movement_new_title">Nuevo movimiento</string>
+    <string name="movement_edit_title">Editar movimiento</string>
+    <string name="movement_title_label">Título</string>
+    <string name="movement_description_label">Descripción</string>
+    <string name="movement_desc_client_supplier">Descripción / Cliente / Proveedor</string>
+    <string name="movement_amount_label">Cantidad (€)</string>
+    <string name="movement_income">Ingreso</string>
+    <string name="movement_expense">Gasto</string>
+    <string name="toast_movement_updated">Movimiento actualizado</string>
+    <string name="toast_movement_deleted">Movimiento eliminado</string>
+    <string name="delete_confirm_title">Confirmar eliminación</string>
+    <string name="delete_confirm_text">¿Estás seguro de que deseas eliminar este movimiento?</string>
+
+
+
 
     <!-- ===== NotasScreen ===== -->
     <string name="notes_title">Notas</string>
@@ -273,17 +295,181 @@
     <string name="register_have_account">¿Ya tienes cuenta? </string>
     <string name="auth_sign_in">Iniciar sesión</string>
 
-    <!-- ===== Otros módulos (base) ===== -->
+    <!-- Contactos -->
+    <string name="contact_type_client">Cliente</string>
+    <string name="contact_type_supplier">Proveedor</string>
+    <string name="contact_photo_cd">Foto de %1$s</string>
+    <string name="contact_initial_cd">Inicial del contacto</string>
     <string name="contacts_title">Contactos</string>
     <string name="contacts_add">Añadir contacto</string>
     <string name="contacts_edit">Editar contacto</string>
+    <string name="contacts_error_loading_with_reason">Error al cargar contactos: %1$s</string>
+    <string name="contacts_saved">Contacto guardado</string>
+    <string name="contacts_error_saving_with_reason">Error al guardar: %1$s</string>
+    <string name="contacts_updated">Contacto actualizado</string>
+    <string name="contacts_error_updating_with_reason">Error al actualizar: %1$s</string>
+    <string name="contacts_deleted">Contacto eliminado</string>
+    <string name="contacts_error_deleting_with_reason">Error al eliminar: %1$s</string>
+    <string name="contacts_photo_uploaded">Foto subida</string>
+    <string name="contacts_error_uploading_photo_with_reason">Error al subir foto: %1$s</string>
 
+    <!-- ContactosScreen -->
+
+    <string name="contacts_search_cd">Buscar</string>
+    <string name="contacts_search_label">Buscar contacto</string>
+    <string name="contacts_search_placeholder">Introduce nombre o teléfono...</string>
+    <string name="contacts_delete_title">Eliminar contacto</string>
+    <string name="contacts_delete_text">¿Estás seguro de que deseas eliminar a %1$s?</string>
+
+    <!-- Crear/Editar/Detalle Contacto -->
+    <string name="contacts_create_title">Crear contacto nuevo</string>
+    <string name="contacts_edit_title">Editar contacto</string>
+    <string name="contact_detail_title">Contacto</string>
+    <string name="common_edit">Editar</string>
+
+    <!-- Campos -->
+    <string name="contacts_field_name">Nombre</string>
+    <string name="contacts_field_phone">Teléfono</string>
+    <string name="contacts_field_address">Dirección</string>
+    <string name="contacts_field_email">Email</string>
+
+    <!-- Tipo -->
+
+    <string name="contacts_type_prefix">Tipo: %1$s</string>
+
+    <!-- Botones y acciones -->
+    <string name="contacts_save">Guardar contacto</string>
+    <string name="contacts_save_changes">Guardar cambios</string>
+    <string name="contacts_import_from_phonebook">Importar de la agenda</string>
+
+    <!-- A11y / CDs -->
+    <string name="contacts_photo_add">Añadir foto</string>
+    <string name="contacts_photo_cd_generic">Foto del contacto</string>
+    <string name="contacts_back">Volver</string>
+    <string name="contacts_call">Llamar</string>
+    <string name="contacts_sms">SMS</string>
+    <string name="contacts_whatsapp">WhatsApp</string>
+    <string name="contacts_email">Email</string>
+
+    <!-- Textos detalle -->
+    <string name="contact_phone_fmt">📞 %1$s</string>
+    <string name="contact_email_fmt">✉️ %1$s</string>
+    <string name="contact_address_fmt">🏠 %1$s</string>
+
+    <!-- Estados/errores -->
+    <string name="contacts_not_found">Contacto no encontrado</string>
+    <string name="contacts_permission_denied">Permiso de contactos denegado</string>
+    <string name="contacts_whatsapp_open_error">No se pudo abrir WhatsApp</string>
+    <string name="contacts_no_email">Este contacto no tiene email</string>
+
+
+    <!-- Dashboard: cabecera y navegación -->
+    <string name="dashboard_welcome_title">Bienvenido</string>
+    <string name="dashboard_welcome_subtitle">Administra tu pyme fácilmente</string>
+    <string name="dashboard_cd_user">Usuario</string>
+    <string name="common_logout">Cerrar sesión</string>
+    <string name="nav_home">Inicio</string>
+    <string name="nav_stats">Estadísticas</string>
+    <string name="nav_contacts">Contactos</string>
+    <string name="nav_settings">Ajustes</string>
+    <string name="user_generic_name">Usuario</string>
+
+    <!-- Tarjetas -->
+    <string name="dashboard_card_movements_title">Movimientos</string>
+    <string name="dashboard_card_movements_subtitle">Ver movimientos registrados</string>
+    <string name="dashboard_card_files_title">Archivos</string>
+    <string name="dashboard_card_files_subtitle">Ver archivos guardados</string>
+    <string name="dashboard_card_agenda_title">Agenda</string>
+    <string name="dashboard_card_agenda_subtitle">Agenda de tareas</string>
+    <string name="dashboard_card_notes_title">Notas</string>
+    <string name="dashboard_card_notes_subtitle">Ver notas guardadas</string>
+
+    <!-- Saludo -->
+    <string name="greeting_morning">Buenos días %1$s,</string>
+    <string name="greeting_night">Buenas noches %1$s.</string>
+    <string name="greeting_hello">Hola %1$s</string>
+    <string name="dashboard_tasks_today_none">no tienes tareas hoy</string>
+    <string name="dashboard_tasks_tomorrow_none">No tienes tareas para mañana</string>
+    <plurals name="dashboard_tasks_today">
+        <item quantity="one">tienes %d tarea hoy</item>
+        <item quantity="other">tienes %d tareas hoy</item>
+    </plurals>
+    <plurals name="dashboard_tasks_tomorrow">
+        <item quantity="one">Para mañana tienes %d tarea programada</item>
+        <item quantity="other">Para mañana tienes %d tareas programadas</item>
+    </plurals>
+
+    <!-- Diálogo de cierre de sesión -->
+    <string name="logout_title">¿Cerrar sesión?</string>
+    <string name="logout_text">¿Estás seguro de que deseas cerrar sesión?</string>
+
+
+
+    <!-- Estadísticas: app bar / acciones -->
+    <string name="stats_title">Estadísticas</string>
+    <string name="stats_back">Atrás</string>
+    <string name="stats_toggle_mode">Cambiar modo</string>
+
+    <!-- Periodos -->
+    <string name="stats_period_today">Hoy</string>
+    <string name="stats_period_week">Esta semana</string>
+    <string name="stats_period_month">Este mes</string>
+    <string name="stats_period_custom">Personalizado</string>
+
+    <!-- Selector de mes -->
+    <string name="stats_month">Mes</string>
+    <string name="stats_month_a">Mes A</string>
+    <string name="stats_month_b">Mes B</string>
+
+    <!-- Resumen -->
+    <string name="stats_summary">Resumen</string>
+    <string name="stats_empty_movements">Aún no hay movimientos</string>
+    <string name="stats_balance">Saldo</string>
+    <string name="stats_income">Ingresos</string>
+    <string name="stats_expenses">Gastos</string>
+
+    <!-- Categorías -->
+    <string name="stats_expenses_by_category">Gastos por categorías — %1$s</string>
+    <string name="stats_see_top_n">Ver top %1$d</string>
+    <string name="stats_see_all">Ver todas</string>
+    <string name="stats_no_expenses_period">Sin gastos en este periodo</string>
+    <string name="stats_others">Otros</string>
+
+    <!-- Gráficos -->
+    <string name="stats_chart_income_vs_expenses_day">Ingresos vs Gastos por día — %1$s</string>
+    <string name="stats_chart_no_data_month">No hay datos en este mes.</string>
+    <string name="stats_chart_accumulated_balance">Saldo acumulado — %1$s</string>
+    <string name="stats_compare_totals">Comparativa de totales</string>
+    <string name="stats_compare_no_data">No hay datos para comparar.</string>
+    <string name="stats_trend_12m">Tendencia últimos 12 meses</string>
+    <string name="stats_no_data">Sin datos</string>
+    <string name="stats_legend_a">A: %1$s</string>
+    <string name="stats_legend_b">B: %1$s</string>
+
+    <!-- Lista -->
+    <string name="stats_list_month">Movimientos de %1$s</string>
+    <string name="stats_list_today">Movimientos de hoy</string>
+    <string name="stats_list_week">Movimientos de esta semana</string>
+    <string name="stats_list_custom">Movimientos (rango personalizado)</string>
+
+    <!-- DateRangePicker -->
+    <string name="stats_daterange_title">Rango personalizado</string>
+    <string name="common_apply">Aplicar</string>
+
+    <!-- Plurales (si quieres usarlos aquí también) -->
+    <plurals name="stats_days" translatable="false">
+        <item quantity="one">%d día</item>
+        <item quantity="other">%d días</item>
+    </plurals>
+
+
+
+    <!-- ===== Otros módulos (base) ===== -->
     <string name="profile_title">Perfil</string>
     <string name="profile_edit">Editar perfil</string>
     <string name="dashboard_title">Dashboard</string>
-    <string name="stats_title">Estadísticas</string>
     <string name="settings_reset_mime">borrar preferencias</string>
-
+    <string name="contacts_empty_hint">Lista Vacia</string>
 
     <!-- Plurals de ejemplo (tareas, notas, contactos) -->
     <plurals name="count_tasks">
@@ -298,6 +484,5 @@
         <item quantity="one">%1$d contacto</item>
         <item quantity="other">%1$d contactos</item>
     </plurals>
-
 
 </resources>
