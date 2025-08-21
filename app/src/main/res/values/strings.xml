@@ -483,12 +483,31 @@
 
 
 
+
+
     <!-- ===== Otros módulos (base) ===== -->
     <string name="profile_title">Perfil</string>
     <string name="profile_edit">Editar perfil</string>
     <string name="dashboard_title">Dashboard</string>
     <string name="settings_reset_mime">borrar preferencias</string>
     <string name="contacts_empty_hint">Lista Vacia</string>
+
+    <string name="today">Hoy</string>
+    <string name="tomorrow">Mañana</string>
+
+
+    <string name="settings_date_format">Formato de fecha</string>
+    <string name="settings_select_date_format">Selecciona formato de fecha</string>
+    <string name="relative_today_tomorrow">Relativo (hoy/mañana)</string>
+
+    <string name="settings_currency">Moneda por defecto</string>
+    <string name="settings_select_currency">Selecciona moneda</string>
+
+    <string name="settings_default_reminder">Recordatorio por defecto</string>
+    <string name="enabled">Activado</string>
+    <string name="disabled">Desactivado</string>
+
+
 
     <!-- Pantallas -->
     <string name="faq_title">Preguntas frecuentes</string>
@@ -497,57 +516,56 @@
 
     <!-- Guía (markdown simple: ##, -, párrafos) -->
     <string name="instructions_markdown">
-        ## ¿Qué es PymeTask?
-        PymeTask es una app para gestionar tareas, contactos, notas y archivos enfocada en pequeños negocios.
+         ## ¿Qué es PymeTask?\n
+    PymeTask es una app para gestionar tareas, contactos, notas y archivos enfocada en pequeños negocios.\n\n
 
-        ## Primeros pasos
-        - Inicia sesión con Google o email.
-        - Completa tu perfil desde Ajustes.
-        - Crea tu primera tarea desde el Dashboard.
+    ## Primeros pasos\n
+    - Inicia sesión con Google o email.\n
+    - Completa tu perfil desde Ajustes.\n
+    - Crea tu primera tarea desde el Dashboard.\n\n
 
-        ## Tareas
-        - Pulsa "Nueva tarea".
-        - Introduce título, descripción, fecha y hora.
-        - Activa "Alarma" para recordatorio (opcional).
-        - Edita una tarea desde su detalle o lista.
-        - Marca como completada cuando la finalices.
+    ## Tareas\n
+    - Pulsa "Nueva tarea".\n
+    - Introduce título, descripción, fecha y hora.\n
+    - Activa "Alarma" para recordatorio (opcional).\n
+    - Edita una tarea desde su detalle o lista.\n
+    - Marca como completada cuando la finalices.\n\n
 
-        ## Contactos
-        - Crea contactos o impórtalos desde la agenda del dispositivo.
-        - Añade foto, teléfono y email.
-        - Desde el detalle puedes llamar, enviar SMS, WhatsApp o email.
+    ## Contactos\n
+    - Crea contactos o impórtalos desde la agenda del dispositivo.\n
+    - Añade foto, teléfono y email.\n
+    - Desde el detalle puedes llamar, enviar SMS, WhatsApp o email.\n\n
 
-        ## Notas
-        - Crea notas rápidas, asigna color y compártelas por WhatsApp, email o SMS.
-        - Edita/borra desde el listado o el detalle.
+    ## Notas\n
+    - Crea notas rápidas, asigna color y compártelas por WhatsApp, email o SMS.\n
+    - Edita/borra desde el listado o el detalle.\n\n
 
-        ## Archivos
-        - Crea carpetas y sube archivos (imágenes, vídeos, audios, PDF, Office).
-        - Renombra, comparte o elimina desde el menú contextual.
-        - Los ficheros se suben a la nube y los metadatos se guardan en la base de datos.
+    ## Archivos\n
+    - Crea carpetas y sube archivos (imágenes, vídeos, audios, PDF, Office).\n
+    - Renombra, comparte o elimina desde el menú contextual.\n
+    - Los ficheros se suben a la nube y los metadatos se guardan en la base de datos.\n\n
 
-        ## Estadísticas
-        - Filtra por rango de fechas.
-        - Visualiza categorías e indicadores clave.
+    ## Estadísticas\n
+    - Filtra por rango de fechas.\n
+    - Visualiza categorías e indicadores clave.\n\n
 
-        ## Ajustes
-        - Cambia idioma, tema (claro/oscuro/sistema) y tamaño de fuente.
-        - Restablece preferencias si es necesario.
-        - Consulta versión en "Información".
+    ## Ajustes\n
+    - Cambia idioma, tema (claro/oscuro/sistema) y tamaño de fuente.\n
+    - Restablece preferencias si es necesario.\n
+    - Consulta versión en "Información".\n\n
 
-        ## Permisos
-        - Contactos: para importar desde tu agenda.
-        - Almacenamiento/Multimedia: para seleccionar y subir archivos.
-        - Teléfono/SMS: para llamar o enviar mensajes desde un contacto.
+    ## Permisos\n
+    - Contactos: importar desde agenda.\n
+    - Almacenamiento/Multimedia: seleccionar y subir archivos.\n
+    - Teléfono/SMS: llamar o enviar mensajes desde un contacto.\n\n
 
-        ## Solución de problemas
-        - Si no ves cambios de idioma, cierra y abre la app (se fuerza con “Recrear”).
-        - Si la alarma no suena, revisa permisos de notificaciones y ahorro de batería.
-        - Comprueba tu conexión si una subida/descarga falla.
+    ## Solución de problemas\n
+    - Si no ves cambios de idioma, reabre la app.\n
+    - Si la alarma no suena, revisa notificaciones y ahorro de batería.\n
+    - Comprueba conexión en subidas/descargas.\n\n
 
-        ## Soporte
-        - Escríbenos a soporte@pymetask.app e indica tu versión (Ajustes &gt; Información).
-    </string>
+    ## Soporte\n
+    - Escribe a soporte@pymetask.app indicando tu versión (Ajustes &gt; Información).  </string>
 
     <!-- FAQ: 12 preguntas/12 respuestas (mismo orden) -->
     <string-array name="faq_questions">

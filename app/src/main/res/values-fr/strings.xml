@@ -547,6 +547,22 @@
     <string name="profile_name_required">Le nom est obligatoire</string>
     <string name="profile_updated">Profil mis à jour</string>
 
+    <string name="today">Aujourd’hui</string>
+    <string name="tomorrow">Demain</string>
+
+
+    <string name="settings_date_format">Format de date</string>
+    <string name="settings_select_date_format">Sélectionnez le format de date</string>
+    <string name="relative_today_tomorrow">Relatif (aujourd\'hui/demain)</string>
+
+    <string name="settings_currency">Devise par défaut</string>
+    <string name="settings_select_currency">Sélectionnez la devise</string>
+
+    <string name="settings_default_reminder">Rappel par défaut</string>
+    <string name="enabled">Activé</string>
+    <string name="disabled">Désactivé</string>
+
+
 
 
 

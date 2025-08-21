@@ -445,55 +445,55 @@
     <string name="search">Search…</string>
 
     <string name="instructions_markdown">
-        ## What is PymeTask?
-        PymeTask helps you manage tasks, contacts, notes, and files for your small business.
+        ## What is PymeTask?\n
+        PymeTask helps you manage tasks, contacts, notes, and files for your small business.\n\n
 
-        ## Getting started
-        - Sign in with Google or email.
-        - Complete your profile in Settings.
-        - Create your first task from the Dashboard.
+        ## Getting started\n
+        - Sign in with Google or email.\n
+        - Complete your profile in Settings.\n
+        - Create your first task from the Dashboard.\n\n
 
-        ## Tasks
-        - Tap "New task".
-        - Enter title, description, date and time.
-        - Enable "Alarm" if you want a reminder.
-        - Edit from list or detail.
-        - Mark as completed when finished.
+        ## Tasks\n
+        - Tap "New task".\n
+        - Enter title, description, date and time.\n
+        - Enable "Alarm" if you want a reminder.\n
+        - Edit from list or detail.\n
+        - Mark as completed when finished.\n\n
 
-        ## Contacts
-        - Create contacts or import from your phone book.
-        - Add photo, phone and email.
-        - From the detail screen you can call, send SMS, WhatsApp or email.
+        ## Contacts\n
+        - Create contacts or import from your phone book.\n
+        - Add photo, phone and email.\n
+        - From the detail screen you can call, send SMS, WhatsApp or email.\n\n
 
-        ## Notes
-        - Create quick notes, assign a color, and share via WhatsApp, email or SMS.
-        - Edit/delete from the list or detail.
+        ## Notes\n
+        - Create quick notes, assign a color, and share via WhatsApp, email or SMS.\n
+        - Edit/delete from the list or detail.\n\n
 
-        ## Files
-        - Create folders and upload files (images, videos, audio, PDF, Office).
-        - Rename, share or delete from the context menu.
-        - Files are uploaded to the cloud and metadata is stored in the database.
+        ## Files\n
+        - Create folders and upload files (images, videos, audio, PDF, Office).\n
+        - Rename, share or delete from the context menu.\n
+        - Files are uploaded to the cloud and metadata is stored in the database.\n\n
 
-        ## Statistics
-        - Filter by date range.
-        - See categories and key indicators.
+        ## Statistics\n
+        - Filter by date range.\n
+        - See categories and key indicators.\n\n
 
-        ## Settings
-        - Change language, theme (light/dark/system) and font size.
-        - Reset preferences if needed.
-        - Check version in "Info".
+        ## Settings\n
+        - Change language, theme (light/dark/system) and font size.\n
+        - Reset preferences if needed.\n
+        - Check version in "Info".\n\n
 
-        ## Permissions
-        - Contacts: to import from your phone book.
-        - Storage/Media: to pick and upload files.
-        - Phone/SMS: to call or send messages from a contact.
+        ## Permissions\n
+        - Contacts: to import from your phone book.\n
+        - Storage/Media: to pick and upload files.\n
+        - Phone/SMS: to call or send messages from a contact.\n\n
 
-        ## Troubleshooting
-        - If language doesn’t refresh, reopen the app (we also force it on “Recreate”).
-        - If alarms don’t ring, check notification permissions and battery optimization.
-        - Make sure you’re online when uploading/downloading files.
+        ## Troubleshooting\n
+        - If language doesn’t refresh, reopen the app (we also force it on “Recreate”).\n
+        - If alarms don’t ring, check notification permissions and battery optimization.\n
+        - Make sure you’re online when uploading/downloading files.\n\n
 
-        ## Support
+        ## Support\n
         - Email support@pymetask.app and include your app version (Settings &gt; Info).
     </string>
 
@@ -550,6 +550,20 @@
     <string name="profile_name_required">Name is required</string>
     <string name="profile_updated">Profile updated</string>
 
+    <string name="today">today</string>
+    <string name="tomorrow">tomorrow</string>
+
+
+        <string name="settings_date_format">Date format</string>
+        <string name="settings_select_date_format">Select date format</string>
+        <string name="relative_today_tomorrow">Relative (today/tomorrow)</string>
+
+        <string name="settings_currency">Default currency</string>
+        <string name="settings_select_currency">Select currency</string>
+
+        <string name="settings_default_reminder">Default reminder</string>
+        <string name="enabled">Enabled</string>
+        <string name="disabled">Disabled</string>
 
 
 
