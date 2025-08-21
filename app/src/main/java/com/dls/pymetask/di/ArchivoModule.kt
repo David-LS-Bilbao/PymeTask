@@ -12,6 +12,7 @@ import com.dls.pymetask.domain.useCase.archivo.GuardarArchivoUseCase
 import com.dls.pymetask.domain.useCase.archivo.ListarArchivosUseCase
 import com.dls.pymetask.domain.useCase.archivo.ObtenerArchivosFirestoreUseCase
 import com.dls.pymetask.domain.useCase.archivo.ObtenerArchivosPorCarpetaUseCase
+import com.dls.pymetask.domain.useCase.archivo.ObtenerNombreCarpetaUseCase
 import com.dls.pymetask.domain.useCase.archivo.RenombrarArchivoUseCase
 import com.dls.pymetask.domain.useCase.archivo.SubirArchivoUseCase
 import com.google.firebase.firestore.FirebaseFirestore
@@ -99,7 +100,8 @@ object ArchivoModule {
         guardarArchivo: GuardarArchivoUseCase,
         eliminarArchivo: EliminarArchivoUseCase,
         obtenerPorCarpeta: ObtenerArchivosPorCarpetaUseCase,
-        eliminarArchivosPorCarpeta: EliminarArchivosPorCarpetaUseCase
+        eliminarArchivosPorCarpeta: EliminarArchivosPorCarpetaUseCase,
+        repo: ArchivoRepository
     ): ArchivoUseCase {
         return ArchivoUseCase(
             crearCarpeta = crearCarpeta,
@@ -110,7 +112,8 @@ object ArchivoModule {
             guardarArchivo = guardarArchivo,
             eliminarArchivo = eliminarArchivo,
             obtenerPorCarpeta = obtenerPorCarpeta,
-            eliminarArchivosPorCarpeta = eliminarArchivosPorCarpeta
+            eliminarArchivosPorCarpeta = eliminarArchivosPorCarpeta,
+            obtenerNombreCarpeta = ObtenerNombreCarpetaUseCase(repo)
         )
     }
 

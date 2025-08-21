@@ -33,7 +33,8 @@ import com.dls.pymetask.presentation.components.ArchivoCardExtendido
 fun ContenidoCarpetaScreen(
     carpetaId: String,
     navController: NavController,
-    viewModel: ContenidoCarpetaViewModel = hiltViewModel(),
+    nombreInicial: String? = null, // <-- NUEVO
+    viewModel: ContenidoCarpetaViewModel = hiltViewModel()
 ) {
     val archivos by viewModel.archivos.collectAsState()
     val context = LocalContext.current
@@ -41,7 +42,9 @@ fun ContenidoCarpetaScreen(
     // Estados UI
     var mostrarMenu by remember { mutableStateOf(false) }
     var selectedArchivo by remember { mutableStateOf<ArchivoUiModel?>(null) }
-    var nombreCarpeta by remember { mutableStateOf("Carpeta") } // título dinámico
+
+    val nombreCarpeta by viewModel.nombreCarpeta.collectAsState()
+
     var mostrarMenuTipoArchivo by remember { mutableStateOf(false) }
     var mimeToLoad by remember { mutableStateOf("*/*") }
     var expanded by remember { mutableStateOf(false) }
@@ -52,9 +55,9 @@ fun ContenidoCarpetaScreen(
     val estaCargando by viewModel.cargando.collectAsState()
 
     // Carga datos iniciales
-    LaunchedEffect(Unit) {
+    LaunchedEffect(carpetaId) {
         viewModel.cargarArchivosDeCarpeta(carpetaId)
-        viewModel.obtenerNombreCarpeta(carpetaId) { nombre -> nombreCarpeta = nombre }
+        viewModel.obtenerNombreCarpeta(carpetaId) // ahora sin callback
     }
     // Muestra mensajes desde el VM (si vienen como literales, podemos migrarlos a recursos más adelante)
     LaunchedEffect(Unit) {
@@ -63,6 +66,11 @@ fun ContenidoCarpetaScreen(
         }
     }
 
+
+    LaunchedEffect(carpetaId) {
+        viewModel.cargarArchivosDeCarpeta(carpetaId)
+        viewModel.obtenerNombreCarpeta(carpetaId) // actualiza con el real
+    }
 
     // Selector de contenido (sistema)
     val launcher = rememberLauncherForActivityResult(
@@ -79,7 +87,7 @@ fun ContenidoCarpetaScreen(
         topBar = {
             TopAppBar(
                 // Título: nombre de la carpeta (dinámico)
-                title = { Text(nombreCarpeta) },
+                title = { Text(nombreCarpeta.ifBlank { stringResource(R.string.files_folder) }) },
                 navigationIcon = {
                     // Botón volver con contentDescription localizado
                     IconButton(onClick = { navController.popBackStack() }) {
@@ -91,6 +99,7 @@ fun ContenidoCarpetaScreen(
                 },
                 actions = {
                     // Menú "Opciones" (tres puntos)
+
                     Box {
                         IconButton(onClick = { expanded = true }) {
                             Icon(
@@ -122,12 +131,12 @@ fun ContenidoCarpetaScreen(
 
                     // Indicador de carga en la app bar (si procede)
                     if (estaCargando) {
-                        Box(
+                        CircularProgressIndicator(
                             modifier = Modifier
-                                .fillMaxSize()
-                                .padding(16.dp),
-                            contentAlignment = Alignment.Center
-                        ) { CircularProgressIndicator() }
+                                .padding(end = 12.dp)
+                                .size(18.dp),
+                            strokeWidth = 2.dp
+                        )
                     }
                 }
             )
@@ -235,7 +244,6 @@ fun ContenidoCarpetaScreen(
                                 archivo = archivo,
                                 onRenombrar = {
                                     selectedArchivo = archivo
-                                    nuevoNombre = archivo.nombre
                                     mostrarDialogoRenombrar = true
                                 },
                                 onEliminar = {

@@ -37,6 +37,87 @@ class ContenidoCarpetaViewModel @Inject constructor(
     private val _cargando = MutableStateFlow(true)
     val cargando: StateFlow<Boolean> = _cargando
 
+    // ===== Nombre de carpeta para el TopBar =====
+    private val _nombreCarpeta = MutableStateFlow("")
+    val nombreCarpeta: StateFlow<String> = _nombreCarpeta
+
+    /** Permite fijar un nombre inicial (pasado por navegación) para que el usuario lo vea al instante */
+    fun setNombreCarpetaInicial(nombre: String?) {
+        if (_nombreCarpeta.value.isBlank() && !nombre.isNullOrBlank()) {
+            _nombreCarpeta.value = nombre
+        }
+    }
+
+    /** Carga el nombre real desde dominio; si no llega, hace fallback contra Firestore en rutas típicas */
+    fun obtenerNombreCarpeta(carpetaId: String) {
+        viewModelScope.launch {
+            // 1) Intenta desde dominio (repositorio)
+            val nombreDominio = runCatching { archivoUseCase.obtenerNombreCarpeta(carpetaId) }.getOrNull()
+
+            val nombreFinal = if (!nombreDominio.isNullOrBlank()) {
+                nombreDominio
+            } else {
+                // 2) Fallback: intenta rutas habituales en Firestore
+                fetchNombreCarpetaFallback(carpetaId)
+            }
+
+            if (!nombreFinal.isNullOrBlank()) {
+                _nombreCarpeta.value = nombreFinal
+            }
+        }
+    }
+
+    /** Fallback: busca el nombre de la carpeta probando varias rutas/campos */
+    private suspend fun fetchNombreCarpetaFallback(carpetaId: String): String? {
+        return try {
+            val fs = FirebaseFirestore.getInstance()
+            val candidatos = listOf(
+                fs.collection("carpetas").document(carpetaId),
+                // si organizas por usuario, descomenta y ajusta:
+                // fs.collection("usuarios").document(FirebaseAuth.getInstance().currentUser?.uid ?: return null)
+                //   .collection("carpetas").document(carpetaId)
+            )
+
+            for (ref in candidatos) {
+                val snap = runCatching { ref.get().await() }.getOrNull() ?: continue
+                if (!snap.exists()) continue
+                val nombre = snap.getString("nombre")
+                    ?: snap.getString("name")
+                    ?: snap.getString("titulo")
+                    ?: snap.getString("folderName")
+                if (!nombre.isNullOrBlank()) return nombre
+            }
+            null
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+
+
+
+
+
+
+
+
+//    fun obtenerNombreCarpeta(carpetaId: String) {
+//        viewModelScope.launch {
+//            val nombre = archivoUseCase.obtenerNombreCarpeta(carpetaId)
+//            if (!nombre.isNullOrBlank()) {
+//                _nombreCarpeta.value = nombre
+//            }
+//        }
+//    }
+//
+//    /** Fallback inicial desde navegación (ver apartado B) */
+//    fun setNombreCarpetaInicial(nombre: String?) {
+//        if (_nombreCarpeta.value.isBlank() && !nombre.isNullOrBlank()) {
+//            _nombreCarpeta.value = nombre
+//        }
+//    }
+
+
     // Cargar archivos de una carpeta concreta
     fun cargarArchivosDeCarpeta(carpetaId: String) {
         viewModelScope.launch {
@@ -101,21 +182,21 @@ class ContenidoCarpetaViewModel @Inject constructor(
     }
 
     // Obtener el nombre actual de la carpeta
-    fun obtenerNombreCarpeta(carpetaId: String, onResult: (String) -> Unit) {
-        viewModelScope.launch {
-            try {
-                val firestore = FirebaseFirestore.getInstance()
-                val doc = firestore.collection("archivos").document(carpetaId).get().await()
-                val nombre = doc.getString("nombre") ?: "Carpeta"
-                onResult(nombre)
-            } catch (e: Exception) {
-                onResult("Carpeta")
-                Log.e("ContenidoCarpetaViewModel", "Error al obtener nombre de carpeta: ${e.localizedMessage}")
-            }
-        }
-    }
+//    fun obtenerNombreCarpeta(carpetaId: String, onResult: (String) -> Unit) {
+//        viewModelScope.launch {
+//            try {
+//                val firestore = FirebaseFirestore.getInstance()
+//                val doc = firestore.collection("archivos").document(carpetaId).get().await()
+//                val nombre = doc.getString("nombre") ?: "Carpeta"
+//                onResult(nombre)
+//            } catch (e: Exception) {
+//                onResult("Carpeta")
+//                Log.e("ContenidoCarpetaViewModel", "Error al obtener nombre de carpeta: ${e.localizedMessage}")
+//            }
+//        }
+//    }
 
-    // Renombrar archivo (el nombre del método es correcto; el comentario anterior decía "carpeta")
+
     fun renombrarArchivo(id: String, nuevoNombre: String, carpetaId: String) {
         viewModelScope.launch {
             try {

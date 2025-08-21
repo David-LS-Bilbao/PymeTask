@@ -7,9 +7,12 @@ import com.dls.pymetask.domain.model.Archivo
 import com.dls.pymetask.domain.model.ArchivoUiModel
 import com.dls.pymetask.domain.repository.ArchivoRepository
 import com.dls.pymetask.utils.Constants
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.net.URLConnection
 
@@ -152,6 +155,38 @@ class ArchivoRepositoryImpl(
 
         return archivo.copy(nombre = nuevoNombre, url = nuevoUrl)
     }
+
+    /**
+     * ✅ Lee el documento de la carpeta y devuelve su campo "nombre".
+     * Ajusta "carpetas" si tu colección usa otro nombre.
+     */
+    override suspend fun obtenerNombreCarpeta(carpetaId: String): String? = withContext(Dispatchers.IO) {
+        // 1) Asegura sesión
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return@withContext null
+
+        // 2) Rutas candidatas (ajusta nombres si usas otros)
+        val refs = listOf(
+            firestore.collection("usuarios").document(uid).collection("carpetas").document(carpetaId),
+            firestore.collection("users").document(uid).collection("carpetas").document(carpetaId),
+            firestore.collection("carpetas").document(carpetaId) // fallback global
+        )
+
+        // 3) Intenta cada ruta hasta encontrar un doc con algún campo de nombre
+        for (docRef in refs) {
+            val snap = runCatching { docRef.get().await() }.getOrNull() ?: continue
+            if (!snap.exists()) continue
+
+            // Campos posibles según cómo lo guardaras
+            val nombre = snap.getString("nombre")
+                ?: snap.getString("name")
+                ?: snap.getString("titulo")
+                ?: snap.getString("folderName")
+
+            if (!nombre.isNullOrBlank()) return@withContext nombre
+        }
+        null
+    }
+
 }
 
 

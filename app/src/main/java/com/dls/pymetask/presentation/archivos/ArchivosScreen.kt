@@ -48,18 +48,11 @@ fun ArchivosScreen(
         }
     }
 
-    // Mostrar toasts desde ViewModel (los mensajes vienen ya formateados desde el VM)
-//    LaunchedEffect(Unit) {
-//        viewModel.uiEvent.collect { mensaje ->
-//            Toast.makeText(context, mensaje, Toast.LENGTH_SHORT).show()
-//        }
-//    }
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { uiText ->
             Toast.makeText(context, uiText.asString(context), Toast.LENGTH_SHORT).show()
         }
     }
-
 
 
     // Carga inicial de archivos

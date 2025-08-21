@@ -21,7 +21,7 @@ interface ArchivoRepository {
     suspend fun eliminarArchivo(archivoId: String)
     suspend fun renombrarArchivo(id: String, nuevoNombre: String)
     suspend fun eliminarArchivosPorCarpeta(carpetaId: String)
-
+    suspend fun obtenerNombreCarpeta(carpetaId: String): String?
     suspend fun renombrarCarpetaFirestore(archivo: ArchivoUiModel, nuevoNombre: String): ArchivoUiModel
     suspend fun renombrarArchivoStorageYFirestore(archivo: ArchivoUiModel, nuevoNombre: String): ArchivoUiModel
 

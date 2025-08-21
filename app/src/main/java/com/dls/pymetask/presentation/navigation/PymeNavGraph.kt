@@ -171,9 +171,25 @@ fun PymeNavGraph(
                 taskId = backStackEntry.arguments?.getString("taskId")) }
 
         // archivos --------------------------------------------------------------------------------
-        composable("contenido_carpeta/{carpetaId}") { backStackEntry ->
-            val carpetaId = backStackEntry.arguments?.getString("carpetaId") ?: ""
-            ContenidoCarpetaScreen(carpetaId = carpetaId, navController = navController)
+//        composable("contenido_carpeta/{carpetaId}") { backStackEntry ->
+//            val carpetaId = backStackEntry.arguments?.getString("carpetaId") ?: ""
+//            ContenidoCarpetaScreen(carpetaId = carpetaId, navController = navController)
+//        }
+
+        composable(
+            route = "contenido_carpeta/{carpetaId}?nombre={nombre}",
+            arguments = listOf(
+                navArgument("carpetaId") { type = NavType.StringType },
+                navArgument("nombre") { type = NavType.StringType; defaultValue = "" }
+            )
+        ) { backStackEntry ->
+            val carpetaId = backStackEntry.arguments?.getString("carpetaId")!!
+            val nombre = backStackEntry.arguments?.getString("nombre")
+            ContenidoCarpetaScreen(
+                carpetaId = carpetaId,
+                navController = navController,
+                nombreInicial = nombre // <-- se usa como fallback visual inmediato
+            )
         }
 
 
