@@ -274,7 +274,6 @@ fun TareaFormScreen(
                 }
             }
         }
-
         // Diálogo de confirmación de borrado (localizado)
         if (showDeleteDialog) {
             AlertDialog(
@@ -305,7 +304,6 @@ fun TareaFormScreen(
         }
     }
 }
-
 /**
  * Guarda la tarea (validando campos mínimos) y navega atrás.
  * Mantenemos esta función fuera del composable para reutilizarla desde back y botones.
@@ -325,18 +323,38 @@ private fun saveAndExit(
     activarAlarma: Boolean
 ) {
     // Validaciones localizadas
-    when {
-        titulo.isBlank() -> {
-            Toast.makeText(context, context.getString(R.string.task_toast_title_required), Toast.LENGTH_SHORT).show()
-            return
-        }
-        fecha.isBlank() -> {
-            Toast.makeText(context, context.getString(R.string.task_toast_date_required), Toast.LENGTH_SHORT).show()
-            return
-        }
-        hora.isBlank() -> {
-            Toast.makeText(context, context.getString(R.string.task_toast_time_required), Toast.LENGTH_SHORT).show()
-            return
+    if (titulo.isBlank() && fecha.isBlank() && hora.isBlank()){
+        viewModel.limpiarTareaActual()
+        navController.popBackStack()
+        return
+    }else {
+        when {
+            titulo.isBlank() -> {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.task_toast_title_required),
+                    Toast.LENGTH_SHORT
+                ).show()
+                return
+            }
+
+            fecha.isBlank() -> {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.task_toast_date_required),
+                    Toast.LENGTH_SHORT
+                ).show()
+                return
+            }
+
+            hora.isBlank() -> {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.task_toast_time_required),
+                    Toast.LENGTH_SHORT
+                ).show()
+                return
+            }
         }
     }
 
@@ -353,7 +371,6 @@ private fun saveAndExit(
             activarAlarma = activarAlarma
         )
     )
-
     // Aviso y navegación atrás
     Toast.makeText(context, context.getString(R.string.task_toast_saved), Toast.LENGTH_SHORT).show()
     navController.popBackStack()

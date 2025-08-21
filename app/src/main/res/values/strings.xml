@@ -490,6 +490,97 @@
     <string name="settings_reset_mime">borrar preferencias</string>
     <string name="contacts_empty_hint">Lista Vacia</string>
 
+    <!-- Pantallas -->
+    <string name="faq_title">Preguntas frecuentes</string>
+    <string name="instructions_title">Guía de uso</string>
+    <string name="search">Buscar…</string>
+
+    <!-- Guía (markdown simple: ##, -, párrafos) -->
+    <string name="instructions_markdown">
+        ## ¿Qué es PymeTask?
+        PymeTask es una app para gestionar tareas, contactos, notas y archivos enfocada en pequeños negocios.
+
+        ## Primeros pasos
+        - Inicia sesión con Google o email.
+        - Completa tu perfil desde Ajustes.
+        - Crea tu primera tarea desde el Dashboard.
+
+        ## Tareas
+        - Pulsa "Nueva tarea".
+        - Introduce título, descripción, fecha y hora.
+        - Activa "Alarma" para recordatorio (opcional).
+        - Edita una tarea desde su detalle o lista.
+        - Marca como completada cuando la finalices.
+
+        ## Contactos
+        - Crea contactos o impórtalos desde la agenda del dispositivo.
+        - Añade foto, teléfono y email.
+        - Desde el detalle puedes llamar, enviar SMS, WhatsApp o email.
+
+        ## Notas
+        - Crea notas rápidas, asigna color y compártelas por WhatsApp, email o SMS.
+        - Edita/borra desde el listado o el detalle.
+
+        ## Archivos
+        - Crea carpetas y sube archivos (imágenes, vídeos, audios, PDF, Office).
+        - Renombra, comparte o elimina desde el menú contextual.
+        - Los ficheros se suben a la nube y los metadatos se guardan en la base de datos.
+
+        ## Estadísticas
+        - Filtra por rango de fechas.
+        - Visualiza categorías e indicadores clave.
+
+        ## Ajustes
+        - Cambia idioma, tema (claro/oscuro/sistema) y tamaño de fuente.
+        - Restablece preferencias si es necesario.
+        - Consulta versión en "Información".
+
+        ## Permisos
+        - Contactos: para importar desde tu agenda.
+        - Almacenamiento/Multimedia: para seleccionar y subir archivos.
+        - Teléfono/SMS: para llamar o enviar mensajes desde un contacto.
+
+        ## Solución de problemas
+        - Si no ves cambios de idioma, cierra y abre la app (se fuerza con “Recrear”).
+        - Si la alarma no suena, revisa permisos de notificaciones y ahorro de batería.
+        - Comprueba tu conexión si una subida/descarga falla.
+
+        ## Soporte
+        - Escríbenos a soporte@pymetask.app e indica tu versión (Ajustes &gt; Información).
+    </string>
+
+    <!-- FAQ: 12 preguntas/12 respuestas (mismo orden) -->
+    <string-array name="faq_questions">
+        <item>¿Cómo cambio el idioma de la app?</item>
+        <item>¿Puedo cambiar el tamaño de la fuente?</item>
+        <item>¿Cómo activo recordatorios en las tareas?</item>
+        <item>¿Por qué no suena la alarma?</item>
+        <item>¿Puedo importar contactos de mi agenda del móvil?</item>
+        <item>¿Cómo envío WhatsApp, SMS o email desde un contacto?</item>
+        <item>¿Dónde se guardan mis archivos y notas?</item>
+        <item>¿Hay límite de tamaño al subir archivos?</item>
+        <item>¿Cómo restablezco preferencias (tema/idioma/fuente)?</item>
+        <item>¿Puedo editar o duplicar una tarea ya creada?</item>
+        <item>¿Cómo filtro estadísticas por fecha o categoría?</item>
+        <item>¿Cómo contacto con soporte y qué datos envío?</item>
+    </string-array>
+
+    <string-array name="faq_answers">
+        <item>Ve a Ajustes &gt; Idioma, elige uno y la app se recreará para aplicar los textos.</item>
+        <item>Sí. Ajustes &gt; Tamaño de fuente: Pequeño, Mediano o Grande (se aplica a toda la app).</item>
+        <item>En el formulario de la tarea activa "Alarma" y selecciona fecha y hora. Guarda los cambios.</item>
+        <item>Revisa permisos de notificaciones y excluye la app del ahorro de batería. Verifica que la fecha/hora no estén en el pasado.</item>
+        <item>Sí. En Crear/Editar contacto pulsa "Importar desde agenda" y selecciona el contacto.</item>
+        <item>Desde el detalle del contacto usa los iconos de acción. Necesitas número para WhatsApp/SMS y correo para email.</item>
+        <item>Los archivos se suben a la nube y los metadatos se guardan en la base de datos. Notas y contactos se sincronizan con tu cuenta.</item>
+        <item>Puede existir un límite según tu plan de almacenamiento. Optimiza comprimiendo imágenes/vídeos grandes antes de subir.</item>
+        <item>En Ajustes pulsa "Restablecer preferencias". Se restauran tema, idioma, fuente y asociaciones internas.</item>
+        <item>Desde el listado o detalle abre "Editar". Para duplicar, crea una nueva reutilizando los campos (próxima mejora: botón duplicar).</item>
+        <item>En Estadísticas usa el selector de rango de fechas y filtra por categorías. Actualiza para ver datos recientes.</item>
+        <item>Desde Ajustes &gt; Información copia versión y paquete. Envía un email a soporte@pymetask.app con una breve descripción y, si puedes, capturas de pantalla.</item>
+    </string-array>
+
+
 
     <string name="profile_photo_cd">Foto de perfil</string>
     <string name="profile_icon_cd">Icono de perfil</string>

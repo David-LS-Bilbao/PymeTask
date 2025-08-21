@@ -26,6 +26,8 @@ import com.dls.pymetask.presentation.movimientos.EditarMovimientoScreen
 import com.dls.pymetask.presentation.movimientos.MovimientosScreen
 import com.dls.pymetask.presentation.estadisticas.EstadisticasScreen
 import com.dls.pymetask.presentation.ajustes.AjustesScreen
+import com.dls.pymetask.presentation.ajustes.FaqScreen
+import com.dls.pymetask.presentation.ajustes.InstructionsScreen
 import com.dls.pymetask.presentation.archivos.ArchivosScreen
 import com.dls.pymetask.presentation.archivos.ContenidoCarpetaScreen
 import com.dls.pymetask.presentation.contactos.CrearContactoScreen
@@ -173,6 +175,13 @@ fun PymeNavGraph(
             val carpetaId = backStackEntry.arguments?.getString("carpetaId") ?: ""
             ContenidoCarpetaScreen(carpetaId = carpetaId, navController = navController)
         }
+
+
+        composable(route = "faq") { FaqScreen(navController) }
+        composable(route = "instructions") { InstructionsScreen(navController) }
+
+
+
     }// NavHost--------------------------------------------------------------------------------------
 }
 

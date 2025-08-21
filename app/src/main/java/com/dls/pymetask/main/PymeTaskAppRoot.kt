@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
+import com.dls.pymetask.presentation.ajustes.TextScaleViewModel
 import com.dls.pymetask.presentation.ajustes.ThemeViewModel
 import com.dls.pymetask.presentation.navigation.PymeNavGraph
 import com.dls.pymetask.ui.theme.PymeTaskTheme
@@ -28,6 +29,7 @@ import com.dls.pymetask.ui.theme.PymeTaskTheme
 fun PymeTaskAppRoot(
     mainViewModel: MainViewModel = hiltViewModel(),
     themeViewModel: ThemeViewModel = hiltViewModel(),
+    textScaleViewModel: TextScaleViewModel = hiltViewModel()
 ) {
     // Un único NavController gestionado por Compose
     val navController = rememberNavController()
@@ -37,15 +39,14 @@ fun PymeTaskAppRoot(
 
     // Tema actual de la app
     val themeMode by themeViewModel.themeMode.collectAsState()
-
-
+    val textScale by textScaleViewModel.textScale.collectAsState()
 
 
     LaunchedEffect(Unit) {
         mainViewModel.checkLoginStatus()
     }
 
-    PymeTaskTheme(themeMode = themeMode) {
+    PymeTaskTheme(themeMode = themeMode, textScaleFactor = textScale.factor) {
         Scaffold(
             contentWindowInsets = WindowInsets(0.dp) // evita padding extra por insets
         ) { innerPadding ->

@@ -440,7 +440,92 @@
 
 
 
+    <string name="faq_title">Frequently Asked Questions</string>
+    <string name="instructions_title">User Guide</string>
+    <string name="search">Search…</string>
 
+    <string name="instructions_markdown">
+        ## What is PymeTask?
+        PymeTask helps you manage tasks, contacts, notes, and files for your small business.
+
+        ## Getting started
+        - Sign in with Google or email.
+        - Complete your profile in Settings.
+        - Create your first task from the Dashboard.
+
+        ## Tasks
+        - Tap "New task".
+        - Enter title, description, date and time.
+        - Enable "Alarm" if you want a reminder.
+        - Edit from list or detail.
+        - Mark as completed when finished.
+
+        ## Contacts
+        - Create contacts or import from your phone book.
+        - Add photo, phone and email.
+        - From the detail screen you can call, send SMS, WhatsApp or email.
+
+        ## Notes
+        - Create quick notes, assign a color, and share via WhatsApp, email or SMS.
+        - Edit/delete from the list or detail.
+
+        ## Files
+        - Create folders and upload files (images, videos, audio, PDF, Office).
+        - Rename, share or delete from the context menu.
+        - Files are uploaded to the cloud and metadata is stored in the database.
+
+        ## Statistics
+        - Filter by date range.
+        - See categories and key indicators.
+
+        ## Settings
+        - Change language, theme (light/dark/system) and font size.
+        - Reset preferences if needed.
+        - Check version in "Info".
+
+        ## Permissions
+        - Contacts: to import from your phone book.
+        - Storage/Media: to pick and upload files.
+        - Phone/SMS: to call or send messages from a contact.
+
+        ## Troubleshooting
+        - If language doesn’t refresh, reopen the app (we also force it on “Recreate”).
+        - If alarms don’t ring, check notification permissions and battery optimization.
+        - Make sure you’re online when uploading/downloading files.
+
+        ## Support
+        - Email support@pymetask.app and include your app version (Settings &gt; Info).
+    </string>
+
+    <string-array name="faq_questions">
+        <item>How do I change the app language?</item>
+        <item>Can I change the font size?</item>
+        <item>How do I enable task reminders?</item>
+        <item>Why doesn’t the alarm ring?</item>
+        <item>Can I import contacts from my phone book?</item>
+        <item>How do I send WhatsApp, SMS or email from a contact?</item>
+        <item>Where are my files and notes stored?</item>
+        <item>Is there an upload size limit?</item>
+        <item>How do I reset preferences (theme/language/font)?</item>
+        <item>Can I edit or duplicate an existing task?</item>
+        <item>How do I filter statistics by date or category?</item>
+        <item>How can I contact support and what should I include?</item>
+    </string-array>
+
+    <string-array name="faq_answers">
+        <item>Open Settings &gt; Language, pick one and the app will recreate to apply it.</item>
+        <item>Yes. Settings &gt; Font size: Small, Medium or Large (applies app-wide).</item>
+        <item>In the task form enable "Alarm", then choose date and time and save.</item>
+        <item>Check notification permissions and exclude the app from battery optimization. Also confirm the date/time isn’t in the past.</item>
+        <item>Yes. In Create/Edit contact tap "Import from phone book" and select a contact.</item>
+        <item>From the contact detail use the action icons. You need a phone number for WhatsApp/SMS and an email address for email.</item>
+        <item>Files are uploaded to the cloud and metadata is stored in the database. Notes and contacts sync with your account.</item>
+        <item>There may be limits depending on your storage plan. Consider compressing large images/videos before uploading.</item>
+        <item>In Settings tap "Reset preferences". Theme, language, font and internal associations are restored.</item>
+        <item>Edit from list or detail. To duplicate, create a new one reusing fields (next improvement: duplicate button).</item>
+        <item>Use the date range picker and category filters in Statistics. Refresh to see latest data.</item>
+        <item>Open Settings &gt; Info to copy version and package. Email support@pymetask.app with a short description and, if possible, screenshots.</item>
+    </string-array>
 
     <!-- Others -->
 

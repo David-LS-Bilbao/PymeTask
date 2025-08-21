@@ -436,8 +436,92 @@
     <string name="stats_daterange_title">Plage personnalisée</string>
     <string name="common_apply">Appliquer</string>
 
+    <string name="faq_title">Foire aux questions</string>
+    <string name="instructions_title">Guide d’utilisation</string>
+    <string name="search">Rechercher…</string>
 
+    <string name="instructions_markdown">
+        ## Qu’est-ce que PymeTask ?
+        PymeTask vous aide à gérer tâches, contacts, notes et fichiers pour votre petite entreprise.
 
+        ## Pour commencer
+        - Connectez-vous avec Google ou e-mail.
+        - Complétez votre profil dans Réglages.
+        - Créez votre première tâche depuis le tableau de bord.
+
+        ## Tâches
+        - Touchez « Nouvelle tâche ».
+        - Saisissez titre, description, date et heure.
+        - Activez « Alarme » si vous voulez un rappel.
+        - Modifiez depuis la liste ou le détail.
+        - Marquez comme terminée à la fin.
+
+        ## Contacts
+        - Créez des contacts ou importez-les depuis le carnet d’adresses.
+        - Ajoutez photo, téléphone et e-mail.
+        - Depuis le détail, appelez ou envoyez SMS, WhatsApp ou e-mail.
+
+        ## Notes
+        - Créez des notes rapides, assignez une couleur et partagez via WhatsApp, e-mail ou SMS.
+        - Modifiez/supprimez depuis la liste ou le détail.
+
+        ## Fichiers
+        - Créez des dossiers et téléversez des fichiers (images, vidéos, audio, PDF, Office).
+        - Renommez, partagez ou supprimez depuis le menu contextuel.
+        - Les fichiers sont téléversés dans le cloud et les métadonnées stockées dans la base de données.
+
+        ## Statistiques
+        - Filtrez par plage de dates.
+        - Consultez les catégories et indicateurs clés.
+
+        ## Réglages
+        - Changez la langue, le thème (clair/sombre/système) et la taille de police.
+        - Réinitialisez les préférences si besoin.
+        - Consultez la version dans « Informations ».
+
+        ## Autorisations
+        - Contacts : importer depuis le carnet d’adresses.
+        - Stockage/Médias : sélectionner et téléverser des fichiers.
+        - Téléphone/SMS : appeler ou envoyer des messages depuis un contact.
+
+        ## Dépannage
+        - Si la langue ne change pas, rouvrez l’app (ou utilisez « Recréer »).
+        - Si les alarmes ne sonnent pas, vérifiez les notifications et l’optimisation de la batterie.
+        - Assurez-vous d’être en ligne pour téléverser/télécharger.
+
+        ## Assistance
+        - Écrivez à support@pymetask.app et joignez la version de l’app (Réglages &gt; Informations).
+    </string>
+
+    <string-array name="faq_questions">
+        <item>Comment changer la langue de l’application ?</item>
+        <item>Puis-je modifier la taille de la police ?</item>
+        <item>Comment activer les rappels de tâches ?</item>
+        <item>Pourquoi l’alarme ne sonne-t-elle pas ?</item>
+        <item>Puis-je importer des contacts depuis mon téléphone ?</item>
+        <item>Comment envoyer WhatsApp, SMS ou e-mail depuis un contact ?</item>
+        <item>Où sont stockés mes fichiers et mes notes ?</item>
+        <item>Y a-t-il une limite de taille au téléversement ?</item>
+        <item>Comment réinitialiser les préférences (thème/langue/police) ?</item>
+        <item>Puis-je modifier ou dupliquer une tâche existante ?</item>
+        <item>Comment filtrer les statistiques par date ou catégorie ?</item>
+        <item>Comment contacter l’assistance et que fournir ?</item>
+    </string-array>
+
+    <string-array name="faq_answers">
+        <item>Ouvrez Réglages &gt; Langue, choisissez-en une et l’app se recréera pour l’appliquer.</item>
+        <item>Oui. Réglages &gt; Taille de police : Petite, Moyenne ou Grande (pour toute l’app).</item>
+        <item>Dans le formulaire de tâche, activez « Alarme », choisissez date et heure puis enregistrez.</item>
+        <item>Vérifiez les autorisations de notification et excluez l’app de l’optimisation batterie. Assurez-vous que la date/heure n’est pas passée.</item>
+        <item>Oui. En Création/Édition d’un contact, touchez « Importer depuis le carnet » et sélectionnez un contact.</item>
+        <item>Depuis le détail du contact, utilisez les icônes d’action. Il faut un numéro pour WhatsApp/SMS et un e-mail pour envoyer un courrier.</item>
+        <item>Les fichiers sont dans le cloud et les métadonnées dans la base de données. Notes et contacts se synchronisent avec votre compte.</item>
+        <item>Il peut exister des limites selon votre plan de stockage. Pensez à compresser les images/vidéos volumineuses.</item>
+        <item>Dans Réglages touchez « Réinitialiser les préférences ». Thème, langue, police et associations internes sont restaurés.</item>
+        <item>Modifiez depuis la liste ou le détail. Pour dupliquer, créez-en une nouvelle en réutilisant les champs (amélioration à venir : bouton dupliquer).</item>
+        <item>Dans Statistiques, utilisez la plage de dates et les filtres de catégories. Actualisez pour voir les dernières données.</item>
+        <item>Ouvrez Réglages &gt; Informations pour copier la version et le package, puis écrivez à support@pymetask.app avec une courte description et, si possible, des captures d’écran.</item>
+    </string-array>
 
 
     <!-- Autres -->

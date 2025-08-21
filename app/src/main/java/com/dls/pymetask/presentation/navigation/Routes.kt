@@ -16,4 +16,8 @@ object Routes {
     const val NOTAS = "notas"
     const val AJUSTES = "ajustes"
     const val PERFIL_USER = "perfil_user"
+
+    const val FAQ = "faq"
+
+    const val INSTRUCTIONS = "instructions"
 }
