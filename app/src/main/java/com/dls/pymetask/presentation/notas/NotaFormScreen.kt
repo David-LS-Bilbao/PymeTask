@@ -41,6 +41,8 @@ import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Redo
@@ -56,14 +58,17 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -86,19 +91,26 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.dls.pymetask.R
 import com.dls.pymetask.domain.model.Nota
 import com.dls.pymetask.utils.Constants
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.UUID
 import android.graphics.Color as AColor
+import androidx.compose.ui.text.input.ImeAction
+
 
 @SuppressLint("SourceLockedOrientationActivity")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -147,6 +159,11 @@ fun NotaFormScreen(
     val scope = rememberCoroutineScope()
     val useDarkIcons = backgroundColor.luminance() > 0.5f
     val scrolBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
+    // Necesario para cerrar teclado y quitar foco al pulsar "Done"
+    val focusManager = LocalFocusManager.current            // ← gestiona el foco
+    val keyboardController = LocalSoftwareKeyboardController.current  // ← controla el teclado
+
 
     //desactivar modo landscape
     LaunchedEffect(Unit) {
@@ -213,7 +230,6 @@ fun NotaFormScreen(
         )
     }
 
-
     LaunchedEffect(isKeyboardOpen, contenido) {
         if (isKeyboardOpen) {
             // Pequeña espera para que el IME estabilice su tamaño
@@ -233,70 +249,79 @@ fun NotaFormScreen(
                 TopAppBar(
                     modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars),
                     scrollBehavior = scrolBehavior,
-                    title = { Text(text = titulo.ifBlank { "Nota" }, color = onBg) },
+                    title = {
+                        TextField(
+                            value = titulo,
+                            onValueChange = { titulo = it }, // ← actualiza el estado del título
+                            singleLine = true,
+                            placeholder = { Text(stringResource(R.string.note_title_label), color = onBg.copy(alpha = 0.75f)) },
+                            textStyle = MaterialTheme.typography.headlineSmall.copy(
+                                color = onBg,
+                                fontWeight = FontWeight.SemiBold
+                            ),
+                            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    focusManager.clearFocus()
+                                    keyboardController?.hide()
+                                }
+                            ),
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = TextFieldDefaults.colors(
+                                focusedTextColor = onBg,
+                                unfocusedTextColor = onBg,
+                                focusedPlaceholderColor = onBg.copy(alpha = 0.75f),
+                                unfocusedPlaceholderColor = onBg.copy(alpha = 0.6f),
+                                cursorColor = onBg,
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                disabledContainerColor = Color.Transparent,
+                                errorContainerColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                                disabledIndicatorColor = Color.Transparent
+                            )
+                        )
+                    },
+
                     navigationIcon = {
                         IconButton(onClick = {
-                            guardarYSalir(
-                                context,
-                                navController,
-                                viewModel,
-                                notaId,
-                                titulo,
-                                contenido,
-                                backgroundColor
-                            )
-
+                            guardarYSalir(context, navController, viewModel, notaId, titulo, contenido, backgroundColor)
                         }) {
                             Icon(
                                 Icons.Default.ArrowBackIosNew,
-                                contentDescription = "Atras y guardar"
+                                contentDescription = stringResource(R.string.notes_back_and_save)     // "Atrás y guardar"
                             )
                         }
                     },
                     actions = {
-                        // Menú desplegable de envío
+                        // Menú de envío
                         Box {
                             IconButton(onClick = { mostrarMenuEnvio = true }) {
-                                Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Enviar")
+                                Icon(Icons.AutoMirrored.Filled.Send, contentDescription = stringResource(R.string.share))
                             }
-                            DropdownMenu(
-                                expanded = mostrarMenuEnvio,
-                                onDismissRequest = { mostrarMenuEnvio = false }
-                            ) {
+                            DropdownMenu(expanded = mostrarMenuEnvio, onDismissRequest = { mostrarMenuEnvio = false }) {
                                 DropdownMenuItem(
-                                    text = { Text("WhatsApp") },
-                                    onClick = {
-                                        compartirNota(context, titulo, contenido, "whatsapp")
-                                        mostrarMenuEnvio = false
-                                    }
+                                    text = { Text(stringResource(R.string.share_whatsapp)) },
+                                    onClick = { compartirNota(context, titulo, contenido, "whatsapp"); mostrarMenuEnvio = false }
                                 )
                                 DropdownMenuItem(
-                                    text = { Text("Email") },
-                                    onClick = {
-                                        compartirNota(context, titulo, contenido, "email")
-                                        mostrarMenuEnvio = false
-                                    }
+                                    text = { Text(stringResource(R.string.share_email)) },
+                                    onClick = { compartirNota(context, titulo, contenido, "email"); mostrarMenuEnvio = false }
                                 )
                                 DropdownMenuItem(
-                                    text = { Text("SMS") },
-                                    onClick = {
-                                        compartirNota(context, titulo, contenido, "sms")
-                                        mostrarMenuEnvio = false
-                                    }
+                                    text = { Text(stringResource(R.string.share_sms)) },
+                                    onClick = { compartirNota(context, titulo, contenido, "sms"); mostrarMenuEnvio = false }
                                 )
                             }
                         }
 
-                        // Botón borrar
                         IconButton(onClick = { mostrarConfirmacionBorrado = true }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Borrar nota")
+                            Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.note_delete))
                         }
-
-                        // Selector color
                         IconButton(onClick = { mostrarSelectorColor = !mostrarSelectorColor }) {
-                            Icon(Icons.Default.Palette, contentDescription = "Color")
+                            Icon(Icons.Default.Palette, contentDescription = stringResource(R.string.note_color))
                         }
-                        // Botón guardar
                         IconButton(onClick = {
                             viewModel.guardarNota(
                                 Nota(
@@ -311,11 +336,9 @@ fun NotaFormScreen(
                                     )
                                 )
                             )
-                            //navController.popBackStack()
-                            Toast.makeText(context, "Nota guardada", Toast.LENGTH_SHORT).show()
-
+                            Toast.makeText(context, context.getString(R.string.note_saved), Toast.LENGTH_SHORT).show() // getString fuera de composable
                         }) {
-                            Icon(Icons.Default.Save, contentDescription = "Guardar")
+                            Icon(Icons.Default.Save, contentDescription = stringResource(R.string.common_save))
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
@@ -326,11 +349,8 @@ fun NotaFormScreen(
                     )
                 )
             },
-
         ) { inner ->
 
-
-            // nueva:
             Column(
                 modifier = Modifier
                     .padding(
@@ -345,7 +365,70 @@ fun NotaFormScreen(
                     .imePadding()                  // 👈 empuja el contenido sobre el teclado
                     .padding(bottom = overlayHeight) // 👈 hueco para el overlay inferior
             ) {
-                // ... (tu selector de color y el OutlinedTextField de título igual)
+                // ───────────────────────── CAMPO: Título de la nota ─────────────────────────
+
+                // ── Título SIEMPRE editable, con estilo de cabecera y sin bordes ──
+//                OutlinedTextField(
+//                    value = titulo,
+//                    onValueChange = { titulo = it }, // actualiza estado
+//                    singleLine = true,
+//                    maxLines = 1,
+//                    // Etiqueta traducida
+//                    label = { Text(stringResource(R.string.note_title_label), color = onBg.copy(alpha = 0.75f)) },
+//                    // Estilo "headline" para que parezca un título
+//                    textStyle = MaterialTheme.typography.headlineSmall.copy(color = onBg, fontWeight = FontWeight.SemiBold),
+//                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next), // pasa al contenido
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(horizontal = 16.dp),
+//                    // Quitar bordes/rellenos para que se integre con el fondo
+//                    colors = OutlinedTextFieldDefaults.colors(
+//                        focusedTextColor = onBg,
+//                        unfocusedTextColor = onBg,
+//                        focusedLabelColor = onBg.copy(alpha = 0.90f),
+//                        unfocusedLabelColor = onBg.copy(alpha = 0.75f),
+//                        cursorColor = onBg,
+//                        focusedBorderColor = Color.Transparent,
+//                        unfocusedBorderColor = Color.Transparent,
+//                        focusedContainerColor = Color.Transparent,
+//                        unfocusedContainerColor = Color.Transparent
+//                    )
+//                )
+
+// ───────────────────────── FIN CAMPO Título ─────────────────────────
+
+                if (mostrarSelectorColor) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = stringResource(R.string.note_color), // "Color" (o usa una clave específica si prefieres "Color de fondo")
+                        style = MaterialTheme.typography.labelSmall,
+                        color = onBg                                  // se ve sobre el fondo actual
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        coloresDisponibles.forEach { (_, hex) ->
+                            val color = Color(hex.toColorInt())
+                            Surface(
+                                shape = CircleShape,
+                                color = color,
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .clickable { backgroundColor = color } // <-- aplica el color elegido
+                                    .border(
+                                        width = 2.dp,
+                                        color = if (color == backgroundColor) Color.Black else Color.Transparent,
+                                        shape = CircleShape
+                                    )
+                            ) {}
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+
                 Spacer(modifier = Modifier.height(12.dp))
 
                 OutlinedTextField(
@@ -357,7 +440,7 @@ fun NotaFormScreen(
                             contenido = it
                         }
                     },
-                    label = { Text("Contenido", color = Color.Black) },
+                    label = { Text(text = stringResource(R.string.note_content_label), color = Color.Black) },
                     textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
                     modifier = Modifier
                         .fillMaxSize()
@@ -377,96 +460,6 @@ fun NotaFormScreen(
                 )
             }
 
-
-
-
-
-
-
-
-
-
-//            Column(
-//                modifier = Modifier
-//                    .padding(
-//                        start = inner.calculateStartPadding(LocalLayoutDirection.current),
-//                        end = inner.calculateEndPadding(LocalLayoutDirection.current),
-//                        top = inner.calculateTopPadding()
-//                    )
-//                  //  .padding(4.dp) // Aumenta el padding de la columna
-//                    .fillMaxSize()
-//                    .background(backgroundColor)
-//            ) {
-//                // boton color
-//                if (mostrarSelectorColor) {
-//                    Spacer(modifier = Modifier.height(12.dp))
-//                    Text("Color de fondo", style = MaterialTheme.typography.labelSmall)
-//                    Row(
-//                        modifier = Modifier.fillMaxWidth(),
-//                        horizontalArrangement = Arrangement.SpaceEvenly
-//                    ) {
-//                        coloresDisponibles.forEach { (_, hex) ->
-//                            val color = Color(hex.toColorInt())
-//                            Surface(
-//                                shape = CircleShape,
-//                                color = color,
-//                                modifier = Modifier
-//                                    .size(36.dp)
-//                                    .clickable { backgroundColor = color }
-//                                    .border(
-//                                        width = 2.dp,
-//                                        color = if (color == backgroundColor) Color.Black else Color.Transparent,
-//                                        shape = CircleShape
-//                                    )
-//                            ) {}
-//                        }
-//                    }
-//                }
-//                Spacer(modifier = Modifier.height(6.dp))
-//                // titulo
-//                OutlinedTextField(
-//                    value = titulo,
-//                    onValueChange = {
-//                        if (titulo != it) {
-//                            tituloUndoStack.add(it)
-//                            tituloRedoStack.clear()
-//                            titulo = it
-//                        }
-//                    },
-//                    label = { Text("Título") },
-//                    singleLine = true,
-//                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
-//                    modifier = Modifier.fillMaxWidth()
-//                )
-//                Spacer(modifier = Modifier.height(12.dp))
-//                // Cuadro texto para contenido
-//                OutlinedTextField(
-//                    value = contenido,
-//                    onValueChange = {
-//                        if (contenido != it) {
-//                            contenidoUndoStack.add(it)
-//                            contenidoRedoStack.clear()
-//                            contenido = it
-//                        }
-//                    },
-//                    label = { Text("Contenido", color = Color.Black) },
-//                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .weight(1f)// mantiene altura flexible; el TextField ya hace scroll interno
-//                        .bringIntoViewRequester(contenidoBringRequester)   // 👈 preparado
-//                        .onFocusEvent { focus ->
-//                            if (focus.isFocused) {
-//                                // Pequeño retardo para esperar la animación del teclado y luego traer a vista
-//                                scope.launch {
-//                                    delay(200)
-//                                    contenidoBringRequester.bringIntoView()
-//                                }
-//                            }
-//                        },
-//                    maxLines = Int.MAX_VALUE
-//                )
-//            }
             // Diálogo de confirmación para borrar
             if (mostrarConfirmacionBorrado) {
                 AlertDialog(
@@ -476,34 +469,28 @@ fun NotaFormScreen(
                             val idNota = notaId ?: viewModel.notaActual?.id
                             if (idNota != null) {
                                 viewModel.eliminarNotaPorId(idNota)
-                                Toast.makeText(context, "Nota eliminada", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.note_deleted), Toast.LENGTH_SHORT).show()
                             } else {
-                                Toast.makeText(
-                                    context,
-                                    "Error: nota no encontrada",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                Toast.makeText(context,context.getString(R.string.error_note_not_found), Toast.LENGTH_SHORT).show()
                             }
                             mostrarConfirmacionBorrado = false
                             navController.popBackStack()
 
                         }) {
-                            Text("Sí, borrar")
-                        }
+                             Text(stringResource(R.string.delete_confirm_yes))
+                        }     // "Sí, borrar"
+
                     },
                     dismissButton = {
                         TextButton(onClick = { mostrarConfirmacionBorrado = false }) {
-                            Text("Cancelar")
+                            Text(stringResource(R.string.common_cancel))              // "Cancelar"
                         }
                     },
-                    title = { Text("¿Eliminar nota?") },
-                    text = { Text("Esta acción no se puede deshacer.") }
+                    title = { Text(stringResource(R.string.delete_confirm_title_note)) },
+                    text  = { Text(stringResource(R.string.delete_confirm_text)) }
                 )
             }
         }
-        //  Overlay: solo esta fila “sube”
-
-
         Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -564,11 +551,7 @@ fun NotaFormScreen(
                 }
             }
         }
-
     }
-
-
-
 }
 // Funciones para compartir nota---------------------------------------------------------------------
 fun compartirNota(context: Context, titulo: String, contenido: String, via: String) {

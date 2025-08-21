@@ -1,3 +1,4 @@
+
 package com.dls.pymetask.presentation.agenda
 
 import android.annotation.SuppressLint
@@ -167,7 +168,3 @@ fun AgendaScreen(
         }
     }
 }
-
-
-
-

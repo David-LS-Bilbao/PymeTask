@@ -184,7 +184,6 @@
     <string name="mov_incomes">Incomes</string>
     <string name="mov_expenses">Expenses</string>
     <string name="mov_balance">Balance</string>
-
     <string name="movements_add">Add transaction</string>
     <string name="movements_summary">Summary</string>
     <string name="movements_import_csv">Import CSV</string>
@@ -196,6 +195,30 @@
     <string name="movements_expenses">Expenses</string>
     <string name="movements_balance">Balance</string>
     <string name="nav_back_to_menu">Back to menu</string>
+
+
+
+    <string name="notes_back_and_save">Back and save</string>
+    <string name="note_title_fallback">Note</string>
+
+    <string name="share">Share</string>
+    <string name="share_whatsapp">WhatsApp</string>
+    <string name="share_email">Email</string>
+    <string name="share_sms">SMS</string>
+    <string name="share_chooser_title">Share note via…</string>
+
+    <string name="note_delete">Delete note</string>
+    <string name="note_color">Color</string>
+    <string name="note_saved">Note saved</string>
+    <string name="note_deleted">Note deleted</string>
+    <string name="error_note_not_found">Error: note not found</string>
+    <string name="delete_confirm_title_note">Delete note?</string>
+    <string name="delete_confirm_yes">Yes, delete</string>
+
+
+    <string name="note_title_label">Title</string>
+    <string name="note_content_label">Content</string>
+
 
 
 

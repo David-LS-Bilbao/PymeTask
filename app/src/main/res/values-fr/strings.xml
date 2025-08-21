@@ -187,7 +187,6 @@
     <string name="mov_incomes">Revenus</string>
     <string name="mov_expenses">Dépenses</string>
     <string name="mov_balance">Solde</string>
-
     <string name="movements_add">Ajouter un mouvement</string>
     <string name="movements_summary">Résumé</string>
     <string name="movements_import_csv">Importer un CSV</string>
@@ -199,9 +198,6 @@
     <string name="movements_expenses">Dépenses</string>
     <string name="movements_balance">Solde</string>
     <string name="nav_back_to_menu">Retour au menu</string>
-
-
-
     <string name="movement_new_title">Nouveau mouvement</string>
     <string name="movement_edit_title">Modifier le mouvement</string>
     <string name="movement_title_label">Titre</string>
@@ -213,7 +209,32 @@
     <string name="toast_movement_updated">Mouvement mis à jour</string>
     <string name="toast_movement_deleted">Mouvement supprimé</string>
     <string name="delete_confirm_title">Confirmer la suppression</string>
-    <string name="delete_confirm_text">Voulez-vous vraiment supprimer ce mouvement ?</string>
+
+
+
+    <string name="notes_back_and_save">Retour et enregistrer</string>
+    <string name="note_title_fallback">Note</string>
+
+    <string name="share">Envoyer</string>
+    <string name="share_whatsapp">WhatsApp</string>
+    <string name="share_email">E-mail</string>
+    <string name="share_sms">SMS</string>
+    <string name="share_chooser_title">Partager la note avec…</string>
+
+    <string name="note_delete">Supprimer la note</string>
+    <string name="note_color">Couleur</string>
+    <string name="note_saved">Note enregistrée</string>
+    <string name="note_deleted">Note supprimée</string>
+    <string name="error_note_not_found">Erreur : note introuvable</string>
+
+    <string name="delete_confirm_title_note">Supprimer la note ?</string>
+    <string name="delete_confirm_text">Cette action est irréversible.</string>
+    <string name="delete_confirm_yes">Oui, supprimer</string>
+
+
+    <string name="note_title_label">Titre</string>
+    <string name="note_content_label">Contenu</string>
+
 
 
 
