@@ -33,7 +33,7 @@ import com.dls.pymetask.presentation.components.ArchivoCardExtendido
 fun ContenidoCarpetaScreen(
     carpetaId: String,
     navController: NavController,
-    nombreInicial: String? = null, // <-- NUEVO
+    nombreInicial: String? = null,
     viewModel: ContenidoCarpetaViewModel = hiltViewModel()
 ) {
     val archivos by viewModel.archivos.collectAsState()
@@ -65,11 +65,15 @@ fun ContenidoCarpetaScreen(
             Toast.makeText(context, uiText.asString(context), Toast.LENGTH_SHORT).show()
         }
     }
+    // 1) Pintar el nombre inmediatamente con el valor de navegación
+    LaunchedEffect(nombreInicial) {
+        viewModel.setNombreCarpetaInicial(nombreInicial)
+    }
 
-
+    // 2) Cargar datos reales y nombre desde dominio una sola vez
     LaunchedEffect(carpetaId) {
         viewModel.cargarArchivosDeCarpeta(carpetaId)
-        viewModel.obtenerNombreCarpeta(carpetaId) // actualiza con el real
+        viewModel.obtenerNombreCarpeta(carpetaId)
     }
 
     // Selector de contenido (sistema)

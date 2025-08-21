@@ -14,7 +14,8 @@ data class ArchivoUseCase(
     val guardarArchivo: GuardarArchivoUseCase,
     val eliminarArchivo: EliminarArchivoUseCase,
     val obtenerPorCarpeta: ObtenerArchivosPorCarpetaUseCase,
-    val eliminarArchivosPorCarpeta: EliminarArchivosPorCarpetaUseCase
+    val eliminarArchivosPorCarpeta: EliminarArchivosPorCarpetaUseCase,
+    val obtenerNombreCarpeta: ObtenerNombreCarpetaUseCase
 )
 
 class CrearCarpetaUseCase(
@@ -85,5 +86,14 @@ class SubirArchivoUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(uri: Uri, nombre: String): Archivo {
         return repository.subirArchivo(uri, nombre)
+    }
+}
+
+class ObtenerNombreCarpetaUseCase(
+    private val repository: ArchivoRepository
+) {
+    // operator invoke para mantener estilo de invocación: archivoUseCase.obtenerNombreCarpeta(id)()
+    suspend operator fun invoke(carpetaId: String): String? {
+        return repository.obtenerNombreCarpeta(carpetaId)
     }
 }

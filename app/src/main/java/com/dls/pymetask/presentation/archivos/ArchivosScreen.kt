@@ -3,6 +3,7 @@ package com.dls.pymetask.presentation.archivos
 
 import android.app.Activity
 import android.content.pm.ActivityInfo
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -144,7 +145,8 @@ fun ArchivosScreen(
                                 CarpetaItemCard(
                                     archivo = archivo,
                                     onClick = {
-                                        navController.navigate("contenido_carpeta/${archivo.id}")
+                                        val nombre = Uri.encode(archivo.nombre) // evita problemas con espacios y tildes
+                                        navController.navigate("contenido_carpeta/${archivo.id}?nombre=$nombre")
                                     }
                                 )
                             }
