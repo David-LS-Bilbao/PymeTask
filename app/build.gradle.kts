@@ -1,6 +1,3 @@
-val TL_SANDBOX_CLIENT_SECRET: String = (project.findProperty("TL_SANDBOX_CLIENT_SECRET") as String?) ?: ""
-
-
 
 plugins {
     alias(libs.plugins.android.application)
@@ -9,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.kapt) // Necesario para Hilt
     alias(libs.plugins.hilt) // Aplica el plugin de Hilt aquí
     id("com.google.gms.google-services")
+
 
 
 }
@@ -139,20 +137,24 @@ dependencies {
 
     implementation(libs.androidx.datastore.preferences)
 
-    implementation(libs.retrofit.core)
     implementation(libs.retrofit.gson)
     implementation(libs.okhttp.logging)
 
 
     // Retrofit
-   // implementation("com.squareup.retrofit2:retrofit:2.9.0") // O la versión más reciente
+    implementation(libs.retrofit.core) // O la versión más reciente
 
     // Moshi
-    implementation("com.squareup.moshi:moshi:1.15.0") // O la versión más reciente
-    implementation("com.squareup.moshi:moshi-kotlin:1.15.0") // Para soporte de Kotlin (data classes, null safety)
+    implementation(libs.moshi) // O la versión más reciente
+    implementation(libs.moshi.kotlin) // Para soporte de Kotlin (data classes, null safety)
 
     // Convertidor de Moshi para Retrofit
-    implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
+    implementation(libs.converter.moshi)
+
+    implementation(libs.play.services.location)
+
+
+    // Location.
 
 
 
@@ -164,7 +166,7 @@ dependencies {
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    implementation(libs.kotlinx.coroutines.core)
 
 
 }
