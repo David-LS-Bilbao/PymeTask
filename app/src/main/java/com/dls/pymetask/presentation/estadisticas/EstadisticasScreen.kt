@@ -13,6 +13,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -50,6 +51,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -778,6 +780,7 @@ private fun collapseSlices(all: List<CategorySlice>, maxVisible: Int): List<Cate
 
 /* ======================== Donut & leyenda ======================== */
 
+
 @Composable
 private fun CategoryBreakdownCard(
     title: String,
@@ -804,15 +807,24 @@ private fun CategoryBreakdownCard(
             Row(
                 Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+
             ) {
-                Text(title, style = MaterialTheme.typography.titleMedium)
+                Text(title, style = MaterialTheme.typography.titleMedium)}
+            Row(
+                Modifier.fillMaxWidth(),
+//                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End,
+
+            ) {
                 TextButton(onClick = { expanded = !expanded }) {
                     Text(
                         if (expanded)
                             stringResource(R.string.stats_see_top_n, maxVisible)
                         else
-                            stringResource(R.string.stats_see_all)
+                            stringResource(R.string.stats_see_all),
+                                    maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
@@ -824,29 +836,149 @@ private fun CategoryBreakdownCard(
                 return@Column
             }
 
-            Row(
-                Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                DonutChart(
-                    slices = display.mapIndexed { i, s -> s.value to donutPalette[i % donutPalette.size] },
-                    modifier = Modifier.size(height),
-                    thickness = ringThickness
-                )
-                Spacer(Modifier.width(16.dp))
-                LegendList(
-                    slices = display,
-                    selectedLabel = selectedLabel,
-                    onSelect = onSelect,
-                    modifier = Modifier
-                        .weight(1f)
-                        .heightIn(max = height)
-                        .verticalScroll(rememberScrollState())
-                )
+            BoxWithConstraints {
+                val chartSize = if (maxWidth < 360.dp) 130.dp else height
+
+                Row(
+                    Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    DonutChart(
+                        slices = display.mapIndexed { i, s -> s.value to donutPalette[i % donutPalette.size] },
+                        modifier = Modifier.size(chartSize),
+                        thickness = ringThickness
+                    )
+                    Spacer(Modifier.width(16.dp))
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .heightIn(max = height)
+                            .verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        display.forEachIndexed { i, s ->
+                            val pct = if (display.sumOf { it.value } == 0.0) 0 else ((s.value / display.sumOf { it.value }) * 100).toInt()
+                            val isSel = s.label == selectedLabel
+                            val shownLabel = if (s.label == "Otros") stringResource(R.string.stats_others) else s.label
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(
+                                        if (isSel) MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)
+                                        else Color.Transparent
+                                    )
+                                    .clickable { onSelect(s.label) }
+                                    .padding(horizontal = 8.dp, vertical = 6.dp)
+                            ) {
+                                Box(
+                                    Modifier
+                                        .size(10.dp)
+                                        .background(donutPalette[i % donutPalette.size], CircleShape)
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    shownLabel,
+                                    style = MaterialTheme.typography.labelLarge.copy(
+                                        fontWeight = if (isSel) FontWeight.SemiBold else FontWeight.Normal
+                                    ),
+                                    modifier = Modifier.weight(1f),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                val currency = remember {
+                                    NumberFormat.getCurrencyInstance(Locale.getDefault()).apply {
+                                        currency = java.util.Currency.getInstance("EUR")
+                                        maximumFractionDigits = 2
+                                    }
+                                }
+                                Text(
+                                    "${currency.format(s.value)}  ·  $pct%",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 }
+
+
+
+
+//@Composable
+//private fun CategoryBreakdownCard(
+//    title: String,
+//    allSlices: List<CategorySlice>,
+//    selectedLabel: String?,
+//    onSelect: (String) -> Unit,
+//    modifier: Modifier = Modifier,
+//    maxVisible: Int = 8,
+//    height: Dp = 180.dp,
+//    ringThickness: Dp = 22.dp
+//) {
+//    var expanded by remember { mutableStateOf(false) }
+//    val display = remember(allSlices, expanded, maxVisible) {
+//        if (expanded) allSlices else collapseSlices(allSlices, maxVisible)
+//    }
+//
+//    Card(
+//        modifier = modifier,
+//        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+//        elevation = CardDefaults.cardElevation(2.dp),
+//        shape = MaterialTheme.shapes.large
+//    ) {
+//        Column(Modifier.fillMaxWidth().padding(16.dp)) {
+//            Row(
+//                Modifier.fillMaxWidth(),
+//                verticalAlignment = Alignment.CenterVertically,
+//                horizontalArrangement = Arrangement.SpaceBetween
+//            ) {
+//                Text(title, style = MaterialTheme.typography.titleMedium)
+//                TextButton(onClick = { expanded = !expanded }) {
+//                    Text(
+//                        if (expanded)
+//                            stringResource(R.string.stats_see_top_n, maxVisible)
+//                        else
+//                            stringResource(R.string.stats_see_all)
+//                    )
+//                }
+//            }
+//
+//            Spacer(Modifier.height(12.dp))
+//
+//            if (display.isEmpty() || display.sumOf { it.value } <= 0.0) {
+//                TextoVacio(stringResource(R.string.stats_no_expenses_period))
+//                return@Column
+//            }
+//
+//            Row(
+//                Modifier.fillMaxWidth(),
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                DonutChart(
+//                    slices = display.mapIndexed { i, s -> s.value to donutPalette[i % donutPalette.size] },
+//                    modifier = Modifier.size(height),
+//                    thickness = ringThickness
+//                )
+//                Spacer(Modifier.width(16.dp))
+//                LegendList(
+//                    slices = display,
+//                    selectedLabel = selectedLabel,
+//                    onSelect = onSelect,
+//                    modifier = Modifier
+//                        .weight(1f)
+//                        .heightIn(max = height)
+//                        .verticalScroll(rememberScrollState())
+//                )
+//            }
+//        }
+//    }
+//}
 
 @Composable
 private fun LegendList(
@@ -949,4 +1081,6 @@ private val donutPalette = listOf(
     Color(0xFF3B82F6), Color(0xFF22C55E), Color(0xFFF59E0B), Color(0xFFEF4444),
     Color(0xFF8B5CF6), Color(0xFF06B6D4), Color(0xFF10B981), Color(0xFFE11D48),
 )
+
+
 
