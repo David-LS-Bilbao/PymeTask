@@ -36,6 +36,7 @@ import com.dls.pymetask.presentation.agenda.AgendaViewModel
 import com.dls.pymetask.presentation.auth.login.LoginViewModel
 import com.dls.pymetask.presentation.navigation.Routes
 import com.dls.pymetask.presentation.perfil.EditarPerfilViewModel
+import com.dls.pymetask.presentation.weather.DashboardWeatherSection
 import com.dls.pymetask.ui.theme.Poppins
 import com.dls.pymetask.ui.theme.Roboto
 import java.time.LocalDate
@@ -288,6 +289,8 @@ fun DashboardScreen(
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
+            // CLIMA-------
+             DashboardWeatherSection()
 
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
@@ -333,7 +336,12 @@ fun DashboardScreen(
             )
         }
     }
+
+
 }
+
+
+
 
 
 

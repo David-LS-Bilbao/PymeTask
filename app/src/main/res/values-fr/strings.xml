@@ -121,17 +121,13 @@
 
     <string name="files_email_subject_from_app">Fichier depuis %1$s</string>
 
-
     <string name="files_cd_menu">Menu</string>
     <string name="files_cd_video">Vidéo</string>
     <string name="files_cd_audio">Audio</string>
     <string name="files_cd_folder">Dossier</string>
     <string name="files_cd_file">Fichier</string>
 
-
-
-
-
+    <string name="files_folder">Fichers</string>
 
     <!-- AgendaScreen -->
     <string name="agenda_title">Tâches</string>
@@ -319,25 +315,18 @@
     <string name="contacts_delete_title">Supprimer le contact</string>
     <string name="contacts_delete_text">Êtes-vous sûr de vouloir supprimer %1$s ?</string>
 
-
-
     <string name="contacts_create_title">Nouveau contact</string>
     <string name="contacts_edit_title">Modifier le contact</string>
     <string name="contact_detail_title">Contact</string>
     <string name="common_edit">Modifier</string>
-
     <string name="contacts_field_name">Nom</string>
     <string name="contacts_field_phone">Téléphone</string>
     <string name="contacts_field_address">Adresse</string>
     <string name="contacts_field_email">E-mail</string>
-
-
     <string name="contacts_type_prefix">Type : %1$s</string>
-
     <string name="contacts_save">Enregistrer le contact</string>
     <string name="contacts_save_changes">Enregistrer les modifications</string>
     <string name="contacts_import_from_phonebook">Importer du répertoire</string>
-
     <string name="contacts_photo_add">Ajouter une photo</string>
     <string name="contacts_photo_cd_generic">Photo du contact</string>
     <string name="contacts_back">Retour</string>
@@ -345,7 +334,6 @@
     <string name="contacts_sms">SMS</string>
     <string name="contacts_whatsapp">WhatsApp</string>
     <string name="contacts_email">E-mail</string>
-
     <string name="contact_phone_fmt">📞 %1$s</string>
     <string name="contact_email_fmt">✉️ %1$s</string>
     <string name="contact_address_fmt">🏠 %1$s</string>
@@ -522,6 +510,25 @@
         <item>Dans Statistiques, utilisez la plage de dates et les filtres de catégories. Actualisez pour voir les dernières données.</item>
         <item>Ouvrez Réglages &gt; Informations pour copier la version et le package, puis écrivez à support@pymetask.app avec une courte description et, si possible, des captures d’écran.</item>
     </string-array>
+
+
+
+    <!-- === Météo === -->
+    <string name="weather_today_title">Météo du jour</string>
+    <string name="weather_weekly_title">Prévisions hebdo · %1$s</string>
+    <string name="weather_close">Fermer</string>
+    <string name="weather_error">Impossible de charger la météo</string>
+    <string name="weather_retry">Réessayer</string>
+
+    <!-- Conditions -->
+    <string name="cond_sunny">Dégagé</string>
+    <string name="cond_cloudy">Nuageux</string>
+    <string name="cond_rain">Pluie</string>
+    <string name="cond_snow">Neige</string>
+    <string name="cond_storm">Orage</string>
+    <string name="cond_haze">Brouillard</string>
+
+
 
 
     <!-- Autres -->

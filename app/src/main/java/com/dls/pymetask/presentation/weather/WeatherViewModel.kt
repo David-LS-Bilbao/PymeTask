@@ -25,6 +25,7 @@ import javax.inject.Inject
  * - Se asume que la UI ya gestionó permisos de ubicación.
  * - Intenta resolver el nombre de la ciudad con Geocoder (best effort).
  */
+@Suppress("DEPRECATION")
 @HiltViewModel
 class WeatherViewModel @Inject constructor(
     private val getWeather: GetWeatherUseCase,

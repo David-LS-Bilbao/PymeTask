@@ -235,11 +235,7 @@
     <string name="delete_confirm_title">Confirm deletion</string>
     <string name="delete_confirm_text">Are you sure you want to delete this transaction?</string>
 
-
-
-
-
-
+    <string name="files_folder">Files</string>
 
     <!-- NotasScreen -->
     <string name="notes_title">Notes</string>
@@ -434,15 +430,12 @@
     <string name="stats_list_today">Today\'s movements</string>
     <string name="stats_list_week">This week\'s movements</string>
     <string name="stats_list_custom">Movements (custom range)</string>
-
     <string name="stats_daterange_title">Custom range</string>
     <string name="common_apply">Apply</string>
-
-
-
     <string name="faq_title">Frequently Asked Questions</string>
     <string name="instructions_title">User Guide</string>
     <string name="search">Search…</string>
+
 
     <string name="instructions_markdown">
         ## What is PymeTask?\n
@@ -526,6 +519,25 @@
         <item>Use the date range picker and category filters in Statistics. Refresh to see latest data.</item>
         <item>Open Settings &gt; Info to copy version and package. Email support@pymetask.app with a short description and, if possible, screenshots.</item>
     </string-array>
+
+
+
+
+    <!-- === Weather === -->
+    <string name="weather_today_title">Today’s weather</string>
+    <string name="weather_weekly_title">Weekly forecast · %1$s</string>
+    <string name="weather_close">Close</string>
+    <string name="weather_error">Couldn’t load weather</string>
+    <string name="weather_retry">Retry</string>
+
+    <!-- Conditions -->
+    <string name="cond_sunny">Clear</string>
+    <string name="cond_cloudy">Cloudy</string>
+    <string name="cond_rain">Rain</string>
+    <string name="cond_snow">Snow</string>
+    <string name="cond_storm">Storm</string>
+    <string name="cond_haze">Fog</string>
+
 
     <!-- Others -->
 

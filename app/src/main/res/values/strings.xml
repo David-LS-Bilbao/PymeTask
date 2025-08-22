@@ -481,6 +481,20 @@
         <item quantity="other">%d días</item>
     </plurals>
 
+    <!-- === Tiempo / Weather === -->
+    <string name="weather_today_title">Tiempo hoy</string>
+    <string name="weather_weekly_title">Pronóstico semanal · %1$s</string>
+    <string name="weather_close">Cerrar</string>
+    <string name="weather_error">No se pudo cargar el tiempo</string>
+    <string name="weather_retry">Reintentar</string>
+
+    <!-- Condiciones (texto corto) -->
+    <string name="cond_sunny">Despejado</string>
+    <string name="cond_cloudy">Nublado</string>
+    <string name="cond_rain">Lluvia</string>
+    <string name="cond_snow">Nieve</string>
+    <string name="cond_storm">Tormenta</string>
+    <string name="cond_haze">Niebla</string>
 
 
 
@@ -491,21 +505,14 @@
     <string name="dashboard_title">Dashboard</string>
     <string name="settings_reset_mime">borrar preferencias</string>
     <string name="contacts_empty_hint">Lista Vacia</string>
-
     <string name="today">Hoy</string>
     <string name="tomorrow">Mañana</string>
-
     <string name="files_folder">Carpeta</string>
-
-
-
     <string name="settings_date_format">Formato de fecha</string>
     <string name="settings_select_date_format">Selecciona formato de fecha</string>
     <string name="relative_today_tomorrow">Relativo (hoy/mañana)</string>
-
     <string name="settings_currency">Moneda por defecto</string>
     <string name="settings_select_currency">Selecciona moneda</string>
-
     <string name="settings_default_reminder">Recordatorio por defecto</string>
     <string name="enabled">Activado</string>
     <string name="disabled">Desactivado</string>
