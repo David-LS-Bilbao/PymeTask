@@ -275,6 +275,8 @@ fun DashboardScreen(
                 fontFamily = Roboto,
                 color = MaterialTheme.colorScheme.onBackground
             )
+            // CLIMA-------
+            DashboardWeatherSection()
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -289,8 +291,6 @@ fun DashboardScreen(
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
-            // CLIMA-------
-             DashboardWeatherSection()
 
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
@@ -305,7 +305,9 @@ fun DashboardScreen(
                         navController.navigate(route)   // ← navegación por route estable
                         onCardClick(route)              // ← si usas el callback, pásale la route (opcional)
                     }
+
                 }
+
             }
         }
 

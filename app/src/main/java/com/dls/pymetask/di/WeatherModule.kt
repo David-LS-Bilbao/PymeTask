@@ -1,19 +1,26 @@
 package com.dls.pymetask.di
 
 
+import android.content.Context
+import android.location.Geocoder
+import com.dls.pymetask.BuildConfig
+import com.dls.pymetask.data.location.LocationClient
 import com.dls.pymetask.data.repository.WeatherRepositoryImpl
 import com.dls.pymetask.domain.repository.WeatherApi
 import com.dls.pymetask.domain.repository.WeatherRepository
+import com.dls.pymetask.domain.useCase.weather.GetWeatherByDeviceLocationUseCase
 import com.dls.pymetask.domain.useCase.weather.GetWeatherUseCase
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import java.util.Locale
 import javax.inject.Singleton
 
 /**
@@ -26,11 +33,12 @@ object WeatherModule {
     private const val BASE_URL = "https://api.open-meteo.com/"
 
     @Provides @Singleton
-    fun provideLogging(): HttpLoggingInterceptor =
-        HttpLoggingInterceptor().apply {
-            // BASIC para no saturar Logcat; puedes usar BODY en debug.
-            level = HttpLoggingInterceptor.Level.BASIC
-        }
+    fun provideGetWeatherByDeviceLocationUseCase(
+        locationClient: LocationClient,
+        getWeatherUseCase: GetWeatherUseCase
+    ): GetWeatherByDeviceLocationUseCase =
+        GetWeatherByDeviceLocationUseCase(locationClient, getWeatherUseCase)
+
 
     @Provides @Singleton
     fun provideOkHttp(logging: HttpLoggingInterceptor): OkHttpClient =
@@ -39,7 +47,9 @@ object WeatherModule {
             .build()
 
     @Provides @Singleton
-    fun provideMoshi(): Moshi = Moshi.Builder().build()
+    fun provideMoshi(): Moshi = Moshi.Builder()
+        .add(com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory()) // ← clave
+        .build()
 
     @Provides @Singleton
     fun provideRetrofit(okHttp: OkHttpClient, moshi: Moshi): Retrofit =
@@ -60,4 +70,13 @@ object WeatherModule {
     @Provides @Singleton
     fun provideGetWeatherUseCase(repo: WeatherRepository): GetWeatherUseCase =
         GetWeatherUseCase(repo)
+
+
+    @Provides @Singleton
+    fun provideLogging(): HttpLoggingInterceptor =
+        HttpLoggingInterceptor().apply {
+            level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
+            else HttpLoggingInterceptor.Level.BASIC
+        }
+
 }

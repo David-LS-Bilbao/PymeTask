@@ -17,6 +17,8 @@ data class WeatherResponseDto(
     @Json(name = "longitude") val longitude: Double?,
     @Json(name = "timezone") val timezone: String?,
     @Json(name = "current") val current: CurrentDto?,
+    @Json(name = "current_weather") val currentWeather: CurrentWeatherDto? = null,
+
     @Json(name = "daily") val daily: DailyDto?
 )
 
@@ -24,6 +26,12 @@ data class CurrentDto(
     @Json(name = "time") val time: String?,              // ISO "2025-08-21T10:00"
     @Json(name = "temperature_2m") val temperature2m: Double?, // °C
     @Json(name = "weather_code") val weatherCode: Int?   // código WMO
+)
+
+data class CurrentWeatherDto(
+    @Json(name = "time") val time: String?,          // "2025-08-21T10:00"
+    @Json(name = "temperature") val temperature: Double?, // °C
+    @Json(name = "weathercode") val weatherCode: Int?     // ojo: sin "_"
 )
 
 data class DailyDto(

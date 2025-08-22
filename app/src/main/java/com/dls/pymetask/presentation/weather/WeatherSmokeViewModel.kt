@@ -13,15 +13,15 @@ import javax.inject.Inject
 class WeatherSmokeViewModel @Inject constructor(
     private val getWeather: GetWeatherUseCase
 ) : ViewModel() {
-    val log = MutableStateFlow<String>("")
-    init {
-        viewModelScope.launch {
-            try {
-                val (today, week) = getWeather(43.263, -2.935)
-                log.value = "OK: today=${today?.tempC}°C, days=${week.size}"
-            } catch (e: Exception) {
-                log.value = "ERROR: ${e.message}"
-            }
-        }
-    }
+//    val log = MutableStateFlow<String>("")
+//    init {
+//        viewModelScope.launch {
+//            try {
+//                val (today, week) = getWeather(43.263, -2.935)
+//                log.value = "OK: today=${today?.tempC}°C, days=${week.size}"
+//            } catch (e: Exception) {
+//                log.value = "ERROR: ${e.message}"
+//            }
+//        }
+//    }
 }

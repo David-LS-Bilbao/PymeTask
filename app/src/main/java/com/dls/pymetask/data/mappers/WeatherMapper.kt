@@ -24,23 +24,27 @@ data class WeatherDailyUi(
 
 /** Convierte la respuesta Open‑Meteo en Today + Lista semanal. */
 fun WeatherResponseDto.toUiModels(): Pair<WeatherTodayUi?, List<WeatherDailyUi>> {
-    val today = current?.let {
-        // Redondeamos a entero (°C)
-        val t = (it.temperature2m ?: Double.NaN).toInt()
-        val code = it.weatherCode ?: -1
-        WeatherTodayUi(tempC = t, wmoCode = code)
+    val today = when {
+        currentWeather != null -> {
+            val t = (currentWeather.temperature ?: Double.NaN).toInt()
+            val code = currentWeather.weatherCode ?: -1
+            WeatherTodayUi(tempC = t, wmoCode = code)
+        }
+        current != null -> {
+            val t = (current.temperature2m ?: Double.NaN).toInt()
+            val code = current.weatherCode ?: -1
+            WeatherTodayUi(tempC = t, wmoCode = code)
+        }
+        else -> null
     }
 
-    // Open‑Meteo devuelve arrays paralelos: unimos por índice con seguridad.
     val list = buildList {
         val dates = daily?.dates.orEmpty()
         val mins = daily?.tempMin.orEmpty()
         val maxs = daily?.tempMax.orEmpty()
         val codes = daily?.weatherCodes.orEmpty()
-
         val n = listOf(dates.size, mins.size, maxs.size, codes.size).minOrNull() ?: 0
         val parser = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-
         for (i in 0 until n) {
             val date = runCatching { LocalDate.parse(dates[i], parser) }.getOrNull() ?: continue
             add(
@@ -53,6 +57,6 @@ fun WeatherResponseDto.toUiModels(): Pair<WeatherTodayUi?, List<WeatherDailyUi>>
             )
         }
     }
-
     return today to list
 }
+

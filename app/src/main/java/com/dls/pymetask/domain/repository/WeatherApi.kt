@@ -31,7 +31,11 @@ interface WeatherApi {
         // Zona horaria automática
         @Query("timezone") timezone: String = "auto",
 
+        @Query("current_weather") currentWeather: Boolean = true,
+
         // Días de pronóstico
         @Query("forecast_days") days: Int = 7
+
+
     ): WeatherResponseDto
 }
