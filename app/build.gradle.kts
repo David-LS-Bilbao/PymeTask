@@ -144,6 +144,16 @@ dependencies {
     implementation(libs.okhttp.logging)
 
 
+    // Retrofit
+   // implementation("com.squareup.retrofit2:retrofit:2.9.0") // O la versión más reciente
+
+    // Moshi
+    implementation("com.squareup.moshi:moshi:1.15.0") // O la versión más reciente
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.0") // Para soporte de Kotlin (data classes, null safety)
+
+    // Convertidor de Moshi para Retrofit
+    implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
+
 
 
     implementation(libs.security.crypto)
