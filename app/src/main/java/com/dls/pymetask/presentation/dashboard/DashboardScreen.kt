@@ -262,19 +262,8 @@ fun DashboardScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(
-                text = stringResource(R.string.dashboard_welcome_title),
-                fontSize = 26.sp,
-                fontFamily = Poppins,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-            Text(
-                text = stringResource(R.string.dashboard_welcome_subtitle),
-                fontSize = 16.sp,
-                fontFamily = Roboto,
-                color = MaterialTheme.colorScheme.onBackground
-            )
+
+
             // CLIMA-------
             DashboardWeatherSection()
 

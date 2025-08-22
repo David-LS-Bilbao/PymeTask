@@ -179,7 +179,7 @@ fun DashboardWeatherSection(
                 // TÍTULO: fecha del día
                 Text(
                     text = titleText,
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold),
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
                     color = Color.Black   // ← letras negras
                 )
 
@@ -188,7 +188,7 @@ fun DashboardWeatherSection(
                 if (subtitleCity.isNotBlank()) {
                     Text(
                         text = subtitleCity,
-                        style = MaterialTheme.typography.bodyLarge,
+                        style = MaterialTheme.typography.bodyMedium,
                          color = Color.Gray,   // ← letras grises,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -199,43 +199,15 @@ fun DashboardWeatherSection(
                 Text(
                     text = ui.today?.let { "${it.tempC}°C" } ?: "—",
                     style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                    color = Color.Gray ,  // ← letras grises
+                    color = Color.Black ,  // ← letras grises
                     maxLines = 1,
                     textAlign = TextAlign.End,
                     modifier = Modifier
                         .widthIn(min = 56.dp)          // ancho mínimo para que no “salte”
                         .wrapContentWidth(Alignment.End)
                 )
-
-
             }
-//                Text(
-//                    text = stringResource(R.string.weather_today_title),                                   // TIEMPO HOY
-//                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold),
-//                    color = Color.Black   // ← letras negras
-//                )
-//
-//                val dateFmt = remember { DateTimeFormatter.ofPattern("EEEE, d MMMM") }
-//                val subtitle = when {
-//                    ui.error != null -> stringResource(R.string.weather_error)
-//                    ui.today != null  -> buildString {
-//                        if (ui.city.isNotBlank()) append(ui.city).append(" · ")
-//                        append(ui.week.firstOrNull()?.date?.format(dateFmt) ?: "")
-//                    }
-//                    else -> ""
-//                }
-//                Text(
-//                    text = subtitle,
-//                    style = MaterialTheme.typography.bodyLarge,
-//                    color = Color.Gray   // ← letras grises
-//                )
-//            }
-//
-//            Text(
-//                text = ui.today?.let { "${it.tempC}°C" } ?: "—",
-//                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-//                color = Color.Gray   // ← letras grises
-//            )
+
         }
 
         // Divider con el mismo esquema de color (suave)
