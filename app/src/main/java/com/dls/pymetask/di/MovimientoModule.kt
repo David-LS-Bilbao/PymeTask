@@ -3,6 +3,13 @@ package com.dls.pymetask.di
 import android.content.Context
 import com.dls.pymetask.data.repository.MovimientoRepositoryImpl
 import com.dls.pymetask.domain.repository.MovimientoRepository
+import com.dls.pymetask.domain.useCase.movimiento.AddMovimiento
+import com.dls.pymetask.domain.useCase.movimiento.DeleteMovimiento
+import com.dls.pymetask.domain.useCase.movimiento.GetEarliestMovimientoMillis
+import com.dls.pymetask.domain.useCase.movimiento.GetMovimientos
+import com.dls.pymetask.domain.useCase.movimiento.GetMovimientosBetween
+import com.dls.pymetask.domain.useCase.movimiento.MovimientoUseCases
+import com.dls.pymetask.domain.useCase.movimiento.UpdateMovimiento
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
@@ -23,4 +30,20 @@ object MovimientoModule {
     ): MovimientoRepository {
         return MovimientoRepositoryImpl(firestore, context)
     }
+    @Provides
+    @Singleton
+    fun provideMovimientoUseCases(
+        repo: MovimientoRepository
+    ): MovimientoUseCases {
+        return MovimientoUseCases(
+            getMovimientos = GetMovimientos(repo),
+            getMovimientosBetween = GetMovimientosBetween(repo),
+            getEarliestMovimientoMillis = GetEarliestMovimientoMillis(repo),
+            addMovimiento = AddMovimiento(repo),
+            updateMovimiento = UpdateMovimiento(repo),
+            deleteMovimiento = DeleteMovimiento(repo)
+        )
+    }
 }
+
+

@@ -84,10 +84,11 @@ fun EditarMovimientoScreen(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.movement_edit_title), fontFamily = Poppins, fontSize = 20.sp) },
+
                 navigationIcon = {
                     IconButton(onClick = {
-                        navController.popBackStack()
-                        if (!navController.popBackStack()) {
+                        val popped = navController.popBackStack()
+                        if (!popped) {
                             navController.navigate("movimientos") {
                                 popUpTo("movimientos") { inclusive = true }
                             }
@@ -95,7 +96,9 @@ fun EditarMovimientoScreen(
                     }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.common_back))
                     }
-                },
+                }
+
+                ,
                 actions = {
                     IconButton(onClick = { navController.navigate("dashboard") }) {
                         Icon(Icons.Filled.Home, contentDescription = stringResource(R.string.common_home))
@@ -128,7 +131,8 @@ fun EditarMovimientoScreen(
                 onValueChange = { titulo = it },
                 label = { Text(stringResource(R.string.movement_title_label)) },
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                maxLines = 1
             )
 
             OutlinedTextField(
@@ -136,19 +140,25 @@ fun EditarMovimientoScreen(
                 onValueChange = { subtitulo = it },
                 label = { Text(stringResource(R.string.movement_desc_client_supplier)) },
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                maxLines = 1
             )
 
+            // OutlinedTextField de cantidad (usa 'f.isFocused')
             OutlinedTextField(
                 value = cantidad,
+                maxLines = 1,
                 onValueChange = { cantidad = it },
                 label = { Text(stringResource(R.string.movement_amount_label)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .onFocusChanged { f ->
-                        cantidadFocus = f.isFocused
-                        if (!cantidadFocus) {
-                            cantidad = cantidad.replace(",", ".").toDoubleOrNull()?.let { "%.2f".format(it) } ?: cantidad
+                        if (!f.isFocused) {
+                            cantidad = cantidad
+                                .replace(",", ".")
+                                .toDoubleOrNull()
+                                ?.let { "%.2f".format(it) }
+                                ?: cantidad
                         }
                     },
                 keyboardOptions = KeyboardOptions.Default.copy(

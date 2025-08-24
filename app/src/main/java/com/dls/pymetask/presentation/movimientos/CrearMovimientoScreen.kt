@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource // <-- i18n
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -43,30 +43,9 @@ fun CrearMovimientoScreen(
     var subtitulo by remember { mutableStateOf("") }
     var cantidad by remember { mutableStateOf("") }
     var tipoIngreso by remember { mutableStateOf(true) }
-    var cantidadFocus by remember { mutableStateOf(false) }
     var fechaSeleccionada by remember { mutableStateOf<Date?>(null) }
 
     val context = LocalContext.current
-
-    // DatePickerDialog inicial (se mantiene tu lógica)
-    remember {
-        android.app.DatePickerDialog(
-            context,
-            { _, year, month, dayOfMonth ->
-                val calendar = java.util.Calendar.getInstance().apply { set(year, month, dayOfMonth) }
-                fechaSeleccionada = calendar.time
-            },
-            java.util.Calendar.getInstance().get(java.util.Calendar.YEAR),
-            java.util.Calendar.getInstance().get(java.util.Calendar.MONTH),
-            java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_MONTH)
-        )
-    }
-
-    // Selector reusable
-    FechaSelector(
-        context = context,
-        onFechaSeleccionada = { fechaSeleccionada = it }
-    )
 
     Scaffold(
         topBar = {
@@ -96,7 +75,7 @@ fun CrearMovimientoScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // 🗓️ Fecha
+            // 🗓️ Fecha (usa  componente reusable)
             FechaSelector(
                 context = context,
                 fechaInicial = fechaSeleccionada,
@@ -123,20 +102,17 @@ fun CrearMovimientoScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Cantidad
+            // Cantidad (formatea al perder foco)
             OutlinedTextField(
                 value = cantidad,
                 onValueChange = { cantidad = it },
                 label = { Text(stringResource(R.string.movement_amount_label)) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .onFocusChanged { focusState ->
-                        cantidadFocus = focusState.isFocused
-                        if (!cantidadFocus) {
+                    .onFocusChanged { f ->
+                        if (!f.isFocused) {
                             val valor = cantidad.replace(",", ".").toDoubleOrNull()
-                            if (valor != null) {
-                                cantidad = String.format("%.2f", valor)
-                            }
+                            if (valor != null) cantidad = String.format("%.2f", valor)
                         }
                     },
                 maxLines = 1,

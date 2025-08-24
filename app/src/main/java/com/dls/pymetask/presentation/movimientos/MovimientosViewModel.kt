@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dls.pymetask.domain.model.Movimiento
 import com.dls.pymetask.domain.repository.MovimientoRepository
+import com.dls.pymetask.domain.useCase.movimiento.MovimientoUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,7 +29,9 @@ import javax.inject.Inject
 @RequiresApi(Build.VERSION_CODES.O)
 @HiltViewModel
 class MovimientosViewModel @Inject constructor(
-    private val repository: MovimientoRepository,
+   // private val repository: MovimientoRepository,
+    // Inyectamos el contenedor de casos de uso para mantener el VM limpio
+    private val repository: MovimientoUseCases
 
 ) : ViewModel() {
 
@@ -55,7 +58,7 @@ class MovimientosViewModel @Inject constructor(
     fun addMovimiento(mov: Movimiento) {
         viewModelScope.launch {
             try {
-                repository.insertMovimiento(mov)
+                repository.addMovimiento(mov)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -90,7 +93,7 @@ class MovimientosViewModel @Inject constructor(
                 val movs = parseCsvInternal(context, uri)
                 var count = 0
                 movs.forEach { m ->
-                    repository.insertMovimiento(m.copy(userId = userId))
+                    repository.addMovimiento(m.copy(userId = userId))
                     count++
                 }
                 lastSyncResult = "Importados $count movimientos"
@@ -301,44 +304,66 @@ class MovimientosViewModel @Inject constructor(
 
     private val _noHayMas = MutableStateFlow(false)
     val noHayMas = _noHayMas.asStateFlow()
-    /** Llamar una vez (por ejemplo en LaunchedEffect de la pantalla) */
+
+
+
+
+    /**
+     * Prepara la paginación por meses: averigua el movimiento más antiguo del usuario
+     * para saber hasta dónde seguir cargando, y resetea el estado de las secciones.
+     */
     fun startMonthPaging(userId: String) = viewModelScope.launch {
-        // Obtenemos el movimiento más antiguo UNA sola vez para saber cuándo parar
+        // Timestamp del movimiento más antiguo (o null si no hay)
         earliestMillis = repository.getEarliestMovimientoMillis(userId)
+        // Resetea secciones y estado de paginación
         _meses.value = emptyList()
         monthOffset = 0
         _noHayMas.value = false
-        loadNextMonth(userId) // carga el mes actual
+        // Carga el primer mes (mes actual - offset 0)
+        loadNextMonth(userId)
     }
 
+    /**
+     * Carga el siguiente mes hacia atrás en el tiempo en función de monthOffset.
+     * Si el mes resultante no tiene movimientos, incrementa offset y sigue buscando
+     * hasta encontrar un mes con datos o hasta rebasar earliestMillis.
+     */
     fun loadNextMonth(userId: String) {
         viewModelScope.launch {
-            var nextOffset = monthOffset  // empezamos en el offset actual
-
+            var nextOffset = monthOffset
             while (true) {
+                // YearMonth objetivo = mes actual - offset
                 val target = YearMonth.now(zona).minusMonths(nextOffset.toLong())
 
-                val from: Long = target.atDay(1).atStartOfDay(zona).toInstant().toEpochMilli()
-                val to: Long   = target.plusMonths(1).atDay(1).atStartOfDay(zona).toInstant().toEpochMilli()
+                // Rango [from, to) en millis para ese mes
+                val from = target.atDay(1).atStartOfDay(zona).toInstant().toEpochMilli()
+                val to   = target.plusMonths(1).atDay(1).atStartOfDay(zona).toInstant().toEpochMilli()
 
+                // Si ya no queda nada por debajo del límite inferior, marcamos fin
                 val earliest = earliestMillis
                 if (earliest != null && to <= earliest) {
                     _noHayMas.value = true
                     return@launch
                 }
 
-                // Tipamos explícitamente para ayudar al compilador
-                val lista: List<Movimiento> =
-                    repository.getMovimientosBetween(userId, from, to)
+                // Consulta de movimientos del usuario en el rango
+                val lista = repository.getMovimientosBetween(userId, from, to)
 
                 if (lista.isNotEmpty()) {
-                    _meses.value = _meses.value + MesSection(target.year, target.monthValue, lista)
-                    monthOffset = nextOffset + 1  // el siguiente "Mostrar más" pedirá el inmediatamente anterior
+                    // Añadimos sección de este mes y avanzamos offset
+                    _meses.value = _meses.value + MesSection(
+                        year = target.year,
+                        month = target.monthValue,
+                        items = lista
+                    )
+                    monthOffset = nextOffset + 1
                     return@launch
                 } else {
-                    // Salta al mes anterior y sigue buscando
+                    // No hay movimientos en este mes: probar el siguiente hacia atrás
                     nextOffset++
-                    if (nextOffset > 240) { // límite de seguridad (20 años)
+
+                    // Corta búsqueda tras un límite razonable (por ejemplo 20 años)
+                    if (nextOffset > 240) {
                         _noHayMas.value = true
                         return@launch
                     }
@@ -346,4 +371,56 @@ class MovimientosViewModel @Inject constructor(
             }
         }
     }
+
+
+
+
+
+
+
+
+//    fun startMonthPaging(userId: String) = viewModelScope.launch {
+//        // Obtenemos el movimiento más antiguo UNA sola vez para saber cuándo parar
+//        earliestMillis = repository.getEarliestMovimientoMillis(userId)
+//        _meses.value = emptyList()
+//        monthOffset = 0
+//        _noHayMas.value = false
+//        loadNextMonth(userId) // carga el mes actual
+//    }
+//
+//    fun loadNextMonth(userId: String) {
+//        viewModelScope.launch {
+//            var nextOffset = monthOffset  // empezamos en el offset actual
+//
+//            while (true) {
+//                val target = YearMonth.now(zona).minusMonths(nextOffset.toLong())
+//
+//                val from: Long = target.atDay(1).atStartOfDay(zona).toInstant().toEpochMilli()
+//                val to: Long   = target.plusMonths(1).atDay(1).atStartOfDay(zona).toInstant().toEpochMilli()
+//
+//                val earliest = earliestMillis
+//                if (earliest != null && to <= earliest) {
+//                    _noHayMas.value = true
+//                    return@launch
+//                }
+//
+//                // Tipamos explícitamente para ayudar al compilador
+//                val lista: List<Movimiento> =
+//                    repository.getMovimientosBetween(userId, from, to)
+//
+//                if (lista.isNotEmpty()) {
+//                    _meses.value = _meses.value + MesSection(target.year, target.monthValue, lista)
+//                    monthOffset = nextOffset + 1  // el siguiente "Mostrar más" pedirá el inmediatamente anterior
+//                    return@launch
+//                } else {
+//                    // Salta al mes anterior y sigue buscando
+//                    nextOffset++
+//                    if (nextOffset > 240) { // límite de seguridad (20 años)
+//                        _noHayMas.value = true
+//                        return@launch
+//                    }
+//                }
+//            }
+//        }
+//    }
 }
