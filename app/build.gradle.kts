@@ -92,6 +92,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.junit.ktx)
     implementation(libs.ui.test.junit4)
+    implementation(libs.androidx.espresso.intents)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -170,6 +171,7 @@ dependencies {
     testImplementation(libs.mockk) // por si lo usamos en siguientes tests
     testImplementation(libs.turbine)
     androidTestImplementation (libs.mockk.mockk.android)
+    testImplementation(kotlin("test"))
 
 
 }
