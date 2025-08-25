@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource // <-- i18n en Compose
 import androidx.compose.ui.text.TextStyle
@@ -120,7 +121,7 @@ fun LoginScreen(
             onValueChange = { email = it },
             label = { Text(stringResource(R.string.auth_email)) },
             leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().testTag("emailField"),
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email)
         )
 
@@ -139,7 +140,10 @@ fun LoginScreen(
                 }
             },
             visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth(),
+            modifier =
+                Modifier
+                .fillMaxWidth()
+                .testTag("passwordField"),
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password)
         )
 
@@ -188,70 +192,3 @@ fun LoginScreen(
         }
     }
 }
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun LoginScreenPreview() {
-    PymeTaskTheme {
-        // Preview simple usando strings localizados
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterVertically)
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_logo),
-                contentDescription = null,
-                modifier = Modifier.size(200.dp)
-            )
-            Text(
-                stringResource(R.string.login_welcome_title),
-                fontFamily = Poppins,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 22.sp
-            )
-            Text(
-                stringResource(R.string.login_welcome_subtitle),
-                fontFamily = Roboto,
-                fontSize = 16.sp
-            )
-
-            OutlinedTextField(
-                value = "",
-                onValueChange = {},
-                label = { Text(stringResource(R.string.auth_email)) },
-                leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            OutlinedTextField(
-                value = "",
-                onValueChange = {},
-                label = { Text(stringResource(R.string.auth_password)) },
-                leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
-                trailingIcon = {
-                    IconButton(onClick = {}) {
-                        Icon(Icons.Default.Visibility, contentDescription = null)
-                    }
-                },
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Button(onClick = {}, modifier = Modifier.fillMaxWidth()) {
-                Text(stringResource(R.string.login_sign_in))
-            }
-
-            Row {
-                Text(stringResource(R.string.login_no_account))
-                Text(
-                    text = stringResource(R.string.auth_register),
-                    color = Color(0xFF1976D2)
-                )
-            }
-        }
-    }
-}
-

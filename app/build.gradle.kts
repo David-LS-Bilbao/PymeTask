@@ -1,4 +1,3 @@
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -21,16 +20,6 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-
-        // ✅ SANDBOX (API y Auth)
-//        buildConfigField("String", "BANK_BASE_URL", "\"https://api.truelayer-sandbox.com/\"") // Data API sandbox
-//        buildConfigField("String", "OAUTH_BASE_URL", "\"https://auth.truelayer-sandbox.com/\"") // Auth sandbox
-//        buildConfigField("String", "OAUTH_CLIENT_ID", "\"sandbox-pymetask-b17d46\"")
-//        buildConfigField("String", "OAUTH_CLIENT_SECRET", "\"${'$'}{TL_SANDBOX_CLIENT_SECRET}\"") // ← lo leeremos desde gradle.properties
-//        buildConfigField("String", "OAUTH_REDIRECT_URI", "\"pymetask://auth/callback\"")
-//        buildConfigField("String", "OAUTH_SCOPES", "\"accounts balance transactions offline_access\"")
-
-
 
       testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -59,9 +48,17 @@ android {
 
 
 
+
     packaging {
         resources {
             pickFirsts.add("META-INF/LICENSE-MIT")
+
+            excludes.add("META-INF/LICENSE.md")
+            excludes.add("META-INF/LICENSE-notice.md")
+            excludes.add("META-INF/LICENSE")
+            excludes.add("META-INF/NOTICE")
+            excludes.add("META-INF/DEPENDENCIES")
+
         }
     }
     kotlinOptions {
@@ -93,6 +90,8 @@ dependencies {
     implementation(libs.androidx.foundation.layout)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.junit.ktx)
+    implementation(libs.ui.test.junit4)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -160,7 +159,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.test.manifest)
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
+
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
@@ -170,9 +169,7 @@ dependencies {
     testImplementation(libs.truth)
     testImplementation(libs.mockk) // por si lo usamos en siguientes tests
     testImplementation(libs.turbine)
-
-
-
+    androidTestImplementation (libs.mockk.mockk.android)
 
 
 }
