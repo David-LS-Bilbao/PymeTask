@@ -32,7 +32,7 @@ android {
 
 
 
-      // testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+      testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -102,17 +102,11 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(libs.androidx.foundation)
-
     implementation(libs.androidx.material.icons.extended)
-
     implementation(libs.google.auth)
-
     implementation(libs.coil.compose)
-
     implementation(libs.reorderable)
-
     implementation(libs.gson)
-
 
     // Hilt
     implementation(libs.hilt.android)
@@ -134,12 +128,9 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose) // o superior
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.runtime.livedata)
-
     implementation(libs.androidx.datastore.preferences)
-
     implementation(libs.retrofit.gson)
     implementation(libs.okhttp.logging)
-
 
     // Retrofit
     implementation(libs.retrofit.core) // O la versión más reciente
@@ -150,14 +141,9 @@ dependencies {
 
     // Convertidor de Moshi para Retrofit
     implementation(libs.converter.moshi)
-
     implementation(libs.play.services.location)
 
-
     // Location.
-
-
-
     implementation(libs.security.crypto)
     implementation(libs.androidx.browser)
 
@@ -165,7 +151,6 @@ dependencies {
     // habilita desugaring para soportar Java 8 en minSdk 24
     coreLibraryDesugaring(libs.desugar.jdk.libs)
     implementation(libs.kotlinx.coroutines.core)
-
 
     // Unit tests (ViewModel y UseCases)
     testImplementation(libs.kotlinx.coroutines.test)
@@ -178,6 +163,14 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test.v1101)
+
+    testImplementation(libs.truth)
+    testImplementation(libs.mockk) // por si lo usamos en siguientes tests
+    testImplementation(libs.turbine)
+
 
 
 
