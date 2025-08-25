@@ -35,15 +35,33 @@ reorderable = "0.9.6"
 material3 = "1.3.2"
 foundationLayout = "1.9.0"
 
-retrofit = "3.0.0"
+
 okhttp = "5.1.0"
-moshi = "1.15.1"
+
 
 securitycrypto = "1.1.0"
 browser = "1.9.0"
 ui = "4.0.0"
 workRuntimeKtx = "2.10.3"
 appcompat = "1.7.1"
+
+
+coroutinesTest = "1.10.2"
+turbine = "1.2.1"
+
+
+retrofit = "3.0.0"
+
+# 2) Moshi: quédate con una sola; aquí unifico a 'moshi'
+moshi = "1.15.2"
+
+# 3) AndroidX Test (runner/rules/core)
+androidxTest = "1.6.1"
+
+# 4) Aserciones y mocks
+truth = "1.4.2"
+mockk = "1.13.12"
+
 
 
 
@@ -111,6 +129,14 @@ androidx-foundation-layout = { group = "androidx.compose.foundation", name = "fo
 ui = { module = "com.truelayer.payments:ui", version.ref = "ui" }
 androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtx" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutinesTest" }
+turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
+
+
+adapter-rxjava3  = { module = "com.squareup.retrofit2:adapter-rxjava3", version.ref = "retrofit" }
+
+
 
 
 

@@ -23,12 +23,12 @@ android {
         versionName = "1.0"
 
         // ✅ SANDBOX (API y Auth)
-        buildConfigField("String", "BANK_BASE_URL", "\"https://api.truelayer-sandbox.com/\"") // Data API sandbox
-        buildConfigField("String", "OAUTH_BASE_URL", "\"https://auth.truelayer-sandbox.com/\"") // Auth sandbox
-        buildConfigField("String", "OAUTH_CLIENT_ID", "\"sandbox-pymetask-b17d46\"")
-        buildConfigField("String", "OAUTH_CLIENT_SECRET", "\"${'$'}{TL_SANDBOX_CLIENT_SECRET}\"") // ← lo leeremos desde gradle.properties
-        buildConfigField("String", "OAUTH_REDIRECT_URI", "\"pymetask://auth/callback\"")
-        buildConfigField("String", "OAUTH_SCOPES", "\"accounts balance transactions offline_access\"")
+//        buildConfigField("String", "BANK_BASE_URL", "\"https://api.truelayer-sandbox.com/\"") // Data API sandbox
+//        buildConfigField("String", "OAUTH_BASE_URL", "\"https://auth.truelayer-sandbox.com/\"") // Auth sandbox
+//        buildConfigField("String", "OAUTH_CLIENT_ID", "\"sandbox-pymetask-b17d46\"")
+//        buildConfigField("String", "OAUTH_CLIENT_SECRET", "\"${'$'}{TL_SANDBOX_CLIENT_SECRET}\"") // ← lo leeremos desde gradle.properties
+//        buildConfigField("String", "OAUTH_REDIRECT_URI", "\"pymetask://auth/callback\"")
+//        buildConfigField("String", "OAUTH_SCOPES", "\"accounts balance transactions offline_access\"")
 
 
 
@@ -164,9 +164,22 @@ dependencies {
     implementation(libs.ui)
     // habilita desugaring para soportar Java 8 en minSdk 24
     coreLibraryDesugaring(libs.desugar.jdk.libs)
-
-
     implementation(libs.kotlinx.coroutines.core)
+
+
+    // Unit tests (ViewModel y UseCases)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
+
+// Instrumented UI tests (Compose + AndroidX Test)
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.test.manifest)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
+
+
 
 
 }
