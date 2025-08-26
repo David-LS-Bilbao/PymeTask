@@ -21,7 +21,6 @@ class NotaViewModel @Inject constructor(
 
 
     var notaActual: Nota? by mutableStateOf(null)
-    private set
 
 
     private val _isLoading = mutableStateOf(false)

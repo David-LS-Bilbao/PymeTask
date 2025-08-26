@@ -1,3 +1,9 @@
+
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
+
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -24,12 +30,8 @@ android {
       testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+
     buildTypes {
-
-        debug {
-
-        }
-
 
         release {
             isMinifyEnabled = false
@@ -45,8 +47,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
         isCoreLibraryDesugaringEnabled = true
     }
-
-
 
 
     packaging {
@@ -72,6 +72,13 @@ android {
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.3"
+    }
+
+    testOptions{
+        unitTests.isReturnDefaultValues = true
+        unitTests.all {
+            it.useJUnitPlatform()
+        }
     }
 
 }
@@ -166,13 +173,32 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     testImplementation(libs.junit)
-    testImplementation(libs.kotlinx.coroutines.test.v1101)
+   // testImplementation(libs.kotlinx.coroutines.test.v1101)
 
     testImplementation(libs.truth)
-    testImplementation(libs.mockk) // por si lo usamos en siguientes tests
-    testImplementation(libs.turbine)
+//    testImplementation(libs.mockk) // por si lo usamos en siguientes tests
+//    testImplementation(libs.turbine)
     androidTestImplementation (libs.mockk.mockk.android)
     testImplementation(kotlin("test"))
 
+    testImplementation(libs.junit.jupiter) // For JUnit Jupiter (JUnit 5)
+
+    // JUnit 5
+    testImplementation(libs.junit.jupiter.api)
+    testImplementation(libs.junit.jupiter.params)
+    testRuntimeOnly(libs.jupiter.junit.jupiter.engine)
+
+// Coroutines Test
+    testImplementation(libs.kotlinx.coroutines.test)
+    // MockK y Turbine
+    testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
+
+    // Instrumentación
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
 
 }
