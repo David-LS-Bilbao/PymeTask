@@ -1,8 +1,7 @@
-package com.dls.pymetask.presentation
+package com.dls.pymetask.presentation.movimientos
 
-import com.dls.pymetask.presentation.movimientos.MovimientosViewModel
 import com.dls.pymetask.presentation.movimientos.util.parseCsvLines
-import org.junit.Assert.assertEquals
+import org.junit.Assert
 import org.junit.Test
 
 /**
@@ -19,8 +18,8 @@ class MovimientosCsvParserTest {
             "03/08/2025;Pago factura;-123.45"      // EN: decimales con punto negativo
         )
         val rows = parseCsvLines(lines) // <-- implementa o exporta desde tu helper
-        assertEquals(2, rows.size)
-        assertEquals(1234.56, rows[0].amount, 0.001)
-        assertEquals(-123.45, rows[1].amount, 0.001)
+        Assert.assertEquals(2, rows.size)
+        Assert.assertEquals(1234.56, rows[0].amount, 0.001)
+        Assert.assertEquals(-123.45, rows[1].amount, 0.001)
     }
 }

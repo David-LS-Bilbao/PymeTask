@@ -1,17 +1,22 @@
-package com.dls.pymetask.presentation
+package com.dls.pymetask.presentation.movimientos
 
 import app.cash.turbine.test
 import com.dls.pymetask.domain.model.Movimiento
-import com.dls.pymetask.domain.useCase.movimiento.*
+import com.dls.pymetask.domain.useCase.movimiento.AddMovimiento
+import com.dls.pymetask.domain.useCase.movimiento.DeleteMovimiento
+import com.dls.pymetask.domain.useCase.movimiento.GetEarliestMovimientoMillis
+import com.dls.pymetask.domain.useCase.movimiento.GetMovimientos
+import com.dls.pymetask.domain.useCase.movimiento.GetMovimientosBetween
+import com.dls.pymetask.domain.useCase.movimiento.MovimientoUseCases
+import com.dls.pymetask.domain.useCase.movimiento.UpdateMovimiento
 import com.dls.pymetask.fakes.FakeMovimientoRepository
-import com.dls.pymetask.presentation.movimientos.MovimientosViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
-import java.time.ZoneId
 import java.time.YearMonth
+import java.time.ZoneId
 import java.util.UUID
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -57,16 +62,16 @@ class MovimientosViewModelTest {
 
         vm.meses.test {
             // Estado inicial
-            assertEquals(emptyList<MovimientosViewModel.MesSection>(), awaitItem())
+            Assert.assertEquals(emptyList<MovimientosViewModel.MesSection>(), awaitItem())
 
             // Arranca paginación → debe emitir al menos una sección con el mes actual
             vm.startMonthPaging(user)
             val secciones = awaitItem()
             val s0 = secciones.first()
-            assertEquals(now.year, s0.year)
-            assertEquals(now.monthValue, s0.month)
+            Assert.assertEquals(now.year, s0.year)
+            Assert.assertEquals(now.monthValue, s0.month)
             // contiene el movimiento insertado
-            assertEquals(1, s0.items.size)
+            Assert.assertEquals(1, s0.items.size)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -75,7 +80,8 @@ class MovimientosViewModelTest {
     fun `loadNextMonth avanza offset saltando meses vacios hasta encontrar datos`() = runTest {
         val now = YearMonth.now(ZoneId.systemDefault())
         val twoMonthsAgo = now.minusMonths(2)
-        val from2 = twoMonthsAgo.atDay(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val from2 =
+            twoMonthsAgo.atDay(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
         repo.insertMovimiento(mov(from2 + 3_600_000)) // movimiento hace 2 meses
 
         vm.startMonthPaging(user) // crea (o no) la sección actual según datos
@@ -84,8 +90,8 @@ class MovimientosViewModelTest {
 
         val sections = vm.meses.value
         val last = sections.last()
-        assertEquals(twoMonthsAgo.year, last.year)
-        assertEquals(twoMonthsAgo.monthValue, last.month)
-        assertEquals(1, last.items.size)
+        Assert.assertEquals(twoMonthsAgo.year, last.year)
+        Assert.assertEquals(twoMonthsAgo.monthValue, last.month)
+        Assert.assertEquals(1, last.items.size)
     }
 }

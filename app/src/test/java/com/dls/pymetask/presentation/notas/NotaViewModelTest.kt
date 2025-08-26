@@ -1,113 +1,202 @@
+
+
 package com.dls.pymetask.presentation.notas
 
 import com.dls.pymetask.domain.model.Nota
 import com.dls.pymetask.domain.useCase.nota.NotaUseCases
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.mockk
+import io.mockk.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.*
+import org.junit.*
+import org.junit.rules.TestWatcher
+import org.junit.runner.Description
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class NotaViewModelTest {
 
-    private lateinit var viewModel: NotaViewModel
-    private lateinit var useCases: NotaUseCases
+    @get:Rule val mainRule = MainDispatcherRule()
 
-    // Constantes para evitar literales en verificaciones/mocks
-    private val TEST_ID = "1"
-    private val TEST_FECHA = 1_756_000_000_000L
+    private val useCases: NotaUseCases = mockk(relaxed = true)
+    private lateinit var viewModel: NotaViewModel
+
     private val TEST_NOTA = Nota(
-        id = TEST_ID,
-        titulo = "Título de prueba",
+        id = "1",
+        titulo = "Titulo de prueba",
         contenido = "Contenido de prueba",
-        fecha = TEST_FECHA,
-        colorHex = "#FFFFFF"
+        fecha = 1234L,
+        colorHex = "#FFFFFF",
+        contactoId = null,
+        posicion = 0
     )
 
-    @BeforeEach
-    fun setUp() {
-        useCases = mockk(relaxed = true)
+    @Before
+    fun setup() {
+        viewModel = NotaViewModel(useCases)
     }
 
     @Test
-    fun `cargarNotas actualiza lista de notas`() = runTest {
-        // Main = dispatcher de test (sin necesidad de advanceUntilIdle)
-        Dispatchers.setMain(UnconfinedTestDispatcher(testScheduler))
-        viewModel = NotaViewModel(useCases)
-
-        coEvery { useCases.getNotas() } returns listOf(TEST_NOTA)
+    fun cargarNotas_actualizaLista() = runTest {
+        val notas = listOf(TEST_NOTA)
+        coEvery { useCases.getNotas() } returns notas
 
         viewModel.cargarNotas()
 
-        assertEquals(listOf(TEST_NOTA), viewModel.notas.value)
-
-        Dispatchers.resetMain()
+        assertEquals(notas, viewModel.notas.first())
+        coVerify { useCases.getNotas() }
     }
 
     @Test
-    fun `seleccionarNota actualiza notaActual`() = runTest {
-        Dispatchers.setMain(UnconfinedTestDispatcher(testScheduler))
-        viewModel = NotaViewModel(useCases)
+    fun seleccionarNota_actualizaNotaActual() = runTest {
+        coEvery { useCases.getNota("1") } returns TEST_NOTA
 
-        coEvery { useCases.getNota(TEST_ID) } returns TEST_NOTA
-
-        viewModel.seleccionarNota(TEST_ID)
+        viewModel.seleccionarNota("1")
 
         assertEquals(TEST_NOTA, viewModel.notaActual)
-
-        Dispatchers.resetMain()
     }
 
     @Test
-    fun `guardarNota guarda y recarga`() = runTest {
-        Dispatchers.setMain(UnconfinedTestDispatcher(testScheduler))
-        viewModel = NotaViewModel(useCases)
+    fun limpiarNotaActual_laPoneNull() {
+        viewModel.notaActual = TEST_NOTA
+        viewModel.limpiarNotaActual()
+        assertNull(viewModel.notaActual)
+    }
 
-        // Al guardar, el VM llama a addNota y luego cargarNotas -> getNotas
+    @Test
+    fun guardarNota_llamaAddYRecarga() = runTest {
         coEvery { useCases.getNotas() } returns listOf(TEST_NOTA)
 
         viewModel.guardarNota(TEST_NOTA)
 
         coVerify { useCases.addNota(TEST_NOTA) }
         coVerify { useCases.getNotas() }
-
-        Dispatchers.resetMain()
     }
 
     @Test
-    fun `eliminarNotaPorId elimina y recarga`() = runTest {
-        Dispatchers.setMain(UnconfinedTestDispatcher(testScheduler))
-        viewModel = NotaViewModel(useCases)
-
+    fun eliminarNotaPorId_llamaDeleteYRecarga() = runTest {
         coEvery { useCases.getNotas() } returns emptyList()
 
-        viewModel.eliminarNotaPorId(TEST_ID)
+        viewModel.eliminarNotaPorId("1")
 
-        coVerify { useCases.deleteNota(TEST_ID) }
+        coVerify { useCases.deleteNota("1") }
         coVerify { useCases.getNotas() }
-
-        Dispatchers.resetMain()
     }
+}
 
-    @Test
-    fun `limpiarNotaActual pone null`() = runTest {
-        Dispatchers.setMain(UnconfinedTestDispatcher(testScheduler))
-        viewModel = NotaViewModel(useCases)
-
-        viewModel.notaActual = TEST_NOTA
-        viewModel.limpiarNotaActual()
-
-        assertNull(viewModel.notaActual)
-
+// =============================================
+// Regla para reemplazar Dispatchers.Main en tests
+// =============================================
+@OptIn(ExperimentalCoroutinesApi::class)
+class MainDispatcherRule(
+    private val dispatcher: TestDispatcher = UnconfinedTestDispatcher()
+) : TestWatcher() {
+    override fun starting(description: Description) {
+        Dispatchers.setMain(dispatcher)
+    }
+    override fun finished(description: Description) {
         Dispatchers.resetMain()
     }
 }
+
+
+
+//package com.dls.pymetask.presentation.notas
+//
+//
+//import com.dls.pymetask.domain.model.Nota
+//import com.dls.pymetask.domain.useCase.nota.NotaUseCases
+//import io.mockk.*
+//import kotlinx.coroutines.Dispatchers
+//import kotlinx.coroutines.ExperimentalCoroutinesApi
+//import kotlinx.coroutines.flow.first
+//import kotlinx.coroutines.test.*
+//import org.junit.*
+//import org.junit.rules.TestWatcher
+//import org.junit.runner.Description
+//import kotlin.test.assertEquals
+//import kotlin.test.assertNull
+//
+//@OptIn(ExperimentalCoroutinesApi::class)
+//class NotaViewModelTest {
+//
+//    @get:Rule val mainRule = MainDispatcherRule()
+//
+//    private val useCases: NotaUseCases = mockk(relaxed = true)
+//    private lateinit var viewModel: NotaViewModel
+//
+//    private val TEST_NOTA = Nota(
+//        id = "1",
+//        titulo = "Titulo",
+//        contenido = "Contenido",
+//        fecha = 1234L,
+//        colorHex = "#FFFFFF"
+//    )
+//
+//    @Before
+//    fun setup() {
+//        viewModel = NotaViewModel(useCases)
+//    }
+//
+//    @Test
+//    fun cargarNotas_actualizaLista() = runTest {
+//        val notas = listOf(TEST_NOTA)
+//        coEvery { useCases.getNotas() } returns notas
+//
+//        viewModel.cargarNotas()
+//
+//        assertEquals(notas, viewModel.notas.first())
+//        coVerify { useCases.getNotas() }
+//    }
+//
+//    @Test
+//    fun seleccionarNota_actualizaNotaActual() = runTest {
+//        coEvery { useCases.getNota("1") } returns TEST_NOTA
+//
+//        viewModel.seleccionarNota("1")
+//
+//        assertEquals(TEST_NOTA, viewModel.notaActual)
+//    }
+//
+//    @Test
+//    fun limpiarNotaActual_laPoneNull() {
+//        viewModel.notaActual = TEST_NOTA
+//        viewModel.limpiarNotaActual()
+//        assertNull(viewModel.notaActual)
+//    }
+//
+//    @Test
+//    fun guardarNota_llamaAddYRecarga() = runTest {
+//        coEvery { useCases.getNotas() } returns listOf(TEST_NOTA)
+//
+//        viewModel.guardarNota(TEST_NOTA)
+//
+//        coVerify { useCases.addNota(TEST_NOTA) }
+//        coVerify { useCases.getNotas() }
+//    }
+//
+//    @Test
+//    fun eliminarNotaPorId_llamaDeleteYRecarga() = runTest {
+//        coEvery { useCases.getNotas() } returns emptyList()
+//
+//        viewModel.eliminarNotaPorId("1")
+//
+//        coVerify { useCases.deleteNota("1") }
+//        coVerify { useCases.getNotas() }
+//    }
+//}
+//
+//// Regla para Dispatchers.Main en tests
+//@OptIn(ExperimentalCoroutinesApi::class)
+//class MainDispatcherRule(
+//    private val dispatcher: TestDispatcher = UnconfinedTestDispatcher()
+//) : TestWatcher() {
+//    override fun starting(description: Description) {
+//        Dispatchers.setMain(dispatcher)
+//    }
+//    override fun finished(description: Description) {
+//        Dispatchers.resetMain()
+//    }
+//}
