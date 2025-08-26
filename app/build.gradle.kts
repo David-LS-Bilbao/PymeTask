@@ -1,5 +1,4 @@
 
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 
@@ -11,6 +10,7 @@ plugins {
     alias(libs.plugins.kotlin.kapt) // Necesario para Hilt
     alias(libs.plugins.hilt) // Aplica el plugin de Hilt aquí
     id("com.google.gms.google-services")
+
 
 
 
@@ -28,6 +28,8 @@ android {
         versionName = "1.0"
 
       testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+
     }
 
 
@@ -76,7 +78,7 @@ android {
 
     testOptions{
         unitTests.isReturnDefaultValues = true
-        // unitTests.isIncludeAndroidResources = true // solo si usas Robolectric
+        unitTests.isIncludeAndroidResources = true // solo si usas Robolectric
         unitTests.all {
             it.testLogging {
                 events = setOf(
@@ -207,5 +209,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+
 
 }

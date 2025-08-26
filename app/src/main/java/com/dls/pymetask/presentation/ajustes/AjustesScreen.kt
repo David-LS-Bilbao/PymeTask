@@ -379,3 +379,25 @@ fun AjustesScreen(
         }
     }
 }
+// ----- TAGS SOLO PARA TESTS -----
+object AjustesTags {
+    const val THEME_ROW = "settings_theme_row"
+    const val THEME_OPT_LIGHT = "settings_theme_opt_light"
+    const val THEME_OPT_DARK = "settings_theme_opt_dark"
+    const val THEME_OPT_SYSTEM = "settings_theme_opt_system"
+
+    const val LANG_ROW = "settings_lang_row"
+    const val LANG_OPT_ES = "settings_lang_opt_es"
+    const val LANG_OPT_EN = "settings_lang_opt_en"
+    const val LANG_OPT_FR = "settings_lang_opt_fr"
+
+    const val FONT_ROW = "settings_font_row"
+    const val FONT_OPT_SMALL = "settings_font_opt_small"
+    const val FONT_OPT_MEDIUM = "settings_font_opt_medium"
+    const val FONT_OPT_LARGE = "settings_font_opt_large"
+
+    const val RESET_ROW = "settings_reset_row"
+    const val FAQ_ROW = "settings_faq_row"
+    const val GUIDE_ROW = "settings_guide_row"
+}
+

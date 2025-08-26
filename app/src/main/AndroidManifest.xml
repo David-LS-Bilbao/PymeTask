@@ -55,6 +55,7 @@
             </intent-filter>
         </activity>
 
+
         <!-- Activity receptora del redirect OAuth -->
         <activity
             android:name=".presentation.auth.RedirectActivity"
@@ -72,6 +73,8 @@
                     tools:targetApi="33" />
             </intent-filter>
         </activity>
+
+
     </application>
 
 </manifest>
