@@ -28,7 +28,7 @@ import kotlin.coroutines.resume
  */
 
 @HiltViewModel
-class WeatherViewModel @Inject constructor(
+open class WeatherViewModel @Inject constructor(
     private val getWeather: GetWeatherUseCase,
     private val locationClient: LocationClient,
     private val geocoder: Geocoder
@@ -43,7 +43,7 @@ class WeatherViewModel @Inject constructor(
     )
 
     private val _ui = MutableStateFlow(UiState())
-    val ui: StateFlow<UiState> = _ui
+    open val ui: StateFlow<UiState> = _ui
 
 
 
