@@ -76,8 +76,15 @@ android {
 
     testOptions{
         unitTests.isReturnDefaultValues = true
+        // unitTests.isIncludeAndroidResources = true // solo si usas Robolectric
         unitTests.all {
-            it.useJUnitPlatform()
+            it.testLogging {
+                events = setOf(
+                    TestLogEvent.FAILED,
+                    TestLogEvent.SKIPPED,
+                    TestLogEvent.PASSED
+                )
+            }
         }
     }
 
