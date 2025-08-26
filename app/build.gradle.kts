@@ -109,6 +109,7 @@ dependencies {
     implementation(libs.androidx.junit.ktx)
     implementation(libs.ui.test.junit4)
     implementation(libs.androidx.espresso.intents)
+    implementation(libs.androidx.navigation.testing)
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter)
     androidTestImplementation(libs.androidx.junit)
