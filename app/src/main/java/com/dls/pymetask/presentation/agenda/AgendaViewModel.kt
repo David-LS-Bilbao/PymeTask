@@ -34,7 +34,6 @@ class AgendaViewModel @Inject constructor(
     val tareas: StateFlow<List<Tarea>> = _tareas
 
     var tareaActual: Tarea? by mutableStateOf(null)
-    private set
 
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading
