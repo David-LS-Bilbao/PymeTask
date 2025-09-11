@@ -26,6 +26,32 @@ Incluye módulos para **autenticación, contactos, notas, agenda/tareas, movimie
 
 Estructura de carpetas (resumen):contentReference[oaicite:0]{index=0}:
 
+## 🧱 Requisitos
+
+- Android Studio **Narwhal 2025.1.1** (K2)
+- JDK **21**
+- Android SDK: `compileSdk = 35`, `minSdk = 24`  <!-- ajusta si difiere -->
+- Gradle wrapper incluido en el repo
+
+## 🔐 Configuración (Firebase)
+
+1. Crea un proyecto en Firebase y una app Android con tu **applicationId**.
+2. Activa **Authentication** (Email/Password y Google), **Firestore** y **Storage**.
+3. Descarga `google-services.json` y colócalo en `app/`.
+4. (Google Sign-In) Añade **SHA-1** de tu firma debug/release en Firebase.
+5. Lanza la app: login/registro deberían funcionar.
+
+## 🔒 Permisos y privacidad
+
+La app usa únicamente los permisos necesarios:
+- `INTERNET` y `ACCESS_NETWORK_STATE` (conectividad y Firebase).
+- `ACCESS_COARSE_LOCATION` / `ACCESS_FINE_LOCATION` (bloque de clima).
+- `POST_NOTIFICATIONS` (Android 13+, para recordatorios/alarma).
+- **Opcional** `READ_CONTACTS` (solo si importas contactos del dispositivo).
+
+Para llamadas, SMS, WhatsApp y email se usan **Intents** del sistema (sin enviar nada automáticamente).
+
+
 
 ## 🧪 Informes de tests (GitHub Pages)
 
@@ -37,3 +63,28 @@ Todos los reportes HTML generados (Agenda, NotaForm, DetalleContacto, Weather, e
 
 > Los archivos se sirven desde `docs/test-results/` y el índice se genera en `docs/index.html`.  
 > Puedes añadir/renombrar informes y el índice seguirá funcionando sin tocar el README.
+>
+> ## 🧪 Tests
+
+- Unit tests: `./gradlew testDebugUnitTest`
+- Instrumented: `./gradlew connectedDebugAndroidTest`
+
+**Informes HTML** publicados en GitHub Pages:
+➡️ https://david-ls-bilbao.github.io/PymeTask/
+
+
+## 📦 Builds
+
+- Debug APK: `./gradlew assembleDebug`
+- Release APK (firmada): `./gradlew assembleRelease`  
+  El APK queda en `app/build/outputs/apk/release/`.
+
+
+  ## 🔖 Licencia
+MIT. Ver archivo [LICENSE](./LICENSE).
+
+## 👤 Autor
+David López Sotelo — contacto: (lopezsotelo77@gmail.com)
+
+
+
