@@ -23,7 +23,6 @@ class ArchivosViewModel @Inject constructor(
     private val _archivos = MutableStateFlow<List<ArchivoUiModel>>(emptyList())
     val archivos: StateFlow<List<ArchivoUiModel>> = _archivos
 
-    // Antes: SharedFlow<String>
     private val _uiEvent = MutableSharedFlow<UiText>()
     val uiEvent: SharedFlow<UiText> = _uiEvent
 
@@ -65,6 +64,8 @@ class ArchivosViewModel @Inject constructor(
             }
         }
     }
+
+
 }
 
 
