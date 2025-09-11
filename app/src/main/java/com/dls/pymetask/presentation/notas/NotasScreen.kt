@@ -146,13 +146,13 @@ fun NotaCard(nota: Nota, elevation: Dp = 4.dp, modifier: Modifier = Modifier, on
         Column(modifier = Modifier.padding(12.dp)) {
             Text(text = nota.titulo,
             color = Color.Black,
-                style = MaterialTheme.typography.titleSmall)
+                style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = nota.contenido.take(40),
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyMedium,
                 color = Color.Black,
-                maxLines = 2
+                maxLines = 4
             )
         }
     }

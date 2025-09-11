@@ -342,7 +342,7 @@ fun NotaFormScreen(
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.Transparent,           // ✅ deja ver el fondo
+                        containerColor = Color.Transparent,           //  deja ver el fondo
                         titleContentColor = onBg,
                         navigationIconContentColor = onBg,
                         actionIconContentColor = onBg
@@ -397,8 +397,7 @@ fun NotaFormScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-
-                Spacer(modifier = Modifier.height(12.dp))
+              //  Spacer(modifier = Modifier.height(12.dp))
 
                 OutlinedTextField(
                     value = contenido,
@@ -460,6 +459,7 @@ fun NotaFormScreen(
                 )
             }
         }
+
         Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
