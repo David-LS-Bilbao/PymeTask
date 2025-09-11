@@ -25,3 +25,15 @@ Incluye módulos para **autenticación, contactos, notas, agenda/tareas, movimie
 - **Jetpack Compose Navigation**
 
 Estructura de carpetas (resumen):contentReference[oaicite:0]{index=0}:
+
+
+## 🧪 Informes de tests (GitHub Pages)
+
+[![Pages](https://img.shields.io/badge/Docs-GitHub%20Pages-blue)](https://david-ls-bilbao.github.io/PymeTask/)
+
+Todos los reportes HTML generados (Agenda, NotaForm, DetalleContacto, Weather, etc.) están publicados en el índice de GitHub Pages:
+
+➡️ **Ver informes:** https://david-ls-bilbao.github.io/PymeTask/
+
+> Los archivos se sirven desde `docs/test-results/` y el índice se genera en `docs/index.html`.  
+> Puedes añadir/renombrar informes y el índice seguirá funcionando sin tocar el README.
