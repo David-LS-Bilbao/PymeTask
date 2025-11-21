@@ -13,6 +13,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.util.*
 import javax.inject.Inject
 
@@ -79,16 +80,22 @@ class EditarPerfilViewModel @Inject constructor(
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
-        val userMap = mapOf(
-            "nombre" to nombre,
-            "fotoUrl" to fotoUrl,
-            "telefono" to telefono,
-            "direccion" to direccion
-        )
+        viewModelScope.launch {
+            try {
+                val userMap = mapOf(
+                    "nombre" to nombre,
+                    "fotoUrl" to fotoUrl,
+                    "telefono" to telefono,
+                    "direccion" to direccion
+                )
 
-        firestore.collection("usuarios").document(uid)
-            .set(userMap)
-            .addOnSuccessListener { onSuccess() }
-            .addOnFailureListener { onError(it.message ?: "Error actualizando perfil") }
+                firestore.collection("usuarios").document(uid)
+                    .set(userMap)
+                    .await()
+                onSuccess()
+            } catch (e: Exception) {
+                onError(e.message ?: "Error actualizando perfil")
+            }
+        }
     }
 }

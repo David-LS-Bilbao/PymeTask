@@ -10,10 +10,6 @@ plugins {
     alias(libs.plugins.kotlin.kapt) // Necesario para Hilt
     alias(libs.plugins.hilt) // Aplica el plugin de Hilt aquí
     id("com.google.gms.google-services")
-
-
-
-
 }
 
 android {
@@ -36,7 +32,8 @@ android {
     buildTypes {
 
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

@@ -31,6 +31,32 @@ import com.dls.pymetask.presentation.components.FechaSelector
 import com.dls.pymetask.ui.theme.Poppins
 import com.dls.pymetask.ui.theme.Roboto
 
+/**
+ * Sanitiza la entrada de cantidad:
+ * - Convierte comas a puntos
+ * - Elimina caracteres no numéricos excepto el primer punto decimal
+ * - Limita a 2 decimales
+ */
+private fun sanitizeAmountInput(input: String): String {
+    var s = input.replace(',', '.')
+    // Quitar todo lo que no sea dígito o punto
+    s = s.replace(Regex("[^0-9.]"), "")
+    // Mantener solo el primer punto
+    val firstDot = s.indexOf('.')
+    if (firstDot >= 0) {
+        val before = s.substring(0, firstDot + 1)
+        val after = s.substring(firstDot + 1).replace(".", "")
+        s = before + after
+        // Limitar a 2 decimales
+        if (after.length > 2) {
+            s = before + after.substring(0, 2)
+        }
+    }
+    // Evitar múltiples ceros iniciales
+    s = s.replace(Regex("^0+(?=\\d)"), "0")
+    return s
+}
+
 @SuppressLint("DefaultLocale")
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,11 +83,17 @@ fun EditarMovimientoScreen(
     var subtitulo by remember { mutableStateOf(movimiento?.subtitulo.orEmpty()) }
     var cantidad by remember { mutableStateOf(movimiento?.cantidad?.let { "%.2f".format(it) }.orEmpty()) }
     var tipoIngreso by remember { mutableStateOf(movimiento?.ingreso ?: true) }
-    var cantidadFocus by remember { mutableStateOf(false) }
     var (fechaSeleccionada, setFecha) = remember { mutableStateOf(movimiento?.fecha?.let { java.util.Date(it) }) }
 
     fun guardarMovimientoYVolver() {
-        val nuevaCantidad = cantidad.replace(",", ".").toDoubleOrNull() ?: movimiento?.cantidad ?: 0.0
+        val raw = cantidad.trim()
+        val nuevaCantidad = raw.replace(",", ".").toDoubleOrNull()
+
+        if (raw.isBlank() || nuevaCantidad == null || nuevaCantidad == 0.0) {
+            Toast.makeText(context, "Por favor ingrese un monto válido", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val fechaFinal = (fechaSeleccionada ?: movimiento?.fecha?.let { java.util.Date(it) })?.time ?: System.currentTimeMillis()
 
         movimiento?.copy(
@@ -148,7 +180,7 @@ fun EditarMovimientoScreen(
             OutlinedTextField(
                 value = cantidad,
                 maxLines = 1,
-                onValueChange = { cantidad = it },
+                onValueChange = { cantidad = sanitizeAmountInput(it) },
                 label = { Text(stringResource(R.string.movement_amount_label)) },
                 modifier = Modifier
                     .fillMaxWidth()

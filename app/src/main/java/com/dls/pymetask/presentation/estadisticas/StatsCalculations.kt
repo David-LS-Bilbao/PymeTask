@@ -192,7 +192,7 @@ fun aggregateLastMonths(
         tmp.timeInMillis = m.fecha
         val k = tmp.get(Calendar.YEAR) to tmp.get(Calendar.MONTH)
         if (k in acc) {
-            val (ing, gas) = acc[k]!!
+            val (ing, gas) = acc[k] ?: (0.0 to 0.0)
             acc[k] = if (m.ingreso) (ing + m.cantidad) to gas else ing to (gas + m.cantidad)
         }
     }

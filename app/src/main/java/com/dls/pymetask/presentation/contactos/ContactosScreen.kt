@@ -166,11 +166,13 @@ fun ContactosScreen(
                     confirmButton = {
                         TextButton(onClick = {
                             // Delegamos la eliminación COMPLETA al ViewModel
-                            viewModel.onDeleteContacto(
-                                context = context,
-                                contactoId = contactoSeleccionado!!.id,
-                                fotoUrl = contactoSeleccionado!!.fotoUrl
-                            )
+                            contactoSeleccionado?.let { contacto ->
+                                viewModel.onDeleteContacto(
+                                    context = context,
+                                    contactoId = contacto.id,
+                                    fotoUrl = contacto.fotoUrl
+                                )
+                            }
                             showConfirmDialog = false
                         }) {
                             Text(

@@ -715,9 +715,14 @@ private fun DateRangePickerDialog(
             TextButton(
                 enabled = state.selectedStartDateMillis != null && state.selectedEndDateMillis != null,
                 onClick = {
-                    val start = state.selectedStartDateMillis!!.toLocalDate()
-                    val end = state.selectedEndDateMillis!!.toLocalDate()
-                    onConfirm(start, end)
+                    val startMillis = state.selectedStartDateMillis
+                    val endMillis = state.selectedEndDateMillis
+
+                    if (startMillis != null && endMillis != null) {
+                        val start = startMillis.toLocalDate()
+                        val end = endMillis.toLocalDate()
+                        onConfirm(start, end)
+                    }
                 }
             ) { Text(stringResource(R.string.common_apply)) }
         },

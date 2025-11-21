@@ -1,6 +1,7 @@
 package com.dls.pymetask.presentation.navigation
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -183,8 +184,16 @@ fun PymeNavGraph(
                 navArgument("nombre") { type = NavType.StringType; defaultValue = "" }
             )
         ) { backStackEntry ->
-            val carpetaId = backStackEntry.arguments?.getString("carpetaId")!!
+            val carpetaId = backStackEntry.arguments?.getString("carpetaId")
             val nombre = backStackEntry.arguments?.getString("nombre")
+
+            if (carpetaId.isNullOrBlank()) {
+                Log.e("PymeNavGraph", "carpetaId es null o vacío, retrocediendo")
+                navController.popBackStack()
+                return@composable
+            }
+
+
             ContenidoCarpetaScreen(
                 carpetaId = carpetaId,
                 navController = navController,

@@ -368,11 +368,13 @@ fun ContenidoCarpetaScreen(
                                 else
                                     nombreSinExtension.trim()
 
-                                viewModel.renombrarArchivo(
-                                    selectedArchivo!!.id,
-                                    nombreFinal,
-                                    carpetaId
-                                )
+                                selectedArchivo?.let { archivo ->
+                                    viewModel.renombrarArchivo(
+                                        archivo.id,
+                                        nombreFinal,
+                                        carpetaId
+                                    )
+                                }
                                 mostrarDialogoRenombrar = false
                             }
                         }) { Text(stringResource(R.string.common_rename)) }

@@ -3,6 +3,7 @@ package com.dls.pymetask.presentation.movimientos
 
 import android.annotation.SuppressLint
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -30,6 +31,32 @@ import com.dls.pymetask.ui.theme.Poppins
 import com.dls.pymetask.ui.theme.Roboto
 import java.util.Date
 import java.util.UUID
+
+/**
+ * Sanitiza la entrada de cantidad:
+ * - Convierte comas a puntos
+ * - Elimina caracteres no numéricos excepto el primer punto decimal
+ * - Limita a 2 decimales
+ */
+private fun sanitizeAmountInput(input: String): String {
+    var s = input.replace(',', '.')
+    // Quitar todo lo que no sea dígito o punto
+    s = s.replace(Regex("[^0-9.]"), "")
+    // Mantener solo el primer punto
+    val firstDot = s.indexOf('.')
+    if (firstDot >= 0) {
+        val before = s.substring(0, firstDot + 1)
+        val after = s.substring(firstDot + 1).replace(".", "")
+        s = before + after
+        // Limitar a 2 decimales
+        if (after.length > 2) {
+            s = before + after.substring(0, 2)
+        }
+    }
+    // Evitar múltiples ceros iniciales
+    s = s.replace(Regex("^0+(?=\\d)"), "0")
+    return s
+}
 
 @SuppressLint("DefaultLocale")
 @RequiresApi(Build.VERSION_CODES.O)
@@ -105,7 +132,7 @@ fun CrearMovimientoScreen(
             // Cantidad (formatea al perder foco)
             OutlinedTextField(
                 value = cantidad,
-                onValueChange = { cantidad = it },
+                onValueChange = { cantidad = sanitizeAmountInput(it) },
                 label = { Text(stringResource(R.string.movement_amount_label)) },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -124,7 +151,8 @@ fun CrearMovimientoScreen(
             // Ingreso / Gasto
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 Button(
-                    onClick = { tipoIngreso = true },
+                    onClick = {
+                        tipoIngreso = true },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (tipoIngreso) Color(0xFF1976D2) else Color.LightGray
                     )
@@ -151,12 +179,25 @@ fun CrearMovimientoScreen(
             // Guardar
             Button(
                 onClick = {
+                    // Validar cantidad antes de guardar
+                    val raw = cantidad.trim()
+                    val parsed = raw.replace(",", ".").toDoubleOrNull()
+
+                    if (raw.isBlank() || parsed == null || parsed == 0.0) {
+                        Toast.makeText(
+                            context,
+                            "Por favor ingrese un monto válido",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@Button
+                    }
+
                     val userIdSeguro = com.dls.pymetask.utils.Constants.getUserIdSeguro(context) ?: ""
                     val nuevo = Movimiento(
                         id = UUID.randomUUID().toString(),
                         titulo = titulo,
                         subtitulo = subtitulo,
-                        cantidad = cantidad.toDoubleOrNull() ?: 0.0,
+                        cantidad = parsed,
                         ingreso = tipoIngreso,
                         fecha = com.google.firebase.Timestamp(fechaSeleccionada ?: Date()).toDate().time,
                         userId = userIdSeguro
