@@ -15,13 +15,13 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.dls.pymetask.R
 import com.dls.pymetask.main.MainActivity
+import com.dls.pymetask.presentation.agenda.DismissAlarmReceiver
 
 private const val CHANNEL_ID_SILENT = "tarea_recordatorio_silent_v2"
 // ➜ Canales antiguos que pudieron crearse con sonido (ajusta si usaste otros)
 private val OLD_CHANNEL_IDS = arrayOf("tarea_recordatorio")
 object NotificationHelper {
 
-    private var currentAlarmTaskId: String? = null
     private var ringtone: Ringtone? = null
     /**
      * Borra canales antiguos (si existen) y crea el canal NUEVO sin sonido.
@@ -94,14 +94,25 @@ object NotificationHelper {
         message: String) {
         ensureSilentChannel(context) // asegurar canal silencioso creado
 
-        // Al tocar la notificación, abrimos Agenda
+        // Al tocar la notificación, abrimos la tarea específica
         val openIntent = Intent(context, MainActivity::class.java).apply {
-            action = "com.dls.pymetask.OPEN_AGENDA"
-            putExtra("taskId", taskId) // lo usaremos para cancelar y desactivar
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            action = "com.dls.pymetask.OPEN_TASK"
+            putExtra("taskId", taskId)
+            putExtra("openAgenda", true) // Para navegar a Agenda
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
         val contentPI = PendingIntent.getActivity(
-            context, 1001, openIntent,
+            context, taskId?.hashCode() ?: 1001, openIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        // Botón para desactivar alarma sin abrir la app
+        val dismissIntent = Intent(context, DismissAlarmReceiver::class.java).apply {
+            action = "com.dls.pymetask.DISMISS_ALARM"
+            putExtra("taskId", taskId)
+        }
+        val dismissPI = PendingIntent.getBroadcast(
+            context, (taskId?.hashCode() ?: 0) + 5000, dismissIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
@@ -110,18 +121,25 @@ object NotificationHelper {
             .setContentTitle(title)
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setOnlyAlertOnce(true)
             .setSilent(true)      // sin sonido del canal
-            .setContentIntent(contentPI) // <- abre Agenda
+            .setContentIntent(contentPI) // <- abre la tarea
+            .addAction(
+                R.drawable.ic_alarm,
+                "Desactivar alarma",
+                dismissPI
+            )
             .setAutoCancel(true)
             .build()
 
         (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
-            .notify(1, notif)
+            .notify(taskId?.hashCode() ?: 1, notif)
     }
-    fun cancelActiveAlarmNotification(context: Context) {
-        // Si usas siempre el mismo ID (1), con esto basta.
-        NotificationManagerCompat.from(context).cancel(1)
+    fun cancelActiveAlarmNotification(context: Context, taskId: String? = null) {
+        val notificationId = taskId?.hashCode() ?: 1
+        NotificationManagerCompat.from(context).cancel(notificationId)
+        stopAlarmSound() // También detener el sonido si está activo
     }
 
 }

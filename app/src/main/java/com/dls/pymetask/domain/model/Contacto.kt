@@ -8,5 +8,5 @@ data class Contacto(
     val direccion: String = "",
     val fotoUrl: String? = null,
     val email: String = "",
-    val userId: String = ""
+    val uidOwner: String = ""
 )

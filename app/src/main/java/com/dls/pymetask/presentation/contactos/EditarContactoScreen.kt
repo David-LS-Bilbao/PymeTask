@@ -100,6 +100,7 @@ fun EditarContactoScreen(
     var tipo by remember { mutableStateOf("") }
     var fotoUrl by remember { mutableStateOf<String?>(null) }
     var inicializado by remember(contactoId) { mutableStateOf(false) }
+    var mostrarDialogoEliminar by remember { mutableStateOf(false) }
 
     LaunchedEffect(contacto) {
         if (!inicializado) {
@@ -211,6 +212,44 @@ fun EditarContactoScreen(
                 enabled = nombre.isNotBlank() && telefono.isNotBlank() && !isUploading,
                 modifier = Modifier.fillMaxWidth()
             ) { Text(stringResource(R.string.contacts_save_changes)) }
+
+            // Botón de eliminar contacto
+            OutlinedButton(
+                onClick = { mostrarDialogoEliminar = true },
+                enabled = !isUploading,
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = MaterialTheme.colorScheme.error
+                ),
+                modifier = Modifier.fillMaxWidth()
+            ) { Text(stringResource(R.string.contacts_delete_title)) }
+        }
+
+        // Diálogo de confirmación para eliminar
+        if (mostrarDialogoEliminar) {
+            AlertDialog(
+                onDismissRequest = { mostrarDialogoEliminar = false },
+                title = { Text(stringResource(R.string.contacts_delete_title)) },
+                text = { Text(stringResource(R.string.contacts_delete_text, nombre)) },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            viewModel.onDeleteContacto(context, contacto.id, contacto.fotoUrl)
+                            mostrarDialogoEliminar = false
+                            navController.popBackStack()
+                        }
+                    ) {
+                        Text(
+                            stringResource(R.string.common_delete),
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { mostrarDialogoEliminar = false }) {
+                        Text(stringResource(R.string.common_cancel))
+                    }
+                }
+            )
         }
     }
 }

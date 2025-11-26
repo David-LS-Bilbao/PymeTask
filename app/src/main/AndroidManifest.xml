@@ -17,6 +17,31 @@
     <queries>
         <package android:name="com.dls.pymetask" />
         <package android:name="com.google.android.gms" />
+        <package android:name="com.whatsapp" />
+
+        <!-- Query para detectar apps de SMS -->
+        <intent>
+            <action android:name="android.intent.action.SENDTO" />
+            <data android:scheme="sms" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.SENDTO" />
+            <data android:scheme="smsto" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="sms" />
+        </intent>
+
+        <!-- Query para detectar apps de Email -->
+        <intent>
+            <action android:name="android.intent.action.SENDTO" />
+            <data android:scheme="mailto" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.SEND" />
+            <data android:mimeType="message/rfc822" />
+        </intent>
     </queries>
 
     <application
@@ -42,7 +67,11 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <receiver android:name=".presentation.agenda.AlarmReceiver" />
+        <receiver android:name=".presentation.agenda.AlarmReceiver"
+            android:exported="false" />
+
+        <receiver android:name=".presentation.agenda.DismissAlarmReceiver"
+            android:exported="false" />
 
         <activity
             android:name=".main.MainActivity"

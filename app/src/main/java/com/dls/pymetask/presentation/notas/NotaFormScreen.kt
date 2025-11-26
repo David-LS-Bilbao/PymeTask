@@ -524,21 +524,93 @@ fun NotaFormScreen(
 }
 // Funciones para compartir nota---------------------------------------------------------------------
 fun compartirNota(context: Context, titulo: String, contenido: String, via: String) {
-    val intent = Intent().apply {
-        action = Intent.ACTION_SEND
-        putExtra(Intent.EXTRA_SUBJECT, titulo)
-        putExtra(Intent.EXTRA_TEXT, contenido)
-        type = "text/plain"
-    }
+    val textoCompleto = "$titulo\n\n$contenido"
 
-    when (via) {
-        "whatsapp" -> intent.setPackage("com.whatsapp")
-        "email" -> intent.type = "message/rfc822"
-        "sms" -> intent.setPackage("com.android.mms")
-    }
+    try {
+        when (via) {
+            "sms" -> {
+                // Para SMS: lanzar directo sin chooser para evitar bugs del emulador
+                val intent = Intent(Intent.ACTION_VIEW).apply {
+                    data = android.net.Uri.parse("sms:")
+                    putExtra("sms_body", textoCompleto)
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
 
-    val chooser = Intent.createChooser(intent, "Compartir nota con...")
-    context.startActivity(chooser)
+                val packageManager = context.packageManager
+                if (intent.resolveActivity(packageManager) != null) {
+                    context.startActivity(intent)
+                } else {
+                    // Fallback a compartir genérico
+                    val fallbackIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, textoCompleto)
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                    context.startActivity(fallbackIntent)
+                }
+            }
+
+            "email" -> {
+                // Para email: lanzar directo sin chooser
+                val intent = Intent(Intent.ACTION_SEND).apply {
+                    type = "message/rfc822"
+                    putExtra(Intent.EXTRA_SUBJECT, titulo)
+                    putExtra(Intent.EXTRA_TEXT, contenido)
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+
+                val packageManager = context.packageManager
+                if (packageManager.queryIntentActivities(intent, 0).isNotEmpty()) {
+                    context.startActivity(intent)
+                } else {
+                    // Fallback a compartir genérico
+                    val fallbackIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_SUBJECT, titulo)
+                        putExtra(Intent.EXTRA_TEXT, contenido)
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                    context.startActivity(fallbackIntent)
+                }
+            }
+
+            "whatsapp" -> {
+                val intent = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, textoCompleto)
+                    setPackage("com.whatsapp")
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+
+                if (intent.resolveActivity(context.packageManager) != null) {
+                    context.startActivity(intent)
+                } else {
+                    Toast.makeText(
+                        context,
+                        "WhatsApp no está instalado",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+            else -> {
+                // Compartir genérico
+                val intent = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_SUBJECT, titulo)
+                    putExtra(Intent.EXTRA_TEXT, contenido)
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+                context.startActivity(intent)
+            }
+        }
+    } catch (e: Exception) {
+        Toast.makeText(
+            context,
+            "Error al compartir: ${e.message}",
+            Toast.LENGTH_LONG
+        ).show()
+    }
 }
 
 // Guardado con Toast y salida----------------------------------------------------------------------

@@ -3,7 +3,7 @@ package com.dls.pymetask.domain.useCase.archivo
 import android.net.Uri
 import com.dls.pymetask.domain.model.Archivo
 import com.dls.pymetask.domain.repository.ArchivoRepository
-import jakarta.inject.Inject
+import javax.inject.Inject
 
 data class ArchivoUseCase(
     val crearCarpeta: CrearCarpetaUseCase,

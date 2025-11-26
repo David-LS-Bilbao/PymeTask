@@ -12,7 +12,7 @@ import androidx.annotation.RequiresApi
 import com.dls.pymetask.utils.AlarmUtils
 import com.dls.pymetask.utils.NotificationHelper
 import dagger.hilt.android.AndroidEntryPoint
-import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 
@@ -77,15 +77,20 @@ class MainActivity : ComponentActivity() {
     private fun handleIntent(intent: Intent?) {
         val action = intent?.action ?: return
         if (action == "com.dls.pymetask.OPEN_TASK") {
-            // 1) Parar sonido y notificación activa
-            NotificationHelper.stopAlarmSound()
-            NotificationHelper.cancelActiveAlarmNotification(this)
-
-            // 2) Cancelar la alarma con el mismo requestCode (taskId)
+            // 1) Obtener el taskId
             val tid = intent.getStringExtra("taskId")
+
+            // 2) Parar sonido y notificación activa (usando el taskId correcto)
+            NotificationHelper.stopAlarmSound()
             if (!tid.isNullOrBlank()) {
+                NotificationHelper.cancelActiveAlarmNotification(this, tid)
+
+                // 3) Cancelar la alarma con el mismo requestCode (taskId)
                 alarmUtils.cancelarAlarma(tid)
                 taskIdParaDesactivar = tid
+            } else {
+                // Fallback si no hay taskId
+                NotificationHelper.cancelActiveAlarmNotification(this)
             }
         }
     }
@@ -93,4 +98,3 @@ class MainActivity : ComponentActivity() {
 
 
 }
-
