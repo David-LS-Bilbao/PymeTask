@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CopilotDiffPersistence">
+    <option name="pendingDiffs">
+      <map>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/dls/pymetask/presentation/agenda/DismissAlarmReceiver.kt">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/app/src/main/java/com/dls/pymetask/presentation/agenda/DismissAlarmReceiver.kt" />
+              <option name="originalContent" value="&#10;" />
+              <option name="updatedContent" value="package com.dls.pymetask.presentation.agenda&#10;&#10;import android.content.BroadcastReceiver&#10;import android.content.Context&#10;import android.content.Intent&#10;import android.util.Log&#10;import android.widget.Toast&#10;import com.dls.pymetask.utils.AlarmUtils&#10;import com.dls.pymetask.utils.NotificationHelper&#10;import dagger.hilt.android.AndroidEntryPoint&#10;import javax.inject.Inject&#10;&#10;/**&#10; * Receiver que maneja la acción de desactivar alarma desde la notificación.&#10; * Cancela la alarma, detiene el sonido y cierra la notificación.&#10; */&#10;@AndroidEntryPoint&#10;class DismissAlarmReceiver : BroadcastReceiver() {&#10;    &#10;    @Inject&#10;    lateinit var alarmUtils: AlarmUtils&#10;    &#10;    override fun onReceive(context: Context, intent: Intent) {&#10;        if (intent.action == &quot;com.dls.pymetask.DISMISS_ALARM&quot;) {&#10;            val taskId = intent.getStringExtra(&quot;taskId&quot;)&#10;            &#10;            if (taskId != null) {&#10;                try {&#10;                    // 1. Cancelar la alarma&#10;                    alarmUtils.cancelarAlarma(taskId)&#10;                    &#10;                    // 2. Detener el sonido y cancelar la notificación&#10;                    NotificationHelper.stopAlarmSound()&#10;                    NotificationHelper.cancelActiveAlarmNotification(context, taskId)&#10;                    &#10;                    // 3. Detener el parpadeo de la UI&#10;                    AlarmUiState.stopBlink()&#10;                    &#10;                    Log.d(&quot;DismissAlarmReceiver&quot;, &quot;✅ Alarma desactivada para taskId: $taskId&quot;)&#10;                    &#10;                    // Feedback al usuario&#10;                    Toast.makeText(context, &quot;Alarma desactivada&quot;, Toast.LENGTH_SHORT).show()&#10;                } catch (e: Exception) {&#10;                    Log.e(&quot;DismissAlarmReceiver&quot;, &quot;❌ Error al desactivar alarma: ${e.message}&quot;)&#10;                }&#10;            }&#10;        }&#10;    }&#10;}&#10;&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

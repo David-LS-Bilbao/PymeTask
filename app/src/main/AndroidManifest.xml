@@ -73,17 +73,16 @@
         <receiver android:name=".presentation.agenda.DismissAlarmReceiver"
             android:exported="false" />
 
+        <!-- Activity principal (lanzador) -->
         <activity
             android:name=".main.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.PymeTask" >
+            android:theme="@style/Theme.PymeTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
 
         <!-- Activity receptora del redirect OAuth -->
         <activity
