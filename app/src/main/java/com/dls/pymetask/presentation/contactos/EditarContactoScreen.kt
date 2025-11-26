@@ -100,6 +100,7 @@ fun EditarContactoScreen(
     var tipo by remember { mutableStateOf("") }
     var fotoUrl by remember { mutableStateOf<String?>(null) }
     var inicializado by remember(contactoId) { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(contacto) {
         if (!inicializado) {
@@ -211,7 +212,41 @@ fun EditarContactoScreen(
                 enabled = nombre.isNotBlank() && telefono.isNotBlank() && !isUploading,
                 modifier = Modifier.fillMaxWidth()
             ) { Text(stringResource(R.string.contacts_save_changes)) }
+
+            // Botón de eliminar contacto
+            OutlinedButton(
+                onClick = { showDeleteDialog = true },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = MaterialTheme.colorScheme.error
+                )
+            ) { Text(stringResource(R.string.common_delete)) }
         }
+    }
+
+    // Diálogo de confirmación para eliminar
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text(stringResource(R.string.contacts_delete_title)) },
+            text = { Text(stringResource(R.string.contacts_delete_text, contacto.nombre)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        viewModel.onDeleteContacto(context, contacto.id, contacto.fotoUrl)
+                        navController.popBackStack()
+                    }
+                ) {
+                    Text(stringResource(R.string.common_delete), color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text(stringResource(R.string.common_cancel))
+                }
+            }
+        )
     }
 }
 
